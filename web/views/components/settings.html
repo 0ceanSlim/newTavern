@@ -1,0 +1,15 @@
+{{define "settings"}}
+<div class="flex-shrink-0">
+  <div class="flex items-center r-2">
+    <img
+      src="/static/img/cog.png"
+      alt="Settings"
+      class="w-6 h-6 cursor-pointer r-2 md:w-10 md:h-10"
+      hx-trigger="click"
+      hx-get="/settings"
+      hx-swap="outerHTML"
+      hx-target="body"
+    />
+  </div>
+</div>
+{{end}}

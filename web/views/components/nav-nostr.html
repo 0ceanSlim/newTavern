@@ -1,0 +1,38 @@
+{{define "nav-nostr"}}
+<li class="relative rounded-md group bg-bgSecondary text-textPrimary">
+  <a href="#" class="p-2 hover:rounded-md hover:text-textHighlighted">nostr</a>
+  <div
+    class="absolute left-0 hidden m-2 mt-2 border rounded-md shadow-lg border-bgInverted bg-bgSecondary group-hover:block"
+  >
+    <!-- Add a pseudo-element to bridge the gap -->
+    <div class="absolute w-full h-3 -top-3"></div>
+    <ul class="py-2">
+      <li>
+        <a
+          href="#"
+          class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
+          hx-trigger="click"
+          hx-get="/what-is-nostr"
+          hx-swap="outerHTML"
+          hx-target="body"
+          >What is nostr?</a
+        >
+      </li>
+      <li>
+        <a
+          href="#"
+          class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
+          >Clients 🧑‍💻</a
+        >
+      </li>
+      <li>
+        <a
+          href="#"
+          class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
+          >grain 🌾</a
+        >
+      </li>
+    </ul>
+  </div>
+</li>
+{{end}}
