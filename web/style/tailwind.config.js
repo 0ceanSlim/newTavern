@@ -6,6 +6,7 @@ module.exports = {
       colors: {
         bgPrimary: "var(--color-bgPrimary)",
         bgSecondary: "var(--color-bgSecondary)",
+        bgTertiary: "var(--color-bgTertiary)",
         bgInverted: "var(--color-bgInverted)",
         textPrimary: "var(--color-textPrimary)",
         textSecondary: "var(--color-textSecondary)",
@@ -27,5 +28,7 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/aspect-ratio'),
+  ],
 };

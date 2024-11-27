@@ -7,10 +7,9 @@ import (
 
 func Index(w http.ResponseWriter, r *http.Request) {
 
-    data := utils.PageData{
-        Title:       "Dashboard",
+	data := utils.PageData{
+		Title: "🏠",
+	}
 
-    }
-
-    utils.RenderTemplate(w, data, "index.html", false)
+	utils.RenderTemplate(w, data, "index.html", false)
 }
