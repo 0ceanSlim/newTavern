@@ -1,21 +1,31 @@
 {{define "view"}}
-<div class="flex flex-col items-center space-y-4">
-  <button
-    class="btn-secondary"
-    hx-get="/nostr-mobile-ios"
-    hx-target="body"
-    hx-swap="outerHTML"
-  >
-    iOS
-  </button>
-  <button
-    class="btn-secondary"
-    hx-get="/nostr-mobile-android"
-    hx-target="body"
-    hx-swap="outerHTML"
-  >
-    Android
-  </button>
-  <div id="app-details" class="w-full mt-4"></div>
-</div>
+<main class="flex flex-col px-4 my-16 md:my-32">
+  <div class="mb-8 text-center">
+    <h1 class="text-2xl font-bold md:text-4xl">Select Your Operating System</h1>
+  </div>
+  <div class="flex justify-center space-x-4">
+    <button
+      class="p-2 font-bold rounded-md bg-bgSecondary text-textPrimary hover:text-textHighlighted hover:bg-bgTertiary"
+      hx-get="/nostr-mobile-ios"
+      hx-target="body"
+      hx-swap="outerHTML"
+    >
+      iOS 🍎
+    </button>
+    <button
+      class="p-2 font-bold rounded-md bg-bgSecondary text-textPrimary hover:text-textHighlighted hover:bg-bgTertiary"
+      hx-get="/nostr-mobile-android"
+      hx-target="body"
+      hx-swap="outerHTML"
+    >
+      Android 🤖
+    </button>
+  </div>
+  <div id="app-container" class="mt-8">
+    <!-- Placeholder Content -->
+    <p class="text-center text-gray-500">
+      Choose a platform to see available apps.
+    </p>
+  </div>
+</main>
 {{end}}

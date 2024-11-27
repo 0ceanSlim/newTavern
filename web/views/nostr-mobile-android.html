@@ -1,15 +1,46 @@
 {{define "view"}}
-<div class="app-details">
-  <img
-    src="/path/to/ios-app-image.jpg"
-    alt="Android App"
-    class="w-full h-auto mb-4"
-  />
-  <h2 class="text-xl font-semibold">Android Nostr Client</h2>
-  <p class="mb-4 text-gray-600">
-    An excellent Nostr client for Android with rich features and a sleek
-    interface.
-  </p>
-  <a href="https://Android-app.com" class="btn-primary">Visit iOS App Site</a>
+<div class="flex flex-col items-center space-y-4 text-center app-details">
+  <!-- App Image -->
+  <div class="w-20 h-20 md:w-24 md:h-24">
+    <img
+      src="/static/img/amethyst.png"
+      alt="iOS App"
+      class="object-contain rounded-md"
+    />
+  </div>
+
+  <!-- App Title -->
+  <h2 class="text-xl font-semibold">Amethyst</h2>
+
+  <!-- App Description -->
+  <p class="mb-4 text-textMuted">"The social network you control."</p>
+
+  <!-- Buttons Row -->
+  <div class="flex space-x-4">
+    <!-- Visit git repo Button -->
+    <a
+      href="https://github.com/vitorpamplona/amethyst/blob/main/README.md"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="flex items-center justify-center w-48 rounded-lg text-md bg-bgSecondary text-textPrimary hover:text-textHighlighted hover:bg-bgTertiary"
+    >
+      Visit the Project
+    </a>
+
+    <!-- App Store Button -->
+    <a
+      href="https://play.google.com/store/apps/details?id=com.vitorpamplona.amethyst&hl=en-US&pli=1"
+      class="flex items-center justify-center w-48 rounded-md"
+      target="_blank"
+      rel="noopener noreferrer"
+      style="aspect-ratio: 3 / 1"
+    >
+      <img
+        src="/static/img/google-play.png"
+        alt="Download on the App Store"
+        class="object-contain"
+      />
+    </a>
+  </div>
 </div>
-{{end}}
+{{template "returnHome"}} {{end}}
