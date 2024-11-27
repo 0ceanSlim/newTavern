@@ -23,6 +23,12 @@ func main() {
 	mux.HandleFunc("/", routes.Index)
 	mux.HandleFunc("/settings", routes.Settings)
 	mux.HandleFunc("/what-is-nostr", routes.WhatIsNostr)
+	mux.HandleFunc("/nostr-clients", routes.NostrClients)
+	mux.HandleFunc("/nostr-mobile", routes.NostrMobile)
+	mux.HandleFunc("/nostr-mobile-android", routes.NostrMobileAndroid)
+	mux.HandleFunc("/nostr-mobile-ios", routes.NostrMobileIos)
+	mux.HandleFunc("/nostr-desktop", routes.NostrDesktop)
+	
 
 	// Function Handlers
 
