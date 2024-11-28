@@ -41,10 +41,11 @@
     <ul class="py-2">
       <li>
         <a
-          href="#"
           class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
           hx-trigger="click"
           hx-get="/what-is-nostr"
+          hx-push-url="/what-is-nostr"
+          href="/what-is-nostr"
           hx-swap="outerHTML"
           hx-target="body"
           >What is nostr?</a
@@ -52,7 +53,8 @@
       </li>
       <li>
         <a
-          href="#"
+          href="/nostr-clients"
+          hx-push-url="/nostr-clients"
           class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
           hx-trigger="click"
           hx-get="/nostr-clients"

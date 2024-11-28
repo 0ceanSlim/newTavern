@@ -5,16 +5,20 @@
   </div>
   <div class="flex justify-center space-x-4">
     <button
-      class="p-2 font-bold rounded-md bg-bgSecondary text-textPrimary hover:text-textHighlighted hover:bg-bgTertiary"
+      class="p-4 font-bold rounded-md border-bgInverted border-2 bg-bgSecondary text-textPrimary hover:text-textHighlighted hover:bg-bgTertiary"
       hx-get="/nostr-mobile"
+      hx-push-url="/nostr-mobile"
+      href="/nostr-mobile"
       hx-target="body"
       hx-swap="outerHTML"
     >
       Mobile 📱
     </button>
     <button
-      class="p-2 font-bold rounded-md bg-bgSecondary text-textPrimary hover:text-textHighlighted hover:bg-bgTertiary"
+      class="p-4 font-bold border-bgInverted border-2 rounded-md bg-bgSecondary text-textPrimary hover:text-textHighlighted hover:bg-bgTertiary"
       hx-get="/nostr-desktop"
+      hx-push-url="/nostr-desktop"
+      href="/nostr-desktop"
       hx-target="body"
       hx-swap="outerHTML"
     >
