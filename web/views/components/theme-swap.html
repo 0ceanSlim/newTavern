@@ -1,73 +1,54 @@
 {{define "theme-swap"}}
-<div class="relative">
+
+<!-- Wrapper for consistent layout -->
+<div class="relative inline-block">
   <!-- Dropdown Toggle Button -->
   <button
-    onclick="toggleDropdown('themeDropdown')"
-    class="flex items-center justify-center w-10 h-10 rounded-md border-bgInverted bg-bgSecondary hover:bg-bgTertiary"
+    class="rounded-md p-2 w-10 bg-bgSecondary hover:bg-bgTertiary"
+    _="on click toggle .hidden on #themeDropdown"
   >
-    <img
-      src="/static/img/theme-icon.png"
-      alt="Theme Selector"
-      class="w-6 h-6"
-    />
+    <img src="/static/img/themes/paint.png" alt="Theme Selector" class="" />
   </button>
 
   <!-- Dropdown Menu -->
-  <div
-    id="themeDropdown"
-    class="absolute right-0 z-10 hidden mt-2 origin-top-right rounded-md border-bgInverted border-2 shadow-lg bg-bgSecondary p-2"
-  >
-    <div class="flex gap-2">
+  <div id="themeDropdown" class="hidden">
+    <div
+      class="flex absolute right-2 mt-8 flex-col gap-2 border-bgInverted border rounded-md bg-bgSecondary p-2"
+    >
       <!-- Theme Swatches -->
       <button
-        class="swatch w-12 h-12 rounded-full hover:ring-2 hover:ring-bgTertiary focus:outline-none"
+        class="swatch w-12 h-12 hover:bg-bgTertiary rounded-md"
         data-theme=""
       >
-        <img
-          src="/static/img/themes/dark.png"
-          alt="Dark Theme"
-          class="w-full h-full rounded-full object-cover"
-        />
+        <img src="/static/img/themes/dark.png" alt="Dark Theme" class="p-2" />
       </button>
       <button
-        class="swatch w-12 h-12 rounded-full hover:ring-2 hover:ring-bgTertiary focus:outline-none"
+        class="swatch w-12 h-12 hover:bg-bgTertiary rounded-md"
         data-theme="light"
       >
-        <img
-          src="/static/img/themes/light.png"
-          alt="Light Theme"
-          class="w-full h-full rounded-full object-cover"
-        />
+        <img src="/static/img/themes/light.png" alt="Light Theme" class="p-2" />
       </button>
       <button
-        class="swatch w-12 h-12 rounded-full hover:ring-2 hover:ring-bgTertiary focus:outline-none"
+        class="swatch w-12 h-12 hover:bg-bgTertiary rounded-md"
         data-theme="lava"
       >
-        <img
-          src="/static/img/themes/lava.png"
-          alt="Lava Theme"
-          class="w-full h-full rounded-full object-cover"
-        />
+        <img src="/static/img/themes/lava.png" alt="Lava Theme" class="p-2" />
       </button>
       <button
-        class="swatch w-12 h-12 rounded-full hover:ring-2 hover:ring-bgTertiary focus:outline-none"
+        class="swatch w-12 h-12 hover:bg-bgTertiary rounded-md"
         data-theme="midnight"
       >
         <img
           src="/static/img/themes/midnight.png"
           alt="Midnight Theme"
-          class="w-full h-full rounded-full object-cover"
+          class="p-2"
         />
       </button>
       <button
-        class="swatch w-12 h-12 rounded-full hover:ring-2 hover:ring-bgTertiary focus:outline-none"
+        class="swatch w-12 h-12 hover:bg-bgTertiary rounded-md"
         data-theme="solar"
       >
-        <img
-          src="/static/img/themes/solar.png"
-          alt="Solar Theme"
-          class="w-full h-full rounded-full object-cover"
-        />
+        <img src="/static/img/themes/solar.png" alt="Solar Theme" class="p-2" />
       </button>
     </div>
   </div>
