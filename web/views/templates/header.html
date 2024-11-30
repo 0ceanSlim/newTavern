@@ -11,5 +11,15 @@
   <!-- Right: Settings -->
   {{template "theme-swap"}}
 </header>
+<script>
+  function toggleNav() {
+    const navbar = document.getElementById("navbar");
+    navbar.classList.toggle("hidden");
+  }
+  function toggleDropdown(id) {
+    const dropdown = document.getElementById(id);
+    dropdown.classList.toggle("hidden");
+  }
+</script>
 <script src="static/js/theme.js"></script>
 {{end}}

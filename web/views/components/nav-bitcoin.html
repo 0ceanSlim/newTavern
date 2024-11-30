@@ -41,30 +41,59 @@
     <ul class="py-2">
       <li>
         <a
-          href="#"
-          class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
+          class="flex items-center px-4 py-2 space-x-2 whitespace-nowrap hover:text-textHighlighted"
           hx-trigger="click"
-          hx-get="/what-is-nostr"
+          hx-get="/bitcoin-works"
+          hx-push-url="/bitcoin-works"
+          href="/bitcoin-works"
           hx-swap="outerHTML"
           hx-target="body"
-          >What is nostr?</a
         >
+          <span>How does it work?</span>
+        </a>
       </li>
       <li>
         <a
-          href="#"
-          class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
-          >Clients 🧑‍💻</a
+          class="flex items-center px-4 py-2 space-x-2 whitespace-nowrap hover:text-textHighlighted"
+          hx-trigger="click"
+          hx-get="/mempool"
+          hx-push-url="/mempool"
+          href="/mempool"
+          hx-swap="outerHTML"
+          hx-target="body"
         >
+          <img
+            src="https://getumbrel.github.io/umbrel-apps-gallery/mempool/icon.svg"
+            alt="mempool icon"
+            class="w-6 h-6 rounded-sm"
+          />
+          <span>mempool</span>
+        </a>
       </li>
       <li>
         <a
-          href="#"
-          class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
-          >grain 🌾</a
+          href="https://books.happytavern.co"
+          target="_blank"
+          rel="noopener noreferrer"
+          style="aspect-ratio: 3 / 1"
+          class="flex items-center px-4 py-2 space-x-2 whitespace-nowrap hover:text-textHighlighted"
+          onclick="return confirmNavigation(this)"
         >
+          <span>📚 Bitcoin Books</span>
+        </a>
       </li>
     </ul>
   </div>
 </li>
+<script>
+  function confirmNavigation(link) {
+    // Show confirmation with "bitcoin" in quotes
+    const confirmation = confirm('The guest login and password is "bitcoin"');
+    if (confirmation) {
+      // Open the link in a new tab
+      window.open(link.href, "_blank", "noopener,noreferrer");
+    }
+    return false; // Prevent default navigation
+  }
+</script>
 {{end}}
