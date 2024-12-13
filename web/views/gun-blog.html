@@ -1,0 +1,23 @@
+{{define "view"}}
+<main class="flex flex-col items-center my-16 md:my-32 space-y-12">
+  <!-- Blog Entries List -->
+  <section class="w-full max-w-2xl">
+    <h2 class="text-2xl md:text-3xl font-semibold mb-6">Latest Blog Entries</h2>
+    <a
+      href="/gun-blog/ar15guide"
+      hx-push-url="/gun-blog/ar15guide"
+      class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
+      hx-trigger="click"
+      hx-get="/gun-blog/ar15guide"
+      hx-swap="outerHTML"
+      hx-target="body"
+      ><img
+        class="inline-block h-6 align-text-bottom mx-1"
+        src="https://img3.wikia.nocookie.net/__cb20120527192620/guns/images/b/bb/Origin_AR15-6.png"
+      />
+      AR15 Build Guide
+    </a>
+    <ul class="space-y-4"></ul>
+  </section>
+</main>
+{{end}}

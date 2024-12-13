@@ -1,0 +1,361 @@
+{{define "view"}}
+
+<div id="bottomContent" class="bg-bgSecondary rounded-md p-6">
+  <div class="max-w-5xl mx-auto">
+    <h1 class="text-4xl font-bold">AR-15 Build Guide</h1>
+    <h2 class="text-lg mt-2">Detailed Information for Building an AR-15</h2>
+    <h1 class="text-2xl font-bold mb-4">AR-15 Assembly</h1>
+
+    <div class="video-container bg-bgPrimary shadow-md rounded-md p-4">
+      <video id="assembly" class="w-full rounded-md" controls>
+        <source src="/static/.videos/BuildAR15.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <h2 class="text-lg font-semibold mt-4">
+        AR-15 - Detailed Step By Step Assembly / Build Instructions (HD)
+      </h2>
+      <p class="mt-2">
+        The AR-15 is the most common rifle in the U.S.A. It is a semi-automatic
+        rifle modeled after the military's automatic M16. The rifle is modular
+        and can be customized with many different accessories. In this video, I
+        discuss the full assembly of an AR-15 from individual parts.
+      </p>
+    </div>
+
+    <div class="timeparts mt-6 text-left">
+      <h2 class="text-xl font-bold text-textMuted mb-4">
+        Part 1: Lower Receiver Assembly
+      </h2>
+      <ul class="list-disc list-inside space-y-2 text-textMuted">
+        <li>
+          <a
+            href="javascript:void(0);"
+            class="text-textHighlighted hover:underline"
+            onclick="goToTimeAndScroll(190)"
+            >1-2 Bolt Catch [03:10]</a
+          >
+        </li>
+        <li>
+          <a
+            href="javascript:void(0);"
+            class="text-textHighlighted hover:underline"
+            onclick="goToTimeAndScroll(327)"
+            >1-3 Pivot Pin [05:27]</a
+          >
+        </li>
+        <li>
+          <a
+            href="javascript:void(0);"
+            class="text-textHighlighted hover:underline"
+            onclick="goToTimeAndScroll(432)"
+            >1-4 Safety Selector and Pistol Grip [07:12]</a
+          >
+        </li>
+        <li>
+          <a
+            href="javascript:void(0);"
+            class="text-textHighlighted hover:underline"
+            onclick="goToTimeAndScroll(549)"
+            >1-5 Trigger and Hammer [09:09]</a
+          >
+        </li>
+        <li>
+          <a
+            href="javascript:void(0);"
+            class="text-textHighlighted hover:underline"
+            onclick="goToTimeAndScroll(854)"
+            >1-6 Trigger Guard [14:14]</a
+          >
+        </li>
+        <li>
+          <a
+            href="javascript:void(0);"
+            class="text-textHighlighted hover:underline"
+            onclick="goToTimeAndScroll(1011)"
+            >1-7 Buffer Tube and Take Down Pin [16:51]</a
+          >
+        </li>
+        <li>
+          <a
+            href="javascript:void(0);"
+            class="text-textHighlighted hover:underline"
+            onclick="goToTimeAndScroll(1344)"
+            >1-8 Lubrication and Testing [22:24]</a
+          >
+        </li>
+      </ul>
+
+      <h2 class="text-xl font-bold text-textMuted mt-6 mb-4">
+        Part 2: Upper Receiver Assembly
+      </h2>
+      <ul class="list-disc list-inside space-y-2 text-textMuted">
+        <li>
+          <a
+            href="javascript:void(0);"
+            class="text-textHighlighted hover:underline"
+            onclick="goToTimeAndScroll(1445)"
+            >2-1 Ejection Port Cover [24:05]</a
+          >
+        </li>
+        <li>
+          <a
+            href="javascript:void(0);"
+            class="text-textHighlighted hover:underline"
+            onclick="goToTimeAndScroll(1564)"
+            >2-2 Forward Assist [26:04]</a
+          >
+        </li>
+        <li>
+          <a
+            href="javascript:void(0);"
+            class="text-textHighlighted hover:underline"
+            onclick="goToTimeAndScroll(1674)"
+            >2-3 Barrel, Gas Block, and Handguard [27:54]</a
+          >
+        </li>
+        <li>
+          <a
+            href="javascript:void(0);"
+            class="text-textHighlighted hover:underline"
+            onclick="goToTimeAndScroll(2449)"
+            >2-4 Flash Suppressor [40:49]</a
+          >
+        </li>
+        <li>
+          <a
+            href="javascript:void(0);"
+            class="text-textHighlighted hover:underline"
+            onclick="goToTimeAndScroll(2530)"
+            >2-5 Bolt Carrier Group [42:10]</a
+          >
+        </li>
+        <li>
+          <a
+            href="javascript:void(0);"
+            class="text-textHighlighted hover:underline"
+            onclick="goToTimeAndScroll(3050)"
+            >2-6 Charging Handle [50:50]</a
+          >
+        </li>
+        <li>
+          <a
+            href="javascript:void(0);"
+            class="text-textHighlighted hover:underline"
+            onclick="goToTimeAndScroll(3160)"
+            >2-7 Lubrication and Testing [52:40]</a
+          >
+        </li>
+        <li>
+          <a
+            href="javascript:void(0);"
+            class="text-textHighlighted hover:underline"
+            onclick="goToTimeAndScroll(3335)"
+            >2-8 Headspace Check [55:35]</a
+          >
+        </li>
+      </ul>
+
+      <h2 class="text-xl font-bold text-textMuted mt-6">
+        Part 3: Live Fire Testing [01:01:57]
+      </h2>
+    </div>
+
+    <div class="tools mt-8 px-4 py-6 text-left rounded-lg shadow-md">
+      <h3 class="text-lg font-semibold text-textMuted mb-4">Tools Required:</h3>
+      <ol class="list-decimal list-inside space-y-1">
+        <li>Vise</li>
+        <li>AR-15 Lower Receiver Vise Block</li>
+        <li>Small Hammer</li>
+        <li>Set of Roll Pin Punches</li>
+        <li>Screwdriver</li>
+        <li>AR-15 Barrel Wrench</li>
+        <li>Set of Allen Wrenches (i.e., Hex Wrenches)</li>
+        <li>Gun Oil</li>
+        <li>Pivot Pin Installation Tool</li>
+        <li>Torque Wrench</li>
+        <li>Razor Blade</li>
+        <li>AR-15 Upper Receiver Vise Block</li>
+        <li>Snap Ring Pliers</li>
+        <li>5.56 NATO / .223 Headspace Gauge</li>
+        <li>Clamp or Vise with rubber guards</li>
+      </ol>
+      <br />
+      <h3 class="text-lg font-semibold text-textMuted mb-4">
+        Optional Tools (not required, but they make the job easier):
+      </h3>
+      <ol class="list-decimal list-inside space-y-1" start="16">
+        <li>Drill (if you desire to dimple barrel)</li>
+        <li>Blue Loctite</li>
+        <li>Dummy Cartridge</li>
+        <li>Brush and Rag for Cleaning</li>
+        <li>Needle Nose Pliers</li>
+        <li>Empty 5.56/.223 Shell Casing</li>
+        <li>Torque Screwdriver</li>
+        <li>Air Compressor</li>
+        <li>Pencil</li>
+        <li>Center Punch (if you desire to dimple castle nut)</li>
+        <li>Tape</li>
+        <li>Wood Block</li>
+        <li>Rubber Mallet</li>
+      </ol>
+      <br /><br />
+      <h3 class="text-lg font-semibold text-textMuted mb-4">Parts Required:</h3>
+      <ol class="list-decimal list-inside space-y-4">
+        <li>
+          Stripped Lower Receiver
+          <ol class="list-disc list-inside space-y-2 pl-4">
+            <li>Purchase from Gun Store or FFL</li>
+            <li>Depending on state laws, purchase from a private seller.</li>
+            <li>
+              Make your own.
+              <span class="block text-sm text-gray-500"
+                >(Using a drill press, 3D printer, milling machine, etc.)</span
+              >
+            </li>
+          </ol>
+        </li>
+        <li>
+          Lower Parts Kit (LPK)
+          <ol class="list-disc list-inside space-y-2 pl-4">
+            <li>
+              Includes:
+              <span class="block text-sm">
+                Magazine Catch Button, Magazine Catch, Magazine Catch Spring,
+                Bolt Catch, Bolt Catch Plunger, Bolt Catch Roll Pin, Bolt Catch
+                Spring, Pivot Pin, Detent x 2, Detent Spring x 2, Takedown Pin,
+                Safety Selector, Selector Detent, Selector Spring, Trigger
+                Guard, Roll Pin, Buffer Catch, Buffer Catch Spring
+              </span>
+            </li>
+            <li>
+              Some LPKs do not include a trigger group
+              <ol class="list-disc list-inside space-y-1 pl-4">
+                <li>
+                  Trigger, Trigger Spring, Hammer, Hammer Spring, Disconnector,
+                  Disconnector Spring, Hammer and Trigger Pins
+                </li>
+              </ol>
+            </li>
+            <li>
+              Some LPKs do not include a pistol grip
+              <ol class="list-disc list-inside space-y-1 pl-4">
+                <li>Pistol Grip, Grip Screw</li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+        <li>Trigger/Hammer Group (if not included in LPK)</li>
+        <li>Pistol Grip (if not included in LPK)</li>
+        <li>
+          Buffer Tube Kit
+          <ol class="list-disc list-inside space-y-2 pl-4">
+            <li>
+              Buffer Tube
+              <ol class="list-disc list-inside space-y-1 pl-4">
+                <li>If making an AR-15 Pistol, use a pistol tube instead.</li>
+              </ol>
+            </li>
+            <li>Nut</li>
+            <li>Buffer Spring</li>
+            <li>Receiver end plate</li>
+            <li>Castle Nut</li>
+            <li>
+              Buffer
+              <ol class="list-disc list-inside space-y-1 pl-4">
+                <li>Various Weights: H1, H2, or H3</li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+        <li>
+          Buttstock
+          <ol class="list-disc list-inside space-y-2 pl-4">
+            <li>Illegal on an AR-15 Pistol (must use pistol tube)</li>
+          </ol>
+        </li>
+        <li>Barrel and Barrel Nut</li>
+        <li>
+          Handguard
+          <ol class="list-disc list-inside space-y-2 pl-4">
+            <li>Sometimes includes a special barrel nut.</li>
+          </ol>
+        </li>
+        <li>
+          Gas Block Kit
+          <ol class="list-disc list-inside space-y-2 pl-4">
+            <li>Gas Tube</li>
+            <li>Gas Block</li>
+            <li>Gas Tube Pin</li>
+          </ol>
+        </li>
+        <li>Flash Hider/Muzzle Brake and Crush Washer</li>
+        <li>Stripped Upper Receiver</li>
+        <li>
+          Ejection Port Cover Kit
+          <ol class="list-disc list-inside space-y-2 pl-4">
+            <li>Ejection Port Cover</li>
+            <li>Hinge Pin</li>
+            <li>Hinge Pin Snap</li>
+            <li>Hinge Spring</li>
+          </ol>
+        </li>
+        <li>
+          Forward Assist Kit
+          <ol class="list-disc list-inside space-y-2 pl-4">
+            <li>Forward Assist (with pre-installed Pawl)</li>
+            <li>Forward Assist Retainer Pin</li>
+            <li>Forward Assist Spring</li>
+          </ol>
+        </li>
+        <li>
+          Bolt Carrier Group
+          <ol class="list-disc list-inside space-y-2 pl-4">
+            <li>
+              Bolt
+              <ol class="list-disc list-inside space-y-1 pl-4">
+                <li>Extractor Pin, Extractor with Spring, and Bolt</li>
+              </ol>
+            </li>
+            <li>
+              Carrier
+              <ol class="list-disc list-inside space-y-1 pl-4">
+                <li>Carrier, Cam Pin, and Retaining Pin</li>
+              </ol>
+            </li>
+            <li>Firing pin</li>
+          </ol>
+        </li>
+        <li>
+          Charging Handle
+          <ol class="list-disc list-inside space-y-2 pl-4">
+            <li>with spring, latch, and roll pin if purchased separately.</li>
+          </ol>
+        </li>
+        <li>
+          Magazines
+          <ol class="list-disc list-inside space-y-2 pl-4">
+            <li>Variety of sizes: 10, 20, 30, etc...</li>
+          </ol>
+        </li>
+        <li>Sights/Optics</li>
+      </ol>
+    </div>
+  </div>
+</div>
+<script>
+  function goToTimeAndScroll(seconds) {
+    const video = document.getElementById("assembly");
+    if (video) {
+      video.currentTime = seconds;
+      video.play();
+    }
+    const videoContainer = document.querySelector(".video-container");
+    if (videoContainer) {
+      const rect = videoContainer.getBoundingClientRect();
+      const offsetTop = window.pageYOffset + rect.top;
+      window.scrollTo({ top: offsetTop, behavior: "smooth" });
+    }
+  }
+</script>
+
+{{end}}

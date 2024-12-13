@@ -2,7 +2,7 @@
 <li class="relative rounded-md group bg-bgSecondary text-textPrimary">
   <a
     href="#"
-    onclick="toggleDropdown('nostrDropdown')"
+    onclick="toggleDropdown('otherDropdown')"
     class="flex items-center justify-between p-2 space-x-2 hover:rounded-md hover:text-textHighlighted"
   >
     <div class="w-12 h-12 md:w-14 md:h-14">
@@ -31,7 +31,7 @@
 
   <!-- Dropdown container -->
   <div
-    id="nostrDropdown"
+    id="otherDropdown"
     class="absolute left-0 lg:left-auto hidden lg:group-hover:block lg:m-2 mt-2 border rounded-md shadow-lg border-bgInverted bg-bgSecondary"
     style="min-width: 12rem; z-index: 10"
   >
@@ -41,16 +41,21 @@
     <ul class="py-2">
       <li>
         <a
-          href="#"
+          href="/gun-blog"
+          hx-push-url="/gun-blog"
           class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
           hx-trigger="click"
-          hx-get="/what-is-nostr"
+          hx-get="/gun-blog"
           hx-swap="outerHTML"
           hx-target="body"
-          >What is nostr?</a
-        >
+          ><img
+            class="inline-block h-6 align-text-bottom mx-1"
+            src="https://clipart-library.com/images_k/gun-png-transparent/gun-png-transparent-5.png"
+          />
+          Gun Blog
+        </a>
       </li>
-      <li>
+      <!--<li>
         <a
           href="#"
           class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
@@ -63,7 +68,7 @@
           class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
           >grain 🌾</a
         >
-      </li>
+      </li>-->
     </ul>
   </div>
 </li>
