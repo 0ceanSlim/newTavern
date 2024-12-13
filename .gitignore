@@ -5,3 +5,4 @@ config.json
 /web/static/*
 !/web/static/js/
 !/web/static/img/
+!/web/static/style/

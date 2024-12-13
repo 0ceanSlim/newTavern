@@ -31,9 +31,6 @@ func main() {
 	mux.HandleFunc("/nostr-mobile-ios", routes.NostrMobileIos)
 	mux.HandleFunc("/nostr-desktop", routes.NostrDesktop)
 
-	styleDir := "web/style"
-	mux.Handle("/style/", http.StripPrefix("/style", http.FileServer(http.Dir(styleDir))))
-
 	fmt.Printf("Server is running on http://localhost:%d\n", cfg.Port)
 	http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), mux)
 }
