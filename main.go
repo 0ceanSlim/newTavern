@@ -17,6 +17,9 @@ func main() {
 
 	mux := http.NewServeMux()
 
+	// Access-Control-Allow-Origin", "*" for nostr.json
+	mux.HandleFunc("/.well-known/nostr.json", utils.ServeWellKnownNostr)
+
 	// Initialize Routes
 	routes.InitializeRoutes(mux)
 
