@@ -14,12 +14,31 @@
 
   <!-- Blurb Section -->
   <section class="max-w-2xl">
-    <p class="text-lg md:text-xl">
-      Grain is a highly configurable nostr relay implementation written in GO
-      that uses MongoDB (for now) as a database for nostr Events. It offers the
-      flexibility to meet various use cases with extensive rate and resource
-      limits, whitelist and blacklist configurations, and many other variables
-      to ensure reliability and performance.
+    <p class="flextext-lg md:text-xl">
+      Grain is a highly configurable nostr relay implementation written in
+      <a
+        class="text-textHighlighted hover:underline"
+        href="https://go.dev/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        GO<img
+          src="https://download.logo.wine/logo/Go_(programming_language)/Go_(programming_language)-Logo.wine.png"
+          class="inline-block h-6 align-text-bottom mx-1" /></a
+      >that uses
+      <a
+        class="text-textHighlighted hover:underline"
+        href="https://www.mongodb.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        >MongoDB<img
+          src="https://cdn.icon-icons.com/icons2/2415/PNG/512/mongodb_original_logo_icon_146424.png"
+          class="inline-block h-6 align-text-bottom mx-1"
+      /></a>
+      (for now) as a database for nostr Events. It offers the flexibility to
+      meet various use cases with extensive rate and resource limits, whitelist
+      and blacklist configurations, and many other variables to ensure
+      reliability and performance.
     </p>
   </section>
 
@@ -78,30 +97,30 @@
       files.
     </p>
 
-    <div class="bg-bgSecondary p-4 rounded">
+    <div class="bg-bgSecondary p-4 rounded border-bgInverted border-2">
       <div class="flex flex-wrap justify-center gap-2 mb-4">
         <button
           onclick="loadContent('https://raw.githubusercontent.com/0ceanSlim/grain/main/app/static/examples/config.example.yml')"
-          class="px-3 py-2 rounded shadow text-sm"
+          class="inline-block border-bgInverted border-2 p-4 my-4 mt-4 text-sm font-bold align-baseline rounded-md bg-bgSecondary hover:bg-bgTertiary hover:text-textHighlighted"
         >
           Config
         </button>
         <button
           onclick="loadContent('https://raw.githubusercontent.com/0ceanSlim/grain/refs/heads/main/app/static/examples/whitelist.example.yml')"
-          class="px-3 py-2 rounded shadow text-sm"
+          class="inline-block border-bgInverted border-2 p-4 my-4 mt-4 text-sm font-bold align-baseline rounded-md bg-bgSecondary hover:bg-bgTertiary hover:text-textHighlighted"
         >
           Whitelist
         </button>
         <button
           onclick="loadContent('https://raw.githubusercontent.com/0ceanSlim/grain/refs/heads/main/app/static/examples/blacklist.example.yml')"
-          class="px-3 py-2 rounded shadow text-sm"
+          class="inline-block border-bgInverted border-2 p-4 my-4 mt-4 text-sm font-bold align-baseline rounded-md bg-bgSecondary hover:bg-bgTertiary hover:text-textHighlighted"
         >
           Blacklist
         </button>
       </div>
       <pre
         id="config-content"
-        class="w-full max-w-full bg-bgPrimary text-textPrimary text-left rounded shadow overflow-x-auto p-2 text-sm break-words"
+        class="border-bgInverted border-2 w-full max-w-full bg-bgPrimary text-textPrimary text-left rounded shadow overflow-x-auto p-4 text-sm break-words"
       ></pre>
     </div>
   </section>
