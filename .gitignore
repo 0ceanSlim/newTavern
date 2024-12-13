@@ -2,7 +2,6 @@
 config.json
 /logs
 /build
-/web/*
-!/web/style
-!/web/static
-!/web/views
+/web/static/*
+!/web/static/js/
+!/web/static/img/
