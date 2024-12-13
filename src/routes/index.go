@@ -7,7 +7,7 @@ import (
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		fileServer := http.FileServer(http.Dir("web/static"))
+		fileServer := http.FileServer(http.Dir("web"))
 		http.StripPrefix("/", fileServer).ServeHTTP(w, r)
 		return
 	}

@@ -31,18 +31,6 @@ func main() {
 	mux.HandleFunc("/nostr-mobile-ios", routes.NostrMobileIos)
 	mux.HandleFunc("/nostr-desktop", routes.NostrDesktop)
 
-	// Function Handlers
-
-	// Serve Web Files
-	// Serve specific files from the root directory
-	mux.HandleFunc("/favicon.svg", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "web/favicon.svg")
-	})
-	// Serve static files from the /web/static directory at /static/
-	staticDir := "web/static"
-	mux.Handle("/static", http.StripPrefix("/static", http.FileServer(http.Dir(staticDir))))
-
-	// Serve CSS files from the /web/style directory at /style/
 	styleDir := "web/style"
 	mux.Handle("/style/", http.StripPrefix("/style", http.FileServer(http.Dir(styleDir))))
 
