@@ -65,7 +65,13 @@
       </li>
       <li>
         <a
-          href="#"
+          href="/grain"
+          hx-push-url="/grain"
+          class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
+          hx-trigger="click"
+          hx-get="/grain"
+          hx-swap="outerHTML"
+          hx-target="body"
           class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
           >grain 🌾</a
         >

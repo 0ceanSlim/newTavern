@@ -1,0 +1,139 @@
+{{define "view"}}
+<main class="flex flex-col items-center my-16 md:my-32 space-y-12">
+  <!-- Welcome Section -->
+  <section class="text-center">
+    <h1 class="text-4xl md:text-6xl font-bold">G.R.A.I.N. 🌾</h1>
+  </section>
+
+  <!-- Slogan Section -->
+  <section>
+    <p class="text-2xl md:text-3xl italic">
+      Go Relay Architecture for Implementing Nostr
+    </p>
+  </section>
+
+  <!-- Blurb Section -->
+  <section class="max-w-2xl">
+    <p class="text-lg md:text-xl">
+      Grain is a highly configurable nostr relay implementation written in GO
+      that uses MongoDB (for now) as a database for nostr Events. It offers the
+      flexibility to meet various use cases with extensive rate and resource
+      limits, whitelist and blacklist configurations, and many other variables
+      to ensure reliability and performance.
+    </p>
+  </section>
+
+  <!-- Slogan Section -->
+  <section>
+    <a
+      href="https://github.com/0ceanSlim/grain"
+      class="flex items-center justify-center w-80 rounded-md"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <img
+        src="https://camo.githubusercontent.com/f29ef55bf732d0eba7756f49161c4acd3551ed06a4555cf0d8c5fc846c3b37bd/68747470733a2f2f63656e736f72736869702e6e6f2f696d672f6769746875622d62616467652e706e67"
+        alt="View on Github"
+      />
+    </a>
+  </section>
+
+  <!-- Feature Highlights Section -->
+  <section class="max-w-3xl space-y-4">
+    <h2 class="text-2xl md:text-3xl font-semibold">Key Features</h2>
+    <ul
+      class="list-disc list-inside text-md md:text-lg text-left text-textMuted"
+    >
+      <li>
+        Dynamic event handling with support for event deletion as per NIP-09.
+      </li>
+      <li>
+        Highly configurable through YAML-based settings for diverse use cases.
+      </li>
+      <li>
+        Efficient rate limiting for WebSocket messages, events, and requests.
+      </li>
+      <li>
+        Robust blacklisting and whitelisting capabilities for enhanced control.
+      </li>
+      <li>MongoDB integration for scalable, high-performance storage.</li>
+      <li>
+        Scalable architecture built with Go, ideal for high-throughput
+        scenarios.
+      </li>
+    </ul>
+  </section>
+
+  <!-- Configuration Overview Section -->
+  <section class="max-w-full space-y-4 px-4">
+    <h2
+      class="text-2xl md:text-3xl font-semibold underline underline-offset-2 text-center"
+    >
+      Configuration Preview
+    </h2>
+
+    <p class="text-base md:text-lg text-textMuted text-center">
+      Grain is designed for simplicity and flexibility. You can customize
+      settings to suit your requirements by editing the YAML configuration
+      files.
+    </p>
+
+    <div class="bg-bgSecondary p-4 rounded">
+      <div class="flex flex-wrap justify-center gap-2 mb-4">
+        <button
+          onclick="loadContent('https://raw.githubusercontent.com/0ceanSlim/grain/main/app/static/examples/config.example.yml')"
+          class="px-3 py-2 rounded shadow text-sm"
+        >
+          Config
+        </button>
+        <button
+          onclick="loadContent('https://raw.githubusercontent.com/0ceanSlim/grain/refs/heads/main/app/static/examples/whitelist.example.yml')"
+          class="px-3 py-2 rounded shadow text-sm"
+        >
+          Whitelist
+        </button>
+        <button
+          onclick="loadContent('https://raw.githubusercontent.com/0ceanSlim/grain/refs/heads/main/app/static/examples/blacklist.example.yml')"
+          class="px-3 py-2 rounded shadow text-sm"
+        >
+          Blacklist
+        </button>
+      </div>
+      <pre
+        id="config-content"
+        class="w-full max-w-full bg-bgPrimary text-textPrimary text-left rounded shadow overflow-x-auto p-2 text-sm break-words"
+      ></pre>
+    </div>
+  </section>
+
+  <!-- Implementation Details Section -->
+  <section class="text-center max-w-2xl space-y-4">
+    <p class="text-lg md:text-xl">
+      I created Grain because existing solutions didn’t meet my expectations for
+      flexibility. Feedback and contributions are always welcome to help improve
+      this project!
+    </p>
+  </section>
+</main>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    hljs.highlightAll();
+    loadContent(
+      "https://raw.githubusercontent.com/0ceanSlim/grain/main/app/static/examples/config.example.yml"
+    );
+  });
+
+  function loadContent(url) {
+    fetch(url)
+      .then((response) => response.text())
+      .then((data) => {
+        const preElement = document.getElementById("config-content");
+        preElement.innerHTML = `<code>${data}</code>`;
+        hljs.highlightElement(preElement);
+      })
+      .catch((error) => {
+        console.error("Error fetching content:", error);
+      });
+  }
+</script>
+{{end}}

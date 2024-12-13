@@ -13,4 +13,5 @@ func InitializeRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/nostr-mobile-android", NostrMobileAndroid)
 	mux.HandleFunc("/nostr-mobile-ios", NostrMobileIos)
 	mux.HandleFunc("/nostr-desktop", NostrDesktop)
+	mux.HandleFunc("/grain", Grain)
 }
