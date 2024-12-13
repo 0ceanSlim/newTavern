@@ -2,3 +2,6 @@
 config.json
 /logs
 /build
+/web/static/*
+!/web/static/js/
+!/web/static/img/
