@@ -40,7 +40,7 @@ func main() {
 	})
 	// Serve static files from the /web/static directory at /static/
 	staticDir := "web/static"
-	mux.Handle("/static/", http.StripPrefix("/static", http.FileServer(http.Dir(staticDir))))
+	mux.Handle("/static", http.StripPrefix("/static", http.FileServer(http.Dir(staticDir))))
 
 	// Serve CSS files from the /web/style directory at /style/
 	styleDir := "web/style"

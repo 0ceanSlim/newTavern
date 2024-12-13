@@ -6,6 +6,11 @@ import (
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		fileServer := http.FileServer(http.Dir("web/static"))
+		http.StripPrefix("/", fileServer).ServeHTTP(w, r)
+		return
+	}
 
 	data := utils.PageData{
 		Title: "🏠",
