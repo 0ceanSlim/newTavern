@@ -1,0 +1,23 @@
+{{define "view"}}
+<div class="min-h-screen p-8 bg-bgPrimary">
+  <div class="max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+      <div class="space-y-8">
+        <!-- SimpleX Contact Link -->
+        {{template "contact-simplex" .}}
+
+        <!-- Secure Contact Container -->
+        {{template "contact-email" .}}
+
+        <!-- Book a Meeting -->
+        {{template "contact-meet" .}}
+      </div>
+
+      <div class="space-y-8">
+        <!-- Social Links -->
+        {{template "contact-follow" .}}
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}

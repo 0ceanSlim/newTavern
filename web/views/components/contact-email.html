@@ -1,0 +1,52 @@
+{{define "contact-email"}}
+<div class="p-6 rounded-lg shadow-md bg-bgSecondary">
+  <button
+    class="px-4 py-2 text-white transition bg-blue-500 rounded hover:bg-blue-600"
+    onclick="window.location.href='mailto:OceanSlim@gmx.com'"
+  >
+    Email Me! 📧
+  </button>
+  <div class="relative mt-4">
+    <h3 class="mb-2 text-lg font-semibold">PGP Public Key</h3>
+    <div class="relative">
+      <button
+        class="absolute text-gray-500 transition top-2 right-2 hover:text-gray-700"
+        onclick="copyPGPKey()"
+        title="Copy PGP Key"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+          />
+        </svg>
+      </button>
+      <pre
+        class="p-3 overflow-x-auto text-xs text-left break-all whitespace-pre-wrap rounded-lg bg-bgPrimary max-h-[150px] overflow-y-auto"
+        id="pgp-key"
+      >
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+mDMEZ1t2uhYJKwYBBAHaRw8BAQdAX0E3xz2xjA76gVUTlaXDFRzNMJnPVbFHgrzCyl3es4+0HU9jZWFuU2xpbSA8b2NlYW5zbGltQGdteC5jb20+iHIEExYIABoECwkIBwIVCAIWAQIZAQWCZ1t2ugKeAQKbAwAKCRDZQ27j8bh3C//GAP9PFDxoQ6ZPzEZ5fDrpInICKLLCDrHic9aA0HsMqSGwQAEAp8X1XUg0WxttfB7LOz527FeYgEsR4ebvx2AEClwn1gq4OARnW3a6EgorBgEEAZdVAQUBAQdA8nMkIbFVNf5RjzjZknln8+O/RifUvxMQTsVr73mz8RQDAQgHiGEEGBYIAAkFgmdbdroCmwwACgkQ2UNu4/G4dwsmIAD/TztBEsj0RrypLreNwyEb3oIRACnLImaHu0i9C7fxYm4BAJgUxuHcpUkE+nIaoFMcOoluClh611tYtWnCXLNz8BoF=/Y9Q
+-----END PGP PUBLIC KEY BLOCK-----
+      </pre>
+    </div>
+  </div>
+</div>
+
+<script>
+  function copyPGPKey() {
+    const pgpKey = document.getElementById("pgp-key").innerText;
+    navigator.clipboard.writeText(pgpKey).then(() => {
+      //alert("PGP key copied to clipboard!");
+    });
+  }
+</script>
+{{end}}
