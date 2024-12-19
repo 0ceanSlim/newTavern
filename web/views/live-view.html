@@ -1,0 +1,17 @@
+{{define "view"}}
+<h1>{{.Title}}</h1>
+<video id="videoPlayer" controls autoplay width="640" height="360"></video>
+<script>
+  var video = document.getElementById("videoPlayer");
+  var streamURL = "{{ .CustomData.StreamURL }}";
+  if (Hls.isSupported()) {
+    var hls = new Hls();
+    hls.loadSource(streamURL);
+    hls.attachMedia(video);
+  } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+    video.src = streamURL; // Native support
+  } else {
+    console.error("HLS not supported in this browser.");
+  }
+</script>
+{{end}}
