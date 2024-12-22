@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"log"
-	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -23,14 +22,14 @@ func MonitorStream() {
 			stopHLSStream()
 			handleExistingFiles()
 		} else {
-			log.Println("No active stream detected. Retrying...")
+			//log.Println("No active stream detected. Retrying...")
 		}
 		time.Sleep(5 * time.Second) // Check every 5 seconds
 	}
 }
 
 func isStreamActive(url string) bool {
-	log.Printf("Checking stream status for URL: %s", url)
+	//log.Printf("Checking stream status for URL: %s", url)
 
 	// Create a context with a timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second) // 5-second timeout
@@ -52,7 +51,7 @@ func isStreamActive(url string) bool {
 		return false
 	}
 
-	log.Printf("ffprobe output: %s", string(output))
+	//log.Printf("ffprobe output: %s", string(output))
 
 	// Check for active video stream
 	return containsVideoStream(output)
@@ -84,12 +83,12 @@ func containsVideoStream(output []byte) bool {
 		}
 		codecName, ok := streamMap["codec_name"].(string)
 		if ok && codecName != "" {
-			log.Printf("Video stream detected with codec: %s", codecName)
+			//log.Printf("Video stream detected with codec: %s", codecName)
 			return true
 		}
 	}
 
-	log.Println("No active video stream found.")
+	//log.Println("No active video stream found.")
 	return false
 }
 
@@ -155,7 +154,7 @@ func waitForStreamToStop(rtmpStreamURL string) {
 			}
 		} else {
 			consecutiveInactiveChecks = 0 // Reset if the stream becomes active again
-			log.Println("Stream is active, resetting inactive checks.")
+			//log.Println("Stream is active, resetting inactive checks.")
 		}
 		time.Sleep(5 * time.Second)
 	}
@@ -172,26 +171,4 @@ func stopHLSStream() {
 		}
 		ffmpegCmd = nil
 	}
-}
-
-func ServeHLS(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
-
-	// Serve the HLS file
-	http.ServeFile(w, r, "web/live/output.m3u8")
-}
-
-func ServeHLSFolderWithCORS(dir string) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-		http.FileServer(http.Dir(dir)).ServeHTTP(w, r)
-	})
 }
