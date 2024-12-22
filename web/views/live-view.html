@@ -1,6 +1,5 @@
 {{define "view"}}
-<h1>{{.Title}}</h1>
-<video id="videoPlayer" controls autoplay width="640" height="360"></video>
+<video id="videoPlayer" controls autoplay class="flex rounded-md"></video>
 <script>
   var video = document.getElementById("videoPlayer");
   var streamURL = "{{ .CustomData.StreamURL }}";

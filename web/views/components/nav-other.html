@@ -57,6 +57,19 @@
       </li>
       <li>
         <a
+          href="/live/view"
+          hx-push-url="/live/view"
+          class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
+          hx-trigger="click"
+          hx-get="/live/view"
+          hx-swap="outerHTML"
+          hx-target="body"
+        >
+          🔴 Live Stream
+        </a>
+      </li>
+      <li>
+        <a
           href="/contact"
           hx-push-url="/contact"
           class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"

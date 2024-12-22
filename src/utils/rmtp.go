@@ -41,7 +41,7 @@ func isStreamActive(url string) bool {
 
 	// Check for timeout or other errors
 	if ctx.Err() == context.DeadlineExceeded {
-		log.Printf("ffprobe timed out while checking stream: %s", url)
+		//log.Printf("ffprobe timed out while checking stream: %s", url)
 		return false
 	}
 
