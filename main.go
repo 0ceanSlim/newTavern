@@ -27,6 +27,7 @@ func main() {
 	mux.HandleFunc("/live/output.m3u8", utils.ServeHLS)
 
 	mux.Handle("/live/", http.StripPrefix("/live/", utils.ServeHLSFolderWithCORS("web/live/")))
+	mux.Handle("/live/", http.StripPrefix("/live/", utils.ServeHLSFolderWithCORS("web/.videos/past-streams/*")))
 
 	// Initialize Routes
 	routes.InitializeRoutes(mux)
