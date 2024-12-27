@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"goFrame/src/api"
 	"goFrame/src/routes"
 	"goFrame/src/utils"
 	"net/http"
@@ -18,7 +19,12 @@ func main() {
 	// Start monitoring the RTMP stream
 	go utils.MonitorStream()
 
+	go api.LogPrice() // Start logging prices
+
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("/api/btc-price", api.FetchBitcoinPrice)
+	mux.HandleFunc("/api/price-logs", api.ServePriceLogs)
 
 	// Access-Control-Allow-Origin", "*" for nostr.json
 	mux.HandleFunc("/.well-known/nostr.json", utils.ServeWellKnownNostr)

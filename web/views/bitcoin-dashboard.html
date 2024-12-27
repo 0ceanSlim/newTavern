@@ -1,0 +1,153 @@
+{{define "view"}}
+<div class="w-full h-screen p-4">
+  <h1 class="mb-4 text-2xl font-bold text-center">Bitcoin Dashboard</h1>
+
+  <!-- Bitcoin Price Section -->
+  <div id="bitcoin-price" class="mb-8 text-center">
+    <h2 class="text-xl font-semibold">Current Bitcoin Price</h2>
+    <div id="price-display" class="mt-2 text-lg"></div>
+    <button
+      onclick="fetchBitcoinPrice()"
+      class="px-4 py-2 mt-2 text-white bg-blue-500 rounded hover:bg-blue-600"
+    >
+      Refresh Price
+    </button>
+  </div>
+
+  <!-- Static Sats Calculator -->
+  <div id="sats-calculator" class="mb-8">
+    <h2 class="text-xl font-semibold">USD to Sats (1 USD = Sats)</h2>
+    <div id="usd-to-sats" class="mt-2 text-lg"></div>
+  </div>
+
+  <!-- Sats to USD Calculator -->
+  <div id="interactive-calculator" class="mb-8">
+    <h2 class="text-xl font-semibold">Interactive Sats ↔ USD Calculator</h2>
+    <div class="flex items-center mt-4">
+      <input
+        type="number"
+        id="calc-input"
+        class="w-full p-2 border rounded"
+        placeholder="Enter value"
+      />
+      <button
+        onclick="calculateConversion()"
+        class="px-4 py-2 ml-4 text-white bg-green-500 rounded hover:bg-green-600"
+      >
+        Convert
+      </button>
+    </div>
+    <div class="mt-4">
+      <button
+        onclick="toggleCalcMode()"
+        class="px-4 py-2 text-white bg-gray-500 rounded hover:bg-gray-600"
+      >
+        Flip Calculation
+      </button>
+    </div>
+    <div id="calc-result" class="mt-4 text-lg"></div>
+  </div>
+
+  <!-- Price Chart -->
+  <div id="price-chart" class="mb-8">
+    <h2 class="text-xl font-semibold">Bitcoin Price Over Time</h2>
+    <canvas id="priceChart" width="400" height="200"></canvas>
+  </div>
+</div>
+
+<script>
+  let calcMode = "sats-to-usd"; // Default mode
+
+  async function fetchBitcoinPrice() {
+    try {
+      const response = await fetch("/api/btc-price");
+      const data = await response.json();
+      document.getElementById(
+        "price-display"
+      ).textContent = `BTC/USD: $${data.Price}`;
+      const price = parseFloat(data.Price);
+
+      // Update static sats calculator
+      const satsPerUsd = Math.round(100_000_000 / price);
+      document.getElementById(
+        "usd-to-sats"
+      ).textContent = `1 USD = ${satsPerUsd} sats`;
+    } catch (error) {
+      console.error("Error fetching Bitcoin price:", error);
+    }
+  }
+
+  function calculateConversion() {
+    const input = parseFloat(document.getElementById("calc-input").value);
+    const priceDisplay = document.getElementById("price-display").textContent;
+    const price = parseFloat(priceDisplay.split("$")[1]);
+
+    if (isNaN(input) || isNaN(price)) {
+      alert("Enter a valid value and ensure the price is loaded.");
+      return;
+    }
+
+    const result =
+      calcMode === "sats-to-usd"
+        ? (input / 100_000_000) * price
+        : (input / price) * 100_000_000;
+
+    const resultLabel =
+      calcMode === "sats-to-usd"
+        ? `${input} sats = $${result.toFixed(2)}`
+        : `$${input} = ${result.toFixed(0)} sats`;
+
+    document.getElementById("calc-result").textContent = resultLabel;
+  }
+
+  function toggleCalcMode() {
+    calcMode = calcMode === "sats-to-usd" ? "usd-to-sats" : "sats-to-usd";
+    document.getElementById("calc-input").value = "";
+    document.getElementById("calc-result").textContent = "";
+    alert(
+      `Switched to ${
+        calcMode === "sats-to-usd" ? "Sats to USD" : "USD to Sats"
+      } mode.`
+    );
+  }
+
+  // Chart setup (uses Chart.js)
+  const ctx = document.getElementById("priceChart").getContext("2d");
+  const priceChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: [], // Timestamps
+      datasets: [
+        {
+          label: "BTC Price (USD)",
+          data: [], // Price data
+          borderColor: "rgb(75, 192, 192)",
+          tension: 0.1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: { title: { display: true, text: "Time" } },
+        y: { title: { display: true, text: "Price (USD)" } },
+      },
+    },
+  });
+
+  async function updateChart() {
+    const response = await fetch("/api/price-logs");
+    const data = await response.json();
+
+    const timestamps = data.map((entry) => entry.timestamp);
+    const prices = data.map((entry) => entry.price);
+
+    priceChart.data.labels = timestamps;
+    priceChart.data.datasets[0].data = prices;
+    priceChart.update();
+  }
+
+  setInterval(updateChart, 60000); // Update every 60 seconds
+  fetchBitcoinPrice();
+</script>
+{{end}}

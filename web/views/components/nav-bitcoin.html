@@ -32,7 +32,7 @@
   <!-- Dropdown container -->
   <div
     id="nostrDropdown"
-    class="absolute left-0 lg:left-auto hidden lg:group-hover:block lg:m-2 mt-2 border rounded-md shadow-lg border-bgInverted bg-bgSecondary"
+    class="absolute left-0 hidden mt-2 border rounded-md shadow-lg lg:left-auto lg:group-hover:block lg:m-2 border-bgInverted bg-bgSecondary"
     style="min-width: 12rem; z-index: 10"
   >
     <!-- Pseudo-element for hover gap -->
@@ -50,6 +50,24 @@
           hx-target="body"
         >
           <span>How does it work?</span>
+        </a>
+      </li>
+      <li>
+        <a
+          class="flex items-center px-4 py-2 space-x-2 whitespace-nowrap hover:text-textHighlighted"
+          hx-trigger="click"
+          hx-get="/btc-dash"
+          hx-push-url="/btc-dash"
+          href="/btc-dash"
+          hx-swap="outerHTML"
+          hx-target="body"
+        >
+          <img
+            src="https://pnghq.com/wp-content/uploads/dashboard-png-png-download-48707.png"
+            alt="dash icon"
+            class="w-6 h-6 rounded-sm"
+          />
+          <span>Dashboard</span>
         </a>
       </li>
       <li>
