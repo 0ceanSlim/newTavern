@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const logFilePath = "btc_price_logs.json"
+const logFilePath = "web/.logs/btc_price_logs.json"
 
 // LogPrice fetches Bitcoin price from your /api/btc-price endpoint and logs it
 func LogPrice() {

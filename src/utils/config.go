@@ -1,26 +1,27 @@
 package utils
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
+
+	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
-	Port        int    `json:"port"`
-	Development string `json:"development"`
+	Port        int    `yaml:"port"`
+
 }
 
 func LoadConfig() (*Config, error) {
-	file, err := os.Open("config.json")
+	file, err := os.Open("config.yml")
 	if err != nil {
 		return nil, fmt.Errorf("failed to open config file: %v", err)
 	}
 	defer file.Close()
 
 	var config Config
-	err = json.NewDecoder(file).Decode(&config)
-	if err != nil {
+	decoder := yaml.NewDecoder(file)
+	if err := decoder.Decode(&config); err != nil {
 		return nil, fmt.Errorf("failed to decode config file: %v", err)
 	}
 
