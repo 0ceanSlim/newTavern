@@ -17,8 +17,17 @@ type PriceResponse struct {
 
 func LogBitcoinPrice() {
 	logFilePath := "web/logs/btc-price-log.csv"
-	apiURL := "http://localhost:8787/api/btc-price"
 	blockHeightURL := "https://mempool.happytavern.co/api/blocks/tip/height"
+
+	// Load config
+	cfg, err := LoadConfig()
+	if err != nil {
+		fmt.Println("Error loading config:", err)
+		return
+	}
+
+	// Construct API URL using port from config
+	apiURL := fmt.Sprintf("http://localhost:%d/api/btc-price", cfg.Port)
 
 	// Ensure directory and file exist
 	if err := ensureFileExists(logFilePath); err != nil {
