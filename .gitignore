@@ -1,5 +1,5 @@
 /tmp
-config.json
+config.yml
 /logs
 /build
 /web/*

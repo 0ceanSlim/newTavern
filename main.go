@@ -6,6 +6,7 @@ import (
 	"goFrame/src/routes"
 	"goFrame/src/utils"
 	"net/http"
+	"time"
 )
 
 func main() {
@@ -19,12 +20,9 @@ func main() {
 	// Start monitoring the RTMP stream
 	go utils.MonitorStream()
 
-	//go api.LogPrice() // Start logging prices need to fix this , ignore /logs put in web root and name log, serve the log
-
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/api/btc-price", api.FetchBitcoinPrice)
-	//mux.HandleFunc("/api/price-logs", api.ServePriceLogs)
 	mux.HandleFunc("/api/gold-price", api.GoldPriceHandler)
 
 	// Access-Control-Allow-Origin", "*" for nostr.json
@@ -38,6 +36,17 @@ func main() {
 
 	// Initialize Routes
 	routes.InitializeRoutes(mux)
+
+	// Start logging prices as a goroutine with 5 minute interval
+	go func() {
+		ticker := time.NewTicker(5 * time.Minute)
+		defer ticker.Stop()
+
+		for {
+			utils.LogBitcoinPrice()
+			<-ticker.C
+		}
+	}()
 
 	fmt.Printf("Server is running on http://localhost:%d\n", cfg.Port)
 	http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), mux)
