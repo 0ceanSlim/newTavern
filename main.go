@@ -23,7 +23,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/api/btc-price", api.FetchBitcoinPrice)
-	mux.HandleFunc("/api/price-logs", api.ServePriceLogs)
+	mux.HandleFunc("/api/btc-price-log", api.ServePriceLogs)
 	mux.HandleFunc("/api/gold-price", api.GoldPriceHandler)
 
 	// Access-Control-Allow-Origin", "*" for nostr.json
