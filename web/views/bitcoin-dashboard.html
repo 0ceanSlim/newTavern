@@ -5,101 +5,110 @@
   <!-- Bitcoin Price Section -->
   <div id="bitcoin-price" class="mb-8 text-center">
     <h2 class="text-xl font-semibold">Current Bitcoin Price</h2>
-    <div id="price-display" class="mt-2 text-lg"></div>
+    <div
+      id="btc-price"
+      class="mt-2 text-2xl text-orange-500 font-bold"
+      hx-get="/api/btc-price"
+      hx-trigger="load, every 30s"
+      hx-swap="innerHTML"
+      hx-target="this"
+      _="on htmx:afterRequest 
+          set the innerHTML of me to JSON.parse(event.detail.xhr.responseText).Price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})"
+    >
+      Loading price...
+    </div>
   </div>
 
   <!-- Static Sats Calculator -->
   <div id="sats-calculator" class="mb-8">
-    <h2 class="text-xl font-semibold">USD to Sats (1 USD = Sats)</h2>
-    <div id="usd-to-sats" class="mt-2 text-lg"></div>
+    <div id="usd-to-sats" class="mt-2 text-lg">Loading conversion...</div>
   </div>
 
-  <!-- Sats to USD Calculator -->
-  <div id="interactive-calculator" class="mb-8">
-    <h2 class="text-xl font-semibold">Interactive Sats ↔ USD Calculator</h2>
-    <div class="flex items-center mt-4">
+  <script>
+    function updateSatsCalculator() {
+      // Trigger the HTMX request to fetch the BTC price
+      htmx.trigger("#btc-price", "refreshPrice");
+    }
+
+    document.addEventListener("htmx:afterRequest", function (event) {
+      if (event.target.id === "btc-price") {
+        const response = JSON.parse(event.detail.xhr.responseText);
+        const btcPrice = parseFloat(response.Price);
+
+        if (!isNaN(btcPrice) && btcPrice > 0) {
+          const satsPerUsd = Math.round(100_000_000 / btcPrice);
+          document.getElementById(
+            "usd-to-sats"
+          ).textContent = `1 USD = ${satsPerUsd} sats`;
+        }
+      }
+    });
+
+    // Initial update
+    updateSatsCalculator();
+
+    // Set interval to update every 30 seconds
+    setInterval(updateSatsCalculator, 30000);
+  </script>
+
+  <div id="interactive-calculator" class="mb-8 text-center">
+    <h2 class="text-2xl font-semibold text-textPrimary">sats ↔️ $ calc</h2>
+
+    <div
+      id="calc-container"
+      class="flex items-center justify-center mt-6 space-x-4"
+    >
       <input
         type="number"
         id="calc-input"
-        class="w-full p-2 text-black border rounded"
+        class="w-full p-3 text-lg text-textPrimary bg-bgSecondary border border-bgTertiary rounded-lg focus:outline-none focus:ring-2 focus:ring-textHighlighted"
         placeholder="Enter value"
+        _="on keyup 
+          set btcPriceText to #btc-price.textContent
+          set btcPrice to parseFloat(btcPriceText)
+          set inputValue to parseFloat(my.value)
+  
+          if isNaN(btcPrice) or btcPrice <= 0 
+            set #calc-result.innerText to 'Waiting for BTC price...'
+          else if isNaN(inputValue) or inputValue <= 0
+            set #calc-result.innerText to 'Enter a valid number'
+          else
+            if #calc-container.matches('[flipped]') 
+              set result to (inputValue * 100000000) / btcPrice
+              set #calc-result.innerText to result.toFixed(0) + ' sats'
+            else 
+              set result to (inputValue / 100000000) * btcPrice
+              set #calc-result.innerText to result.toFixed(2) + ' USD'"
       />
-      <button
-        onclick="calculateConversion()"
-        class="px-4 py-2 ml-4 text-white bg-green-500 rounded hover:bg-green-600"
+      <div id="left-label" class="text-xl font-semibold text-textPrimary">
+        sats
+      </div>
+
+      <div
+        id="right-label"
+        class="text-xl font-semibold text-textPrimary hidden"
       >
-        Convert
-      </button>
+        USD
+      </div>
     </div>
-    <div class="mt-4">
-      <button
-        onclick="toggleCalcMode()"
-        class="px-4 py-2 text-white bg-gray-500 rounded hover:bg-gray-600"
-      >
-        Flip Calculation
-      </button>
+
+    <button
+      id="flip-button"
+      class="mt-6 px-6 py-3 text-textInverted bg-bgSecondary border border-bgTertiary rounded-full hover:bg-bgTertiary transition-colors duration-200"
+      _="on click 
+        set temp to #left-label.innerText 
+        set #left-label.innerText to #right-label.innerText 
+        set #right-label.innerText to temp
+  
+        toggle @flipped on #calc-container 
+        then trigger keyup on #calc-input"
+    >
+      <span class="text-xl">↕️</span>
+    </button>
+
+    <div id="calc-result" class="mt-8 text-xl text-textPrimary">
+      Enter a value...
     </div>
-    <div id="calc-result" class="mt-4 text-lg"></div>
   </div>
 </div>
-
-<script>
-  let calcMode = "sats-to-usd"; // Default mode
-
-  async function fetchBitcoinPrice() {
-    try {
-      const response = await fetch("/api/btc-price");
-      const data = await response.json();
-      document.getElementById(
-        "price-display"
-      ).textContent = `BTC/USD: $${data.Price}`;
-      const price = parseFloat(data.Price);
-
-      // Update static sats calculator
-      const satsPerUsd = Math.round(100_000_000 / price);
-      document.getElementById(
-        "usd-to-sats"
-      ).textContent = `1 USD = ${satsPerUsd} sats`;
-    } catch (error) {
-      console.error("Error fetching Bitcoin price:", error);
-    }
-  }
-
-  function calculateConversion() {
-    const input = parseFloat(document.getElementById("calc-input").value);
-    const priceDisplay = document.getElementById("price-display").textContent;
-    const price = parseFloat(priceDisplay.split("$")[1]);
-
-    if (isNaN(input) || isNaN(price)) {
-      alert("Enter a valid value and ensure the price is loaded.");
-      return;
-    }
-
-    const result =
-      calcMode === "sats-to-usd"
-        ? (input / 100_000_000) * price
-        : (input / price) * 100_000_000;
-
-    const resultLabel =
-      calcMode === "sats-to-usd"
-        ? `${input} sats = $${result.toFixed(2)}`
-        : `$${input} = ${result.toFixed(0)} sats`;
-
-    document.getElementById("calc-result").textContent = resultLabel;
-  }
-
-  function toggleCalcMode() {
-    calcMode = calcMode === "sats-to-usd" ? "usd-to-sats" : "sats-to-usd";
-    document.getElementById("calc-input").value = "";
-    document.getElementById("calc-result").textContent = "";
-    alert(
-      `Switched to ${
-        calcMode === "sats-to-usd" ? "Sats to USD" : "USD to Sats"
-      } mode.`
-    );
-  }
-
-  setInterval(fetchBitcoinPrice, 30000); // Fetch price every 30 seconds
-  fetchBitcoinPrice(); // Initial fetch on page load
-</script>
 {{end}}
