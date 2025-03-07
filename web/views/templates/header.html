@@ -1,15 +1,58 @@
 {{define "header"}}
-<header
-  class="relative flex items-center justify-between p-4 mb-8 rounded-b-md bg-bgSecondary"
->
-  <!-- Left: Logo -->
-  {{template "app-name"}}
 
-  <!-- Center: Navigation -->
-  {{template "navigation"}}
+<header class="bg-bgSecondary rounded-b-md p-4">
+  <div class="flex justify-center items-center space-x-4">
+    <div
+      id="bitcoin-price"
+      class="text-center flex justify-center items-center space-x-1"
+    >
+      <p class="text-xs text-orange-500 font-bold">BTC</p>
+      <p class="text-xs">=</p>
 
-  <!-- Right: Settings -->
-  {{template "theme-swap"}}
+      <div
+        id="header-btc-price"
+        class="text-xs text-green-400"
+        hx-get="/api/btc-price"
+        hx-trigger="load, every 30s"
+        hx-swap="innerHTML"
+        hx-target="this"
+        _="on htmx:afterRequest 
+            set the innerHTML of me to '$' + JSON.parse(event.detail.xhr.responseText).Price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})"
+      >
+        Loading price...
+      </div>
+    </div>
+    <div
+      id="header-gold-price"
+      class="text-center flex justify-center items-center space-x-1"
+    >
+      <p class="text-xs text-yellow-500 font-bold">gold</p>
+      <p class="text-xs">=</p>
+
+      <div
+        id="gold-price"
+        class="text-xs text-green-400"
+        hx-get="/api/gold-price"
+        hx-trigger="load, every 600s"
+        hx-swap="innerHTML"
+        hx-target="this"
+        _="on htmx:afterRequest 
+            set the innerHTML of me to '$' + JSON.parse(event.detail.xhr.responseText).price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})"
+      >
+        Loading price...
+      </div>
+    </div>
+  </div>
+  <div class="relative flex items-center justify-between mb-4 bg-bgSecondary">
+    <!-- Left: Logo -->
+    {{template "app-name"}}
+
+    <!-- Center: Navigation -->
+    {{template "navigation"}}
+
+    <!-- Right: Settings -->
+    {{template "theme-swap"}}
+  </div>
 </header>
 <script>
   function toggleNav() {

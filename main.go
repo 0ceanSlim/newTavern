@@ -19,12 +19,13 @@ func main() {
 	// Start monitoring the RTMP stream
 	go utils.MonitorStream()
 
-	go api.LogPrice() // Start logging prices
+	//go api.LogPrice() // Start logging prices need to fix this , ignore /logs put in web root and name log, serve the log
 
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/api/btc-price", api.FetchBitcoinPrice)
-	mux.HandleFunc("/api/price-logs", api.ServePriceLogs)
+	//mux.HandleFunc("/api/price-logs", api.ServePriceLogs)
+	mux.HandleFunc("/api/gold-price", api.GoldPriceHandler)
 
 	// Access-Control-Allow-Origin", "*" for nostr.json
 	mux.HandleFunc("/.well-known/nostr.json", utils.ServeWellKnownNostr)
