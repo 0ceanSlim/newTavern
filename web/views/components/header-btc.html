@@ -1,0 +1,22 @@
+{{define "header-btc"}}
+<div
+  id="bitcoin-price"
+  class="text-center flex justify-center items-center space-x-1"
+>
+  <p class="text-xs text-orange-500 font-bold">BTC</p>
+  <p class="text-xs">=</p>
+
+  <div
+    id="header-btc-price"
+    class="text-xs text-green-600"
+    hx-get="/api/btc-price"
+    hx-trigger="load, every 30s"
+    hx-swap="innerHTML"
+    hx-target="this"
+    _="on htmx:afterRequest 
+            set the innerHTML of me to '$' + JSON.parse(event.detail.xhr.responseText).Price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})"
+  >
+    Loading price...
+  </div>
+</div>
+{{end}}

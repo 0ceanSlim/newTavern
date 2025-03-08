@@ -1,0 +1,61 @@
+{{define "btc-calc"}}
+<div
+  id="interactive-calculator"
+  class="p-4 bg-bgSecondary rounded-md border-bgInverted border text-center"
+>
+  <h2 class="text-2xl font-semibold text-textPrimary">sats ↔️ $ calc</h2>
+
+  <div
+    id="calc-container"
+    class="flex items-center justify-center mt-6 space-x-4"
+  >
+    <input
+      type="number"
+      id="calc-input"
+      class="w-1/4 p-3 text-lg text-textPrimary bg-bgSecondary border border-bgInverted rounded-lg focus:outline-none focus:ring-2 focus:ring-textHighlighted"
+      placeholder="Enter value"
+      _="on keyup 
+      set btcPriceText to #btc-price.textContent
+      set btcPrice to parseFloat(btcPriceText)
+      set inputValue to parseFloat(my.value)
+
+      if isNaN(btcPrice) or btcPrice <= 0 
+        set #calc-result.innerText to 'Waiting for BTC price...'
+      else if isNaN(inputValue) or inputValue <= 0
+        set #calc-result.innerText to 'Enter a valid number'
+      else
+        if #calc-container.matches('[flipped]') 
+          set result to (inputValue * 100000000) / btcPrice
+          set #calc-result.innerText to result.toFixed(0) + ' sats'
+        else 
+          set result to (inputValue / 100000000) * btcPrice
+          set #calc-result.innerText to result.toFixed(2) + ' USD'"
+    />
+    <div id="left-label" class="text-xl font-semibold text-textPrimary">
+      sats
+    </div>
+
+    <div id="right-label" class="text-xl font-semibold text-textPrimary hidden">
+      USD
+    </div>
+  </div>
+
+  <button
+    id="flip-button"
+    class="mt-6 px-6 py-3 text-textInverted bg-bgTertiary border border-bgInverted rounded-md hover:bg-bgTertiary transition-colors duration-200"
+    _="on click 
+    set temp to #left-label.innerText 
+    set #left-label.innerText to #right-label.innerText 
+    set #right-label.innerText to temp
+
+    toggle @flipped on #calc-container 
+    then trigger keyup on #calc-input"
+  >
+    <span class="text-xl">↕️</span>
+  </button>
+
+  <div id="calc-result" class="mt-8 text-xl text-textPrimary">
+    Enter a value...
+  </div>
+</div>
+{{end}}

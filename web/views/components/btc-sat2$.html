@@ -1,0 +1,33 @@
+{{define "btc-sat2$"}}
+<!-- Static Sats Calculator -->
+<div id="sats-calculator" class="mb-8">
+  <div id="usd-to-sats" class="mt-2 text-lg">Loading conversion...</div>
+</div>
+
+<script>
+  function updateSatsCalculator() {
+    // Trigger the HTMX request to fetch the BTC price
+    htmx.trigger("#btc-price", "refreshPrice");
+  }
+
+  document.addEventListener("htmx:afterRequest", function (event) {
+    if (event.target.id === "btc-price") {
+      const response = JSON.parse(event.detail.xhr.responseText);
+      const btcPrice = parseFloat(response.Price);
+
+      if (!isNaN(btcPrice) && btcPrice > 0) {
+        const satsPerUsd = Math.round(100_000_000 / btcPrice);
+        document.getElementById(
+          "usd-to-sats"
+        ).textContent = `1 USD = ${satsPerUsd} sats`;
+      }
+    }
+  });
+
+  // Initial update
+  updateSatsCalculator();
+
+  // Set interval to update every 30 seconds
+  setInterval(updateSatsCalculator, 30000);
+</script>
+{{end}}

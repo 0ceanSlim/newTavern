@@ -1,0 +1,22 @@
+{{define "header-gold"}}
+<div
+  id="header-gold-price"
+  class="text-center flex justify-center items-center space-x-1"
+>
+  <p class="text-xs text-yellow-600 font-bold">gold</p>
+  <p class="text-xs">=</p>
+
+  <div
+    id="gold-price"
+    class="text-xs text-green-600"
+    hx-get="/api/gold-price"
+    hx-trigger="load, every 600s"
+    hx-swap="innerHTML"
+    hx-target="this"
+    _="on htmx:afterRequest 
+            set the innerHTML of me to '$' + JSON.parse(event.detail.xhr.responseText).price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})"
+  >
+    Loading price...
+  </div>
+</div>
+{{end}}

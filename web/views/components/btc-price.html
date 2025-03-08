@@ -1,0 +1,18 @@
+{{define "btc-price"}}
+<!-- Bitcoin Price Section -->
+<div id="bitcoin-price" class="mb-8 text-center">
+  <h2 class="text-xl font-semibold">Current Bitcoin Price</h2>
+  <div
+    id="btc-price"
+    class="mt-2 text-2xl text-orange-500 font-bold"
+    hx-get="/api/btc-price"
+    hx-trigger="load, every 30s"
+    hx-swap="innerHTML"
+    hx-target="this"
+    _="on htmx:afterRequest 
+          set the innerHTML of me to JSON.parse(event.detail.xhr.responseText).Price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})"
+  >
+    Loading price...
+  </div>
+</div>
+{{end}}
