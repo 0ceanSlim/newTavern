@@ -19,4 +19,5 @@ func InitializeRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/contact", Contact)
 	mux.HandleFunc("/live/view", LiveView)
 	mux.HandleFunc("/btc-dash", BitcoinDashboard)
+	mux.HandleFunc("/nostr-verified", NostrVerified)
 }

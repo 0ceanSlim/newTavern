@@ -1,1 +1,3 @@
 port: 8787
+cln_rest_url: "http://localhost:9737/v1/invoice"
+rune_token: "YOUR_RUNE_HERE"

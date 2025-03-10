@@ -8,8 +8,9 @@ import (
 )
 
 type Config struct {
-	Port        int    `yaml:"port"`
-
+    Port        int    `yaml:"port"`
+    CLNRestURL  string `yaml:"cln_rest_url"`
+    RuneToken   string `yaml:"rune_token"`
 }
 
 func LoadConfig() (*Config, error) {

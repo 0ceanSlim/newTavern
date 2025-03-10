@@ -1,0 +1,67 @@
+{{define "view"}}
+<main class="flex flex-col items-center my-16 space-y-12 md:my-32">
+  <section class="text-center">
+    <h1 class="text-4xl font-bold md:text-6xl">Generate Lightning Invoice</h1>
+  </section>
+
+  <section class="text-center">
+    <p class="text-2xl italic md:text-3xl">
+      Enter your details to generate an invoice
+    </p>
+  </section>
+
+  <form id="invoiceForm" class="space-y-4">
+    <input
+      type="text"
+      id="name"
+      placeholder="Your Name"
+      required
+      class="w-full p-2 border rounded"
+    />
+    <input
+      type="text"
+      id="npub"
+      placeholder="Your Npub"
+      required
+      class="w-full p-2 border rounded"
+    />
+    <button type="submit" class="px-4 py-2 text-white bg-blue-500 rounded">
+      Generate Invoice
+    </button>
+  </form>
+
+  <div id="invoiceResult" class="mt-4 text-center"></div>
+
+  <script>
+    document
+      .getElementById("invoiceForm")
+      .addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const name = document.getElementById("name").value;
+        const npub = document.getElementById("npub").value;
+
+        try {
+          const response = await fetch("/create-invoice", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, npub }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to generate invoice");
+          }
+
+          const result = await response.json();
+          console.log("Received invoice data:", result); //Add logging.
+          document.getElementById(
+            "invoiceResult"
+          ).innerHTML = `<p>Invoice Generated:</p><p><code>${result.bolt11}</code></p>`;
+        } catch (error) {
+          document.getElementById(
+            "invoiceResult"
+          ).innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+        }
+      });
+  </script>
+</main>
+{{end}}
