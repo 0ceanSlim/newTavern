@@ -1,0 +1,26 @@
+{{define "verified-invoice"}}
+<div
+  id="invoiceModal"
+  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden"
+>
+  <div class="bg-bgSecondary p-6 rounded shadow-lg text-center">
+    <div id="qrCodeContainer" class="p-4"></div>
+    <button
+      id="copyInvoice"
+      class="hover:text-textMuted p-4 font-bold border-bgInverted transition duration-300 border-2 rounded-md bg-bgSecondary text-textPrimary hover:bg-bgTertiary"
+    >
+      Copy Invoice
+    </button>
+    <!--<button id="pay-with-ln" class="payment-button">
+    Pay with Lightning
+  </button>
+  <div id="webln-error" class="hidden">
+    <p>
+      Please install a WebLN-compatible wallet like
+      <a href="https://getalby.com">Alby</a>
+    </p>
+  </div>-->
+    <p class="mt-4">Waiting for Payment...</p>
+  </div>
+</div>
+{{end}}

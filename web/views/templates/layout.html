@@ -28,6 +28,31 @@
       crossorigin="anonymous"
     ></script>
     <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+    <script
+      src="https://unpkg.com/webln@0.3.2/dist/webln.min.js"
+      integrity="sha384-MpjpvOQqXz9nCoLUS/sR0bhLwGYuNPMOBN50jsqhnqAzDq0GiOI0u6oC5fHitzI2"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      .spinner {
+        display: none;
+        width: 32px;
+        height: 32px;
+        border: 5px solid purple;
+        border-top: 5px solid violet;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
     <title>{{template "title"}} - {{.Title}}</title>
   </head>
   <body

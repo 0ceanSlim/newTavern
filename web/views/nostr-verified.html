@@ -1,42 +1,88 @@
 {{define "view"}}
 <main class="flex flex-col items-center my-16 space-y-12 md:my-32">
   <section class="text-center">
-    <h1 class="text-4xl font-bold md:text-6xl">Generate Lightning Invoice</h1>
+    <h1 class="text-4xl font-bold md:text-6xl">
+      Get Verified Status @ Happy Tavern 🍻
+    </h1>
   </section>
 
   <section class="text-center">
     <p class="text-2xl italic md:text-3xl">
-      Enter your details to generate an invoice
+      Enter the name you would like and your npub
     </p>
   </section>
 
-  <form id="invoiceForm" class="space-y-4">
-    <input
-      type="text"
-      id="name"
-      placeholder="Your Name"
-      required
-      class="w-full p-2 border rounded"
-    />
-    <input
-      type="text"
-      id="npub"
-      placeholder="Your Npub"
-      required
-      class="w-full p-2 border rounded"
-    />
-    <button type="submit" class="px-4 py-2 text-white bg-blue-500 rounded">
-      Generate Invoice
-    </button>
-  </form>
+  <div class="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto">
+    <form id="invoiceForm" class="space-y-6">
+      <div class="relative">
+        <input
+          type="text"
+          id="name"
+          placeholder="Your Name"
+          required
+          class="w-full p-2 pr-24 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
+        <span class="absolute right-2 top-2 text-gray-500"
+          >@happytavern.co</span
+        >
+      </div>
+      <div>
+        <input
+          type="text"
+          id="npub"
+          placeholder="Your Npub"
+          required
+          class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
+      </div>
+      <button
+        type="submit"
+        class="w-full px-4 py-2 text-white bg-purple-500 rounded hover:bg-purple-600 transition duration-300"
+      >
+        Get Verified!
+      </button>
+    </form>
+  </div>
 
+  <div id="spinner" class="hidden">Loading...</div>
   <div id="invoiceResult" class="mt-4 text-center"></div>
 
+  <div
+    id="invoiceModal"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden"
+  >
+    <div class="bg-bgSecondary p-6 rounded shadow-lg text-center">
+      <div id="qrCodeContainer" class="p-4"></div>
+      <button
+        id="copyInvoice"
+        class="hover:text-textMuted p-4 font-bold border-bgInverted transition duration-300 border-2 rounded-md bg-bgSecondary text-textPrimary hover:bg-bgTertiary"
+      >
+        Copy Invoice
+      </button>
+      <!--<button id="pay-with-ln" class="payment-button">
+        Pay with Lightning
+      </button>
+      <div id="webln-error" class="hidden">
+        <p>
+          Please install a WebLN-compatible wallet like
+          <a href="https://getalby.com">Alby</a>
+        </p>
+      </div>-->
+
+      <p class="mt-4">Waiting for Payment...</p>
+      <div id="spinner"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
     document
       .getElementById("invoiceForm")
       .addEventListener("submit", async function (event) {
         event.preventDefault();
+        document.getElementById("invoiceForm").classList.add("hidden");
+        document.getElementById("spinner").classList.remove("hidden");
+
         const name = document.getElementById("name").value;
         const npub = document.getElementById("npub").value;
 
@@ -47,16 +93,48 @@
             body: JSON.stringify({ name, npub }),
           });
 
-          if (!response.ok) {
-            throw new Error("Failed to generate invoice");
-          }
+          if (!response.ok) throw new Error("Failed to generate invoice");
 
           const result = await response.json();
-          console.log("Received invoice data:", result); //Add logging.
-          document.getElementById(
-            "invoiceResult"
-          ).innerHTML = `<p>Invoice Generated:</p><p><code>${result.bolt11}</code></p>`;
+          const bolt11 = result.bolt11; // Store the bolt11 invoice
+          document.getElementById("spinner").classList.add("hidden");
+          document.getElementById("invoiceModal").classList.remove("hidden");
+
+          const qrCodeContainer = document.getElementById("qrCodeContainer");
+          qrCodeContainer.innerHTML = "";
+          new QRCode(qrCodeContainer, {
+            text: bolt11, // Use the stored bolt11 variable
+            width: 256,
+            height: 256,
+          });
+
+          document
+            .getElementById("copyInvoice")
+            .addEventListener("click", function () {
+              navigator.clipboard.writeText(bolt11); // Use the stored bolt11 variable
+            });
+
+          // Listen for payment event using SSE
+          const eventSource = new EventSource(
+            `/invoice-events?label=${result.label}`
+          );
+
+          eventSource.onmessage = function (event) {
+            const paymentStatus = JSON.parse(event.data);
+            if (paymentStatus.status === "paid") {
+              eventSource.close();
+              document.getElementById("invoiceModal").classList.add("hidden");
+              document.getElementById("invoiceResult").innerHTML =
+                '<h1 class="text-green-500 text-4xl font-bold">PAID</h1>';
+            }
+          };
+
+          eventSource.onerror = function () {
+            console.error("SSE connection error");
+            eventSource.close();
+          };
         } catch (error) {
+          document.getElementById("spinner").classList.add("hidden");
           document.getElementById(
             "invoiceResult"
           ).innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;

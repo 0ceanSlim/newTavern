@@ -26,6 +26,7 @@ func main() {
 	mux.HandleFunc("/api/btc-price-log", api.ServePriceLogs)
 	mux.HandleFunc("/api/gold-price", api.GoldPriceHandler)
 	mux.HandleFunc("/create-invoice", api.HandleNostrInvoice)
+	mux.HandleFunc("/invoice-events", api.InvoiceEventsHandler)
 
 	// Access-Control-Allow-Origin", "*" for nostr.json
 	mux.HandleFunc("/.well-known/nostr.json", utils.ServeWellKnownNostr)

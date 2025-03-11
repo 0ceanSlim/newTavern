@@ -125,11 +125,10 @@ func startHLSStream(rtmpStreamURL string) {
 		"-crf", "18",
 		"-preset", "veryfast",
 		"-c:a", "aac",
-		"-b:a", "160k",
+		"-b:a", "128k",
 		"-f", "hls",
 		"-hls_time", "10",
 		"-hls_list_size", "0",
-		"-hls_flags", "delete_segments",
 		"web/live/output.m3u8",
 	)
 	err := ffmpegCmd.Start()
