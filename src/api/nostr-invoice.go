@@ -230,7 +230,7 @@ func HandleNostrInvoice(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Received input:", input) // Log input data
 
-	bolt11, label, err := CLNInvoice(10000)
+	bolt11, label, err := CLNInvoice(5000)
 	if err != nil {
 		fmt.Println("Error creating invoice:", err) // Log error
 		http.Error(w, "Error creating invoice", http.StatusInternalServerError)

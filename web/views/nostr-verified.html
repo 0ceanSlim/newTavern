@@ -1,21 +1,67 @@
 {{define "view"}}
-<main class="flex flex-col items-center my-16 space-y-12 md:my-32">
+<main
+  class="flex flex-col items-center my-4 px-4 py-4 md:py-8 md:px-8 space-y-4 md:my-8 rounded-md bg-bgSecondary"
+>
   <section class="text-center">
-    <h1 class="text-4xl font-bold md:text-6xl">
-      Get Verified Status @ Happy Tavern 🍻
+    <h1 class="text-lg font-bold md:text-2xl mb-2">
+      What is a
+      <a
+        href="https://github.com/nostr-protocol/nips/blob/master/05.md"
+        class="hover:text-textHighlighted underline"
+        >nostr address (NIP-05)</a
+      >
+      for Happy Tavern ?
     </h1>
+    <p class="text-left">
+      It's a human readable identifier for your public key. It makes finding
+      your profile on Nostr easier. It makes identifying your account easier. A
+      NIP-05 ID also provides you with a shiny verified checkmark!
+    </p>
   </section>
 
   <section class="text-center">
-    <p class="text-2xl italic md:text-3xl">
-      Enter the name you would like and your npub
+    <p class="text-1xl italic md:text-2xl mb-2">
+      Why get an identifier on Happy Tavern ? 🍻
+    </p>
+    <p class="text-left">
+      Happy Tavern is a Nostr address (NIP-05) and Nostr services provider built
+      by me for everyone. Everything I do is in my free time and is open source.
+      They are my contributions to bitcoin and nostr. If you would like to
+      support what I do, you can pay lightning invoice for a Happy Tavern NIP-05
+      nostr address. Happy Tavern instantly groups your profile among other
+      users, allowing new nostr users to easily find you and make you
+      identifiable. Being verified at Happy Tavern also instantly whitelists you
+      for the nostr relay
+      <a
+        href="https://wheat.happytavern.co"
+        class="hover:text-textHighlighted underline"
+        >wss://wheat.happytavern.co</a
+      >. With a whitelist position, I will permanantly store your notes on my
+      relay (Event purging not applied to the whitelist). My relay may also go
+      to a whitelist only relay at any point in the future. Being on the
+      whitelist will ensure you can always write to wheat. I'm always adding new
+      features for whitelisted users on my relay. So get verified now for the
+      best value. As more features are added, the price may increase for the
+      service. There is no subscription. This is a one time payment.
+    </p>
+  </section>
+
+  <section class="text-center">
+    <p class="font-bold text-1xl md:text-2xl mb-2">
+      ⚡️ How much does it cost?
+    </p>
+    <p>
+      The current price for a Happy Tavern NIP-05 is 5k sats. Fill out the form
+      below to generate an invoice and claim your name now! This price won't
+      last long.
     </p>
   </section>
 
   {{template "verified-form"}}
 
   <div id="spinner" class="hidden">Loading...</div>
-  <div id="invoiceResult" class="mt-4 text-center"></div>
+  <!-- Invoice Result (Shows PAID status) -->
+  <div id="invoiceResult" class="text-center mt-6"></div>
 
   {{template "verified-invoice"}}
 </main>

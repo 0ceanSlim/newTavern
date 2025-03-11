@@ -1,7 +1,7 @@
 {{define "verified-form"}}
 <form
   id="invoiceForm"
-  class="space-y-6 bg-white p-6 rounded-lg shadow-md max-w-md mx-auto"
+  class="space-y-6 border border-bgTertiary p-6 rounded-lg shadow-md max-w-md mx-auto"
   hx-post="/create-invoice"
   hx-trigger="submit"
   hx-target="#invoiceResult"
@@ -21,6 +21,8 @@
       hx-on::after-request="handleNameCheck(event)"
       name="name"
     />
+    <span class="absolute right-2 top-2 text-gray-500">@happytavern.co</span>
+
     <div id="name-error" class="mt-1"></div>
     <script>
       function handleNameCheck(event) {
@@ -83,12 +85,42 @@
 <script src="https://unpkg.com/htmx.org@1.9.5"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
+  function showInvoiceModal() {
+    const modal = document.getElementById("invoiceModal");
+    const content = document.getElementById("invoiceContent");
+
+    modal.classList.remove("hidden");
+    setTimeout(() => {
+      content.classList.remove("opacity-0", "translate-y-full");
+      content.classList.add("animate-fadeInUp");
+    }, 10);
+  }
+
+  function hideInvoiceModal() {
+    const modal = document.getElementById("invoiceModal");
+    const content = document.getElementById("invoiceContent");
+
+    content.classList.add("opacity-0", "translate-y-full");
+
+    setTimeout(() => {
+      modal.classList.add("hidden");
+      content.classList.remove("animate-fadeInUp");
+    }, 500); // Match this with Tailwind animation duration
+  }
+
   document
     .getElementById("invoiceForm")
     .addEventListener("submit", async function (event) {
       event.preventDefault();
-      document.getElementById("invoiceForm").classList.add("hidden");
-      document.getElementById("spinner").classList.remove("hidden");
+
+      const invoiceForm = document.getElementById("invoiceForm");
+      const spinner = document.getElementById("spinner");
+      const invoiceModal = document.getElementById("invoiceModal");
+      const invoiceContent = document.getElementById("invoiceContent");
+
+      // Ensure these elements exist before modifying them
+      if (invoiceForm) invoiceForm.classList.add("hidden");
+      if (spinner) spinner.classList.remove("hidden");
 
       const name = document.getElementById("name").value;
       const npub = document.getElementById("npub").value;
@@ -103,22 +135,34 @@
         if (!response.ok) throw new Error("Failed to generate invoice");
 
         const result = await response.json();
-        const bolt11 = result.bolt11; // Store the bolt11 invoice
-        document.getElementById("spinner").classList.add("hidden");
-        document.getElementById("invoiceModal").classList.remove("hidden");
+        const bolt11 = result.bolt11;
+
+        if (spinner) spinner.classList.add("hidden"); // Hide spinner
+
+        if (invoiceModal) {
+          invoiceModal.classList.remove("hidden");
+          setTimeout(() => {
+            if (invoiceContent) {
+              invoiceContent.classList.remove("opacity-0", "translate-y-full");
+              invoiceContent.classList.add("animate-fadeInUp");
+            }
+          }, 10);
+        }
 
         const qrCodeContainer = document.getElementById("qrCodeContainer");
-        qrCodeContainer.innerHTML = "";
-        new QRCode(qrCodeContainer, {
-          text: bolt11, // Use the stored bolt11 variable
-          width: 256,
-          height: 256,
-        });
+        if (qrCodeContainer) {
+          qrCodeContainer.innerHTML = "";
+          new QRCode(qrCodeContainer, {
+            text: bolt11,
+            width: 256,
+            height: 256,
+          });
+        }
 
         document
           .getElementById("copyInvoice")
-          .addEventListener("click", function () {
-            navigator.clipboard.writeText(bolt11); // Use the stored bolt11 variable
+          ?.addEventListener("click", function () {
+            navigator.clipboard.writeText(bolt11);
           });
 
         // Listen for payment event using SSE
@@ -130,9 +174,8 @@
           const paymentStatus = JSON.parse(event.data);
           if (paymentStatus.status === "paid") {
             eventSource.close();
-            document.getElementById("invoiceModal").classList.add("hidden");
-            document.getElementById("invoiceResult").innerHTML =
-              '<h1 class="text-green-500 text-4xl font-bold">PAID</h1>';
+            hideInvoiceModal();
+            showPaidAnimation();
           }
         };
 
@@ -141,11 +184,40 @@
           eventSource.close();
         };
       } catch (error) {
-        document.getElementById("spinner").classList.add("hidden");
+        if (spinner) spinner.classList.add("hidden");
         document.getElementById(
           "invoiceResult"
         ).innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
       }
     });
+
+  // Hide modal safely
+  function hideInvoiceModal() {
+    const invoiceModal = document.getElementById("invoiceModal");
+    const invoiceContent = document.getElementById("invoiceContent");
+
+    if (!invoiceModal || !invoiceContent) return;
+
+    invoiceContent.classList.add("opacity-0", "translate-y-full");
+    setTimeout(() => {
+      invoiceModal.classList.add("hidden");
+      invoiceContent.classList.remove("animate-fadeInUp");
+    }, 500);
+  }
+
+  // Show "PAID" animation
+  function showPaidAnimation() {
+    const invoiceResult = document.getElementById("invoiceResult");
+    if (!invoiceResult) return;
+
+    invoiceResult.innerHTML = `
+      <div class="flex flex-col items-center">
+        <div class="animate-spin w-16 h-16 border-5 border-green-500 border-t-transparent rounded-full mb-4"></div>
+        <h1 class="text-green-500 text-4xl font-bold animate-fadeInUp">PAID</h1>
+        <p class="mt-2 animate-fadeInUp">Your payment has been received! You can now set your nip05 in your profile to the name you paid for. If you need support please see the contact page in other stuff</p>
+      </div>
+    `;
+  }
 </script>
+
 {{end}}

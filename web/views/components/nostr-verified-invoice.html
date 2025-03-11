@@ -3,8 +3,12 @@
   id="invoiceModal"
   class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden"
 >
-  <div class="bg-bgSecondary p-6 rounded shadow-lg text-center">
-    <div id="qrCodeContainer" class="p-4"></div>
+  <div
+    id="invoiceContent"
+    class="bg-bgSecondary p-6 rounded-lg shadow-lg transform transition-all opacity-0 translate-y-full"
+  >
+    <h2 class="text-2xl font-bold text-center">Payment Invoice</h2>
+    <div id="qrCodeContainer" class="flex justify-center my-4"></div>
     <button
       id="copyInvoice"
       class="hover:text-textMuted p-4 font-bold border-bgInverted transition duration-300 border-2 rounded-md bg-bgSecondary text-textPrimary hover:bg-bgTertiary"
@@ -19,10 +23,17 @@
       Please install a WebLN-compatible wallet like
       <a href="https://getalby.com">Alby</a>
     </p>
-  </div>-->
+  </div>
+    <button
+      onclick="hideInvoiceModal()"
+      class="w-full mt-2 px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition duration-300"
+    >
+      Close
+    </button>-->
 
     <p class="mt-4">Waiting for Payment...</p>
-    <div id="spinner"></div>
+    <!-- Spinner -->
+    <div id="spinner" class="spinner hidden mx-auto"></div>
   </div>
 </div>
 {{end}}

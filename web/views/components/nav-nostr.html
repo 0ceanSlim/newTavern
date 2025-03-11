@@ -76,6 +76,24 @@
           >grain 🌾</a
         >
       </li>
+      <li>
+        <a
+          class="flex items-center px-4 py-2 space-x-2 whitespace-nowrap hover:text-textHighlighted"
+          hx-trigger="click"
+          hx-get="/nostr-verified"
+          hx-push-url="/nostr-verified"
+          href="/nostr-verified"
+          hx-swap="outerHTML"
+          hx-target="body"
+        >
+          <img
+            src="https://cdn3.emoji.gg/emojis/4805-verified-developer-badge-purple.png"
+            alt="badge"
+            class="w-6 h-6 rounded-sm"
+          />
+          <span>Get Verified!</span>
+        </a>
+      </li>
     </ul>
   </div>
 </li>
