@@ -2,15 +2,20 @@ package api
 
 import (
 	"bytes"
+	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"goFrame/src/utils"
+
+	"github.com/btcsuite/btcutil/bech32"
 )
 
 var (
@@ -42,12 +47,10 @@ type InvoiceResponse struct {
 	CreatedIndex  int    `json:"created_index"`
 }
 
+// PaymentLog represents a payment entry
 type PaymentLog struct {
-	Name   string `json:"name"`
-	Npub   string `json:"npub"`
-	Label  string `json:"label"`
-	Status string `json:"status"`
-	Time   string `json:"time"`
+	Name string `json:"name"`
+	Key  string `json:"key"`
 }
 
 func generateUniqueLabel() string {
@@ -106,7 +109,7 @@ func CLNInvoice(sats int) (string, string, error) {
 	return response.Bolt11, label, nil
 }
 
-func WaitForNostrInvoice(label, name, npub string) {
+func WaitForNostrInvoice(label, name, key string) {
 	fmt.Println("Waiting for invoice with label:", label)
 	url := fmt.Sprintf("%s/v1/waitinvoice", CLN_REST_URL)
 
@@ -146,7 +149,7 @@ func WaitForNostrInvoice(label, name, npub string) {
 
 	fmt.Println("Invoice paid! Details:", string(body))
 
-	logPayment(name, npub, label, "paid")
+	logPayment(name, key)
 
 	// Notify SSE clients
 	if ch, exists := sseClients[label]; exists {
@@ -154,25 +157,57 @@ func WaitForNostrInvoice(label, name, npub string) {
 	}
 }
 
-func logPayment(name, npub, label, status string) {
-	logEntry := PaymentLog{
-		Name:   name,
-		Npub:   npub,
-		Label:  label,
-		Status: status,
-		Time:   time.Now().Format(time.RFC3339),
+// DecodeNpub decodes a Bech32 encoded npub to its corresponding pubkey
+func DecodeNpub(npub string) (string, error) {
+	hrp, data, err := bech32.Decode(npub)
+	if err != nil {
+		return "", err
+	}
+	if hrp != "npub" {
+		return "", errors.New("invalid hrp")
 	}
 
-	file, err := os.OpenFile("web/logs/nostr_payments.json", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	decodedData, err := bech32.ConvertBits(data, 5, 8, false)
 	if err != nil {
-		fmt.Println("Error opening log file:", err)
+		return "", err
+	}
+
+	return strings.ToLower(hex.EncodeToString(decodedData)), nil
+}
+
+// logPayment logs the payment with name as the key and pubkey as the value under "names"
+func logPayment(name, npub string) {
+	pubkey, err := DecodeNpub(npub)
+	if err != nil {
+		fmt.Println("Error decoding npub:", err)
 		return
 	}
-	defer file.Close()
 
-	jsonData, _ := json.Marshal(logEntry)
-	file.WriteString(string(jsonData) + "\n")
-	fmt.Println("Payment logged!")
+	logFile := "web/logs/nostr.json"
+
+	// Read existing file content
+	var logs map[string]map[string]string // Structure: {"names": { "name": "key", ... }}
+	file, err := os.ReadFile(logFile)
+	if err == nil && len(file) > 0 {
+		_ = json.Unmarshal(file, &logs) // Ignore errors; assume empty if invalid
+	}
+
+	// Ensure the "names" key exists
+	if logs == nil {
+		logs = make(map[string]map[string]string)
+	}
+	if logs["names"] == nil {
+		logs["names"] = make(map[string]string)
+	}
+
+	// Add or update entry
+	logs["names"][name] = pubkey
+
+	// Write back to file
+	jsonData, _ := json.MarshalIndent(logs, "", "  ")
+	os.WriteFile(logFile, jsonData, 0644)
+
+	fmt.Println("Payment logged successfully!")
 }
 
 func HandleNostrInvoice(w http.ResponseWriter, r *http.Request) {

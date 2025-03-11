@@ -1,34 +1,86 @@
 {{define "verified-form"}}
-<div class="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto">
-  <form id="invoiceForm" class="space-y-6">
-    <div class="relative">
-      <input
-        type="text"
-        id="name"
-        placeholder="Your Name"
-        required
-        class="w-full p-2 pr-24 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-      />
-      <span class="absolute right-2 top-2 text-gray-500">@happytavern.co</span>
-    </div>
-    <div>
-      <input
-        type="text"
-        id="npub"
-        placeholder="Your Npub"
-        required
-        class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-      />
-    </div>
-    <button
-      type="submit"
-      class="w-full px-4 py-2 text-white bg-purple-500 rounded hover:bg-purple-600 transition duration-300"
-    >
-      Get Verified!
-    </button>
-  </form>
-</div>
+<form
+  id="invoiceForm"
+  class="space-y-6 bg-white p-6 rounded-lg shadow-md max-w-md mx-auto"
+  hx-post="/create-invoice"
+  hx-trigger="submit"
+  hx-target="#invoiceResult"
+  hx-swap="innerHTML"
+>
+  <div class="relative">
+    <input
+      type="text"
+      id="name"
+      placeholder="name"
+      required
+      class="w-full p-2 text-black pr-24 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+      hx-get="/check-name"
+      hx-trigger="keyup changed delay:200ms"
+      hx-target="#name-error"
+      hx-swap="innerHTML"
+      hx-on::after-request="handleNameCheck(event)"
+      name="name"
+    />
+    <div id="name-error" class="mt-1"></div>
+    <script>
+      function handleNameCheck(event) {
+        const nameError = document.getElementById("name-error");
 
+        if (event.detail.xhr.status === 409) {
+          // Name is taken
+          nameError.innerHTML = `<p class="text-red-500">❌ Name is already taken</p>`;
+        } else if (event.detail.xhr.status === 200) {
+          // Name is available
+          nameError.innerHTML = `<p class="text-green-500">✅ Name is available</p>`;
+        }
+      }
+    </script>
+  </div>
+
+  <div>
+    <input
+      type="text"
+      id="npub"
+      placeholder="npub1234"
+      required
+      class="w-full p-2 border text-black rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+      hx-get="/check-npub"
+      hx-trigger="keyup changed delay:200ms"
+      hx-target="#npub-error"
+      hx-swap="innerHTML"
+      hx-on::after-request="handleNpubCheck(event)"
+      name="npub"
+    />
+    <div id="npub-error" class="mt-1"></div>
+
+    <script>
+      function handleNpubCheck(event) {
+        const npubError = document.getElementById("npub-error");
+
+        if (event.detail.xhr.status === 400) {
+          // Invalid npub format
+          npubError.innerHTML = `<p class="text-red-500">❌ Invalid npub format</p>`;
+        } else if (event.detail.xhr.status === 409) {
+          // Pubkey exists (already verified)
+          npubError.innerHTML = `<p class="text-yellow-500">⚡ You're already verified!</p>`;
+        } else if (event.detail.xhr.status === 200) {
+          // Pubkey is available
+          npubError.innerHTML = `<p class="text-green-500">✅ This npub is available</p>`;
+        }
+      }
+    </script>
+  </div>
+
+  <button
+    type="submit"
+    id="submit-btn"
+    class="w-full px-4 py-2 text-white bg-purple-500 rounded hover:bg-purple-600 transition duration-300"
+  >
+    Get Verified!
+  </button>
+</form>
+
+<script src="https://unpkg.com/htmx.org@1.9.5"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
   document
@@ -36,6 +88,7 @@
     .addEventListener("submit", async function (event) {
       event.preventDefault();
       document.getElementById("invoiceForm").classList.add("hidden");
+      document.getElementById("spinner").classList.remove("hidden");
 
       const name = document.getElementById("name").value;
       const npub = document.getElementById("npub").value;
@@ -88,6 +141,7 @@
           eventSource.close();
         };
       } catch (error) {
+        document.getElementById("spinner").classList.add("hidden");
         document.getElementById(
           "invoiceResult"
         ).innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
