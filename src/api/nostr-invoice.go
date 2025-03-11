@@ -183,7 +183,7 @@ func logPayment(name, npub string) {
 		return
 	}
 
-	logFile := "web/logs/nostr.json"
+	logFile := "web/.well-known/nostr.json"
 
 	// Read existing file content
 	var logs map[string]map[string]string // Structure: {"names": { "name": "key", ... }}

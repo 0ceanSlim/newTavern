@@ -15,7 +15,7 @@ func CheckNameHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logFile := "web/logs/nostr.json"
+	logFile := "web/.well-known/nostr.json"
 
 	// Read the JSON file
 	file, err := os.ReadFile(logFile)
