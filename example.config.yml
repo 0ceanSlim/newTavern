@@ -1,3 +1,8 @@
-port: 8787
-cln_rest_url: "http://localhost:9737/v1/invoice"
-rune_token: "YOUR_RUNE_HERE"
+server:
+  port: 8085
+  tls: false # Set to true if using HTTPS
+
+lightning:
+  type: "cln" # "lnd" or "eclair" support by others
+  cln_rest_url: http://127.0.0.1:3030 # adjust port and host ip accordingly
+  rune: "your rune here"

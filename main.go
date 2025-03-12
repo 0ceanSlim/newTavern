@@ -5,16 +5,19 @@ import (
 	"goFrame/src/api"
 	"goFrame/src/routes"
 	"goFrame/src/utils"
+	"log"
 	"net/http"
 	"time"
 )
 
 func main() {
-	// Load Configurations
-	cfg, err := utils.LoadConfig()
-	if err != nil {
-		fmt.Printf("Failed to load config: %v\n", err)
-		return
+
+	// Default config path
+	configPath := "config.yml"
+
+	// Load config
+	if err := utils.LoadConfig(configPath); err != nil {
+		log.Fatalf("Failed to load config: %v", err)
 	}
 
 	// Start monitoring the RTMP stream
@@ -53,6 +56,6 @@ func main() {
 		}
 	}()
 
-	fmt.Printf("Server is running on http://localhost:%d\n", cfg.Port)
-	http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), mux)
+	fmt.Printf("Server is running on http://localhost:%d\n", utils.AppConfig.Server.Port)
+	http.ListenAndServe(fmt.Sprintf(":%d", utils.AppConfig.Server.Port), mux)
 }

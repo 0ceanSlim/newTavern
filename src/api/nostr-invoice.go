@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -24,13 +25,16 @@ var (
 )
 
 func init() {
-	config, err := utils.LoadConfig()
-	if err != nil {
-		panic("Failed to load config: " + err.Error())
+	// Default config path
+	configPath := "config.yml"
+
+	// Load config
+	if err := utils.LoadConfig(configPath); err != nil {
+		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	CLN_REST_URL = config.CLNRestURL
-	RUNE_TOKEN = config.RuneToken
+	CLN_REST_URL = utils.AppConfig.Lightning.CLNRestURL
+	RUNE_TOKEN = utils.AppConfig.Lightning.Rune
 }
 
 type InvoiceRequest struct {
