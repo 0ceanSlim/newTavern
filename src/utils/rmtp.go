@@ -13,7 +13,7 @@ import (
 var ffmpegCmd *exec.Cmd
 
 func MonitorStream() {
-	rtmpStreamURL := "rtmp://10.1.10.7/live" // Replace with your RTMP stream URL
+	rtmpStreamURL := "rtmp://127.0.0.1/live" // Replace with your RTMP stream URL
 	for {
 		if isStreamActive(rtmpStreamURL) {
 			log.Println("Stream detected, starting HLS process...")
