@@ -3,28 +3,95 @@ package utils
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"time"
+
+	"gopkg.in/yaml.v3"
 )
 
-var ffmpegCmd *exec.Cmd
+type StreamConfig struct {
+	RTMPStreamURL string `yaml:"rtmp_stream_url"`
+}
+
+type MetadataConfig struct {
+	Dtag 		string `yaml:"dtag"` //dtag (unique identifier) of the stream, stays the same through updates
+	Pubkey 	string `yaml:"pubkey"`// author pubkey of stream
+	Title       string `yaml:"title"` //Title of Stream
+	Summery string `yaml:"summery"` //Summery of Stream
+	Image 	 string `yaml:"image"` // url of the Stream Thumbnail
+	Tags 	 []string `yaml:"tags"` // aray of tags [t] in stream event
+	StreamURL string `yaml:"stream_url"` // always https://happytavern.co/live/output.m3u8
+	RecordingURL string `yaml:"recording_url"`// url of the stream recording when handle existing files is called
+	Starts string `yaml:"starts"` //unix stamp when stream starts
+	Ends string `yaml:"ends"` //unix stamp when stream stops
+	Status string `yaml:"status"` //planned, live, ended
+}
+
+var (
+	ffmpegCmd       *exec.Cmd
+	streamConfig    StreamConfig
+	metadataConfig  MetadataConfig
+)
+
+func LoadStreamConfig(path string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("failed to read config file: %w", err)
+	}
+	return yaml.Unmarshal(data, &streamConfig)
+}
+
+func LoadMetadataConfig(path string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("failed to read metadata file: %w", err)
+	}
+	return yaml.Unmarshal(data, &metadataConfig)
+}
+
+func GetMetadataConfig() MetadataConfig {
+	return metadataConfig
+}
+
+func SaveMetadataConfig(path string) error {
+	data, err := yaml.Marshal(&metadataConfig)
+	if err != nil {
+		return fmt.Errorf("failed to write metadata file: %w", err)
+	}
+	return os.WriteFile(path, data, 0644)
+}
+
+func generateDtag() string {
+	return fmt.Sprintf("dtag-%d", rand.Int63())
+}
 
 func MonitorStream() {
-	rtmpStreamURL := "rtmp://127.0.0.1" // Replace with your RTMP stream URL
+	if err := LoadStreamConfig("config.yml"); err != nil {
+		log.Fatalf("Error loading stream config: %v", err)
+	}
+	if err := LoadMetadataConfig("stream.yml"); err != nil {
+		log.Fatalf("Error loading metadata config: %v", err)
+	}
+
+	metadataConfig.Dtag = generateDtag()
+	metadataConfig.Starts = fmt.Sprintf("%d", time.Now().Unix())
+	metadataConfig.Status = "live"
+	SaveMetadataConfig("stream.yml")
+
 	for {
-		if isStreamActive(rtmpStreamURL) {
+		if isStreamActive(streamConfig.RTMPStreamURL) {
 			log.Println("Stream detected, starting HLS process...")
-			startHLSStream(rtmpStreamURL)
-			waitForStreamToStop(rtmpStreamURL)
-			stopHLSStream()
+			startHLSStream()
+			watchMetadataChanges()
+			waitForStreamToStop()
 			handleExistingFiles()
-		} else {
-			//log.Println("No active stream detected. Retrying...")
 		}
-		time.Sleep(5 * time.Second) // Check every 5 seconds
+		time.Sleep(5 * time.Second)
 	}
 }
 
@@ -92,6 +159,13 @@ func containsVideoStream(output []byte) bool {
 	return false
 }
 
+func watchMetadataChanges() {
+	for {
+		time.Sleep(10 * time.Second)
+		LoadMetadataConfig("stream.yml")
+	}
+}
+
 func handleExistingFiles() {
 	log.Println("Archiving existing files...")
 	dateFolder := time.Now().Format("2006-01-02_15-04-05")
@@ -114,46 +188,60 @@ func handleExistingFiles() {
 			log.Printf("Moved file %s to %s", file, targetDir)
 		}
 	}
+
+	metadataConfig.RecordingURL = targetDir
+	metadataConfig.Status = "ended"
+	metadataConfig.Ends = fmt.Sprintf("%d", time.Now().Unix())
+	SaveMetadataConfig("stream.yml")
 	log.Println("Archiving completed.")
 }
 
-func startHLSStream(rtmpStreamURL string) {
-	log.Println("Starting HLS stream...")
+
+func startHLSStream() {
+	log.Println("Starting HLS stream with metadata...")
 	ffmpegCmd = exec.Command("ffmpeg",
-		"-i", rtmpStreamURL,
+		"-i", streamConfig.RTMPStreamURL,
 		"-c:v", "libx264",
 		"-crf", "18",
 		"-preset", "veryfast",
 		"-c:a", "aac",
-		"-b:a", "128k",
+		"-b:a", "160k",
+		"-metadata", fmt.Sprintf("dtag=%s", metadataConfig.Dtag),
+		"-metadata", fmt.Sprintf("pubkey=%s", metadataConfig.Pubkey),
+		"-metadata", fmt.Sprintf("title=%s", metadataConfig.Title),
+		"-metadata", fmt.Sprintf("summery=%s", metadataConfig.Summery),
+		"-metadata", fmt.Sprintf("image=%s", metadataConfig.Image),
+		"-metadata", fmt.Sprintf("tags=%s", metadataConfig.Tags),
+		"-metadata", fmt.Sprintf("stream_url=%s", metadataConfig.StreamURL),
+		"-metadata", fmt.Sprintf("recording_url=%s", metadataConfig.RecordingURL),
+		"-metadata", fmt.Sprintf("starts=%s", metadataConfig.Starts),
+		"-metadata", fmt.Sprintf("ends=%s", metadataConfig.Ends),
+		"-metadata", fmt.Sprintf("status=%s", metadataConfig.Status),
 		"-f", "hls",
 		"-hls_time", "10",
 		"-hls_list_size", "0",
 		"web/live/output.m3u8",
 	)
-	err := ffmpegCmd.Start()
-	if err != nil {
+	if err := ffmpegCmd.Start(); err != nil {
 		log.Fatalf("Failed to start FFmpeg: %v", err)
 	}
 	log.Println("HLS stream started.")
 }
 
-func waitForStreamToStop(rtmpStreamURL string) {
-	consecutiveInactiveChecks := 0
-	const maxInactiveChecks = 3 // Require 5 consecutive inactive checks to confirm stop
+func waitForStreamToStop() {
+	inactiveChecks := 0
+	const maxInactiveChecks = 3
 
 	for {
-		if !isStreamActive(rtmpStreamURL) {
-			consecutiveInactiveChecks++
-			log.Printf("Inactive check %d/%d", consecutiveInactiveChecks, maxInactiveChecks)
-			if consecutiveInactiveChecks >= maxInactiveChecks {
-				log.Println("Stream stopped after multiple inactive checks. Stopping HLS stream...")
+		if !isStreamActive(streamConfig.RTMPStreamURL) {
+			inactiveChecks++
+			if inactiveChecks >= maxInactiveChecks {
+				log.Println("Stream stopped. Stopping HLS stream...")
 				stopHLSStream()
 				break
 			}
 		} else {
-			consecutiveInactiveChecks = 0 // Reset if the stream becomes active again
-			//log.Println("Stream is active, resetting inactive checks.")
+			inactiveChecks = 0
 		}
 		time.Sleep(5 * time.Second)
 	}

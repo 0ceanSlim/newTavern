@@ -6,3 +6,5 @@ lightning:
   type: "cln" # "lnd" or "eclair" support by others
   cln_rest_url: http://127.0.0.1:3030 # adjust port and host ip accordingly
   rune: "your rune here"
+
+rtmp_stream_url: "rtmp://127.0.0.1/"

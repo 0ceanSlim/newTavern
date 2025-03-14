@@ -1,16 +1,56 @@
 {{define "view"}}
-<video id="videoPlayer" controls autoplay class="flex rounded-md"></video>
+<div class="max-w-2xl p-6 mx-auto bg-white rounded-lg shadow-md">
+  <h1 class="text-2xl font-bold">{{ .CustomData.Title }}</h1>
+  <p class="text-gray-600">{{ .CustomData.Summery }}</p>
+  <img
+    id="streamImage"
+    src="{{ .CustomData.Image }}"
+    class="w-full my-4 rounded-md"
+    alt="Stream Thumbnail"
+  />
+  <p>
+    <strong>Status:</strong>
+    <span id="streamStatus">{{ .CustomData.Status }}</span>
+  </p>
+  <p>
+    <strong>Tags:</strong>
+    <span id="streamTags">{{ range .CustomData.Tags }} #{{ . }} {{ end }}</span>
+  </p>
+
+  <video id="videoPlayer" controls autoplay class="w-full rounded-md"></video>
+</div>
+
 <script>
   var video = document.getElementById("videoPlayer");
   var streamURL = "{{ .CustomData.StreamURL }}";
+
   if (Hls.isSupported()) {
     var hls = new Hls();
     hls.loadSource(streamURL);
     hls.attachMedia(video);
   } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-    video.src = streamURL; // Native support
+    video.src = streamURL;
   } else {
     console.error("HLS not supported in this browser.");
   }
+
+  function updateStreamMetadata() {
+    fetch("/api/stream-data")
+      .then((response) => response.json())
+      .then((data) => {
+        document.querySelector("h1").textContent = data.Title;
+        document.querySelector("p").textContent = data.Summery;
+        document.getElementById("streamImage").src = data.Image;
+        document.getElementById("streamStatus").textContent = data.Status;
+        document.getElementById("streamTags").innerHTML = data.Tags.map(
+          (tag) => `#${tag}`
+        ).join(" ");
+      })
+      .catch((error) =>
+        console.error("Error updating stream metadata:", error)
+      );
+  }
+
+  setInterval(updateStreamMetadata, 30000); // Poll every 30 seconds
 </script>
 {{end}}
