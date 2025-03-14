@@ -114,7 +114,7 @@ func isStreamActive(url string) bool {
 
 	if err != nil {
 		log.Printf("ffprobe error: %v", err)
-		log.Printf("ffprobe output: %s", string(output))
+		//log.Printf("ffprobe output: %s", string(output))
 		return false
 	}
 
