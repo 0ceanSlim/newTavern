@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"goFrame/src/api"
+	"goFrame/src/handlers"
 	"goFrame/src/routes"
 	"goFrame/src/utils"
 	"log"
@@ -45,6 +46,26 @@ func main() {
 
 	// Initialize Routes
 	routes.InitializeRoutes(mux)
+
+	// LNURL endpoints with manual method checking
+	mux.HandleFunc("/.well-known/lnurlp/", func(w http.ResponseWriter, r *http.Request) {
+		// Path validation middleware
+		if r.Method != "GET" {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		
+		// Pass through to handler
+		handlers.LNURLpHandler(w, r)
+	})
+	
+	mux.HandleFunc("/lnurl/pay", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		handlers.InvoiceRequest(w, r)
+	})
 
 	// Start logging prices as a goroutine with 5 minute interval
 	go func() {

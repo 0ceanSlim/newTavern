@@ -67,7 +67,7 @@ func SaveMetadataConfig(path string) error {
 }
 
 func generateDtag() string {
-	return fmt.Sprintf("dtag-%d", rand.Int63())
+	return fmt.Sprintf("%d", rand.Intn(900000) + 100000)
 }
 
 func MonitorStream() {
@@ -166,39 +166,23 @@ func watchMetadataChanges() {
 	}
 }
 
-func handleExistingFiles() {
-	log.Println("Archiving existing files...")
-	dateFolder := time.Now().Format("2006-01-02_15-04-05")
-	targetDir := filepath.Join("web/.videos/past-streams", dateFolder)
-
-	if err := os.MkdirAll(targetDir, os.ModePerm); err != nil {
-		log.Fatalf("Failed to create archive folder: %v", err)
-	}
-
-	files, err := filepath.Glob("web/live/*")
-	if err != nil {
-		log.Fatalf("Failed to list files in live directory: %v", err)
-	}
-
-	for _, file := range files {
-		err := os.Rename(file, filepath.Join(targetDir, filepath.Base(file)))
-		if err != nil {
-			log.Printf("Failed to move file %s: %v", file, err)
-		} else {
-			log.Printf("Moved file %s to %s", file, targetDir)
-		}
-	}
-
-	metadataConfig.RecordingURL = targetDir
-	metadataConfig.Status = "ended"
-	metadataConfig.Ends = fmt.Sprintf("%d", time.Now().Unix())
-	SaveMetadataConfig("stream.yml")
-	log.Println("Archiving completed.")
-}
-
-
 func startHLSStream() {
 	log.Println("Starting HLS stream with metadata...")
+
+	// Update metadata before starting the stream
+	metadataConfig.Dtag = generateDtag()
+	metadataConfig.Starts = fmt.Sprintf("%d", time.Now().Unix())
+	metadataConfig.Status = "live"
+	metadataConfig.RecordingURL = fmt.Sprintf("https://happytavern.co/.videos/past-streams/%s-%s", time.Now().Format("1-2-2006"), metadataConfig.Dtag)
+	SaveMetadataConfig("stream.yml")
+
+	// Start watching metadata changes in a goroutine
+	go watchMetadataChanges()
+
+	encodeHLSStream()
+}
+
+func encodeHLSStream() {
 	ffmpegCmd = exec.Command("ffmpeg",
 		"-i", streamConfig.RTMPStreamURL,
 		"-c:v", "libx264",
@@ -228,6 +212,7 @@ func startHLSStream() {
 	log.Println("HLS stream started.")
 }
 
+
 func waitForStreamToStop() {
 	inactiveChecks := 0
 	const maxInactiveChecks = 3
@@ -250,6 +235,12 @@ func waitForStreamToStop() {
 func stopHLSStream() {
 	if ffmpegCmd != nil && ffmpegCmd.Process != nil {
 		log.Println("Stopping HLS stream...")
+		metadataConfig.Status = "ended"
+		metadataConfig.Ends = fmt.Sprintf("%d", time.Now().Unix())
+		SaveMetadataConfig("stream.yml")
+
+		encodeHLSStream()
+
 		err := ffmpegCmd.Process.Kill()
 		if err != nil {
 			log.Printf("Failed to stop FFmpeg process: %v", err)
@@ -258,4 +249,31 @@ func stopHLSStream() {
 		}
 		ffmpegCmd = nil
 	}
+
+	handleExistingFiles()
+}
+
+func handleExistingFiles() {
+	log.Println("Archiving existing files...")
+	archiveFolder := fmt.Sprintf("web/.videos/past-streams/%s-%s", time.Now().Format("1-2-2006"), metadataConfig.Dtag)
+
+	if err := os.MkdirAll(archiveFolder, os.ModePerm); err != nil {
+		log.Fatalf("Failed to create archive folder: %v", err)
+	}
+
+	files, err := filepath.Glob("web/live/*")
+	if err != nil {
+		log.Fatalf("Failed to list files in live directory: %v", err)
+	}
+
+	for _, file := range files {
+		err := os.Rename(file, filepath.Join(archiveFolder, filepath.Base(file)))
+		if err != nil {
+			log.Printf("Failed to move file %s: %v", file, err)
+		} else {
+			log.Printf("Moved file %s to %s", file, archiveFolder)
+		}
+	}
+
+	log.Println("Archiving completed.")
 }

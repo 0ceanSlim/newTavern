@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"goFrame/src/lightning"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -38,5 +39,8 @@ func InvoiceRequest(w http.ResponseWriter, r *http.Request) {
 		"pr": invoice,
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	}
 }
