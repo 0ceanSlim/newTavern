@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"goFrame/src/utils"
@@ -9,8 +10,17 @@ import (
 
 // LiveView serves an HTML page to view the HLS stream.
 func LiveView(w http.ResponseWriter, r *http.Request) {
+	// Load the configuration to get the port
+	if err := utils.LoadConfig("config.yml"); err != nil {
+		http.Error(w, "Failed to load config", http.StatusInternalServerError)
+		return
+	}
+
+	// Construct API URL dynamically using the configured port
+	apiURL := fmt.Sprintf("http://localhost:%d/api/stream-data", utils.AppConfig.Server.Port)
+
 	// Fetch stream metadata from the API
-	resp, err := http.Get("http://localhost:8787/api/stream-data")
+	resp, err := http.Get(apiURL)
 	if err != nil {
 		http.Error(w, "Failed to fetch stream metadata", http.StatusInternalServerError)
 		return
