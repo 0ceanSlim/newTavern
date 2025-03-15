@@ -1,15 +1,9 @@
 {{define "view"}}
-<div class="max-w-2xl p-6 mx-auto bg-white rounded-lg shadow-md">
-  <h1 class="text-2xl font-bold">{{ .CustomData.Title }}</h1>
-  <p class="text-gray-600">{{ .CustomData.Summery }}</p>
-  <img
-    id="streamImage"
-    src="{{ .CustomData.Image }}"
-    class="w-full my-4 rounded-md"
-    alt="Stream Thumbnail"
-  />
+<div class="max-w-2xl p-6 mx-auto bg-bgSecondary rounded-lg shadow-md">
+  <h1 id="streamTitle" class="text-2xl font-bold">{{ .CustomData.Title }}</h1>
+  <p id="streamSummary">{{ .CustomData.Summary }}</p>
+
   <p>
-    <strong>Status:</strong>
     <span id="streamStatus">{{ .CustomData.Status }}</span>
   </p>
   <p>
@@ -17,40 +11,131 @@
     <span id="streamTags">{{ range .CustomData.Tags }} #{{ . }} {{ end }}</span>
   </p>
 
-  <video id="videoPlayer" controls autoplay class="w-full rounded-md"></video>
+  <video
+    id="videoPlayer"
+    controls
+    autoplay
+    class="w-full rounded-md"
+    poster=""
+  ></video>
 </div>
 
 <script>
   var video = document.getElementById("videoPlayer");
   var streamURL = "{{ .CustomData.StreamURL }}";
+  var streamStatus = "{{ .CustomData.Status }}";
+  var isLive = streamStatus.toLowerCase() === "live";
+  var isPlayingLive = false;
 
-  if (Hls.isSupported()) {
-    var hls = new Hls();
-    hls.loadSource(streamURL);
-    hls.attachMedia(video);
-  } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-    video.src = streamURL;
-  } else {
-    console.error("HLS not supported in this browser.");
+  function loadStream(url, poster = "") {
+    if (isPlayingLive && isLive) return;
+
+    if (Hls.isSupported()) {
+      var hls = new Hls();
+      hls.loadSource(url);
+      hls.attachMedia(video);
+    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      video.src = url;
+    } else {
+      console.error("HLS not supported in this browser.");
+    }
+
+    video.poster = poster;
+    isPlayingLive = isLive;
   }
 
-  function updateStreamMetadata() {
-    fetch("/api/stream-data")
-      .then((response) => response.json())
-      .then((data) => {
-        document.querySelector("h1").textContent = data.Title;
-        document.querySelector("p").textContent = data.Summery;
-        document.getElementById("streamImage").src = data.Image;
-        document.getElementById("streamStatus").textContent = data.Status;
-        document.getElementById("streamTags").innerHTML = data.Tags.map(
-          (tag) => `#${tag}`
-        ).join(" ");
-      })
-      .catch((error) =>
-        console.error("Error updating stream metadata:", error)
+  async function updateStreamMetadata() {
+    try {
+      const response = await fetch("/api/stream-data");
+      if (!response.ok) throw new Error("Failed to fetch stream data");
+
+      const data = await response.json();
+      document.getElementById("streamTitle").textContent = data.Title;
+      document.getElementById("streamSummary").textContent = data.Summary;
+      document.getElementById("streamStatus").textContent = data.Status;
+      document.getElementById("streamTags").innerHTML = data.Tags.map(
+        (tag) => `#${tag}`
+      ).join(" ");
+
+      if (data.Status.toLowerCase() === "live") {
+        isLive = true;
+        loadStream(data.StreamURL);
+      } else {
+        isLive = false;
+        loadMostRecentPastStream();
+      }
+    } catch (error) {
+      console.error("Error updating stream metadata:", error);
+    }
+  }
+
+  async function loadMostRecentPastStream() {
+    try {
+      const response = await fetch("/.videos/past-streams/");
+      if (!response.ok) throw new Error("Failed to fetch past streams");
+
+      const text = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(text, "text/html");
+      const links = Array.from(doc.querySelectorAll("a")).map((a) =>
+        a.textContent.trim()
       );
+
+      const streamFolders = links.filter((name) =>
+        /^\d{1,2}-\d{1,2}-\d{4}-\d{6}\/?$/.test(name)
+      );
+
+      if (streamFolders.length === 0) throw new Error("No past streams found");
+
+      let latestStream = null;
+      let latestTimestamp = 0;
+
+      for (const folder of streamFolders) {
+        const folderPath = folder.replace(/\/$/, "");
+        const metadataUrl = `/.videos/past-streams/${folderPath}/metadata.json`;
+
+        try {
+          const metaResponse = await fetch(metadataUrl);
+          if (!metaResponse.ok) continue;
+
+          const metadata = await metaResponse.json();
+          const endTime = parseInt(metadata.Ends, 10);
+
+          if (endTime > latestTimestamp) {
+            latestTimestamp = endTime;
+            latestStream = metadata;
+            latestStream.Folder = folderPath;
+          }
+        } catch (error) {
+          console.warn(`Skipping ${folderPath}: metadata.json fetch failed`);
+        }
+      }
+
+      if (!latestStream) throw new Error("No valid past streams found");
+
+      loadStream(
+        `${latestStream.RecordingURL}/output.m3u8`,
+        latestStream.Image || ""
+      );
+
+      document.getElementById("streamTitle").textContent = latestStream.Title;
+      document.getElementById("streamSummary").textContent =
+        latestStream.Summary;
+      document.getElementById("streamStatus").textContent = "Offline";
+      document.getElementById("streamTags").innerHTML = latestStream.Tags.map(
+        (tag) => `#${tag}`
+      ).join(" ");
+    } catch (error) {
+      console.error("Error loading past stream:", error);
+    }
   }
 
-  setInterval(updateStreamMetadata, 30000); // Poll every 30 seconds
+  if (isLive) {
+    loadStream(streamURL);
+  } else {
+    loadMostRecentPastStream();
+  }
+
+  setInterval(updateStreamMetadata, 30000);
 </script>
 {{end}}
