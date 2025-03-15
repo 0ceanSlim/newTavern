@@ -1,23 +1,23 @@
 {{define "view"}}
-<div class="max-w-2xl p-6 mx-auto bg-bgSecondary rounded-lg shadow-md">
-  <h1 id="streamTitle" class="text-2xl font-bold">{{ .CustomData.Title }}</h1>
-  <p id="streamSummary">{{ .CustomData.Summary }}</p>
+<div id="streamStatus" class="max-w-32 rounded-lg font-bold text-xl mx-auto bg-red-500 my-2">{{ .CustomData.Status }}</div>
+<div class=" p-6 mx-auto bg-bgSecondary rounded-lg shadow-md mt-2">
 
+  <h1 id="streamTitle" class="text-2xl font-bold">{{ .CustomData.Title }}</h1>
+  
+  <video
+  id="videoPlayer"
+  controls
+  autoplay
+  class="w-full rounded-md"
+  poster=""
+></video>
+  
   <p>
-    <span id="streamStatus">{{ .CustomData.Status }}</span>
-  </p>
-  <p>
-    <strong>Tags:</strong>
+    <p id="streamSummary">{{ .CustomData.Summary }}</p>
     <span id="streamTags">{{ range .CustomData.Tags }} #{{ . }} {{ end }}</span>
   </p>
 
-  <video
-    id="videoPlayer"
-    controls
-    autoplay
-    class="w-full rounded-md"
-    poster=""
-  ></video>
+  
 </div>
 
 <script>
@@ -26,6 +26,7 @@
   var streamStatus = "{{ .CustomData.Status }}";
   var isLive = streamStatus.toLowerCase() === "live";
   var isPlayingLive = false;
+  var intervalId = null;
 
   function loadStream(url, poster = "") {
     if (isPlayingLive && isLive) return;
@@ -50,18 +51,18 @@
       if (!response.ok) throw new Error("Failed to fetch stream data");
 
       const data = await response.json();
-      document.getElementById("streamTitle").textContent = data.Title;
-      document.getElementById("streamSummary").textContent = data.Summary;
-      document.getElementById("streamStatus").textContent = data.Status;
-      document.getElementById("streamTags").innerHTML = data.Tags.map(
-        (tag) => `#${tag}`
-      ).join(" ");
-
       if (data.Status.toLowerCase() === "live") {
+        document.getElementById("streamTitle").textContent = data.Title;
+        document.getElementById("streamSummary").textContent = data.Summary;
+        document.getElementById("streamStatus").textContent = data.Status;
+        document.getElementById("streamTags").innerHTML = data.Tags.map(
+          (tag) => `#${tag}`
+        ).join(" ");
+
         isLive = true;
         loadStream(data.StreamURL);
       } else {
-        isLive = false;
+        stopLiveUpdates();
         loadMostRecentPastStream();
       }
     } catch (error) {
@@ -130,12 +131,24 @@
     }
   }
 
+  function startLiveUpdates() {
+    if (!intervalId) {
+      intervalId = setInterval(updateStreamMetadata, 30000);
+    }
+  }
+
+  function stopLiveUpdates() {
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+  }
+
   if (isLive) {
     loadStream(streamURL);
+    startLiveUpdates();
   } else {
     loadMostRecentPastStream();
   }
-
-  setInterval(updateStreamMetadata, 30000);
 </script>
 {{end}}
