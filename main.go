@@ -6,6 +6,7 @@ import (
 	"goFrame/src/handlers"
 	"goFrame/src/routes"
 	"goFrame/src/utils"
+	"goFrame/src/utils/stream"
 	"log"
 	"net/http"
 	"time"
@@ -22,7 +23,7 @@ func main() {
 	}
 
 	// Start monitoring the RTMP stream
-	go utils.MonitorStream()
+	go stream.MonitorStream()
 
 	mux := http.NewServeMux()
 
@@ -54,11 +55,11 @@ func main() {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
-		
+
 		// Pass through to handler
 		handlers.LNURLpHandler(w, r)
 	})
-	
+
 	mux.HandleFunc("/lnurl/pay", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
