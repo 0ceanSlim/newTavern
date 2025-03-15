@@ -1,33 +1,7 @@
-# Unique identifier for the stream - Generated at stream start, DO NOT CHANGE.
-dtag: ""
-
-# Public key of the stream author - Can be set manually before starting.
-pubkey: "My Live Stream"
-
-# Title of the stream - Can be changed while the stream is live.
-title: "Stream Title"
-
-# Summary/description of the stream - Can be changed while the stream is live.
-summery: "This is a live stream of my event."
-
-# Thumbnail image URL for the stream - Can be changed while the stream is live.
-image: "https://example.com/image.jpg"
-
-# Tags associated with the stream - Can be changed while the stream is live.
-tags: ["tag1", "tag2", "tag3"]
-
-# Always set to the live stream HLS URL - Managed by the server, DO NOT CHANGE.
-stream_url: "https://happytavern.co/live/output.m3u8"
-
-# Recording URL - Set when the stream ends, DO NOT CHANGE manually.
-recording_url: ""
-
-# Unix timestamp of when the stream starts - Set at stream start, DO NOT CHANGE.
-starts: ""
-
-# Unix timestamp of when the stream ends - Set when the stream ends, DO NOT CHANGE.
-ends: ""
-
-# Status of the stream: "planned", "live", or "ended".
-# Managed by the server but can be monitored.
-status: "planned"
+title: Stream Title
+summery: This is a live stream of my event.
+image: https://example.com/image.jpg
+tags:
+  - tag1
+  - tag2
+  - tag3
