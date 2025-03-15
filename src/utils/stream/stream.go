@@ -56,14 +56,6 @@ func GetMetadataConfig() MetadataConfig {
 	return metadataConfig
 }
 
-func SaveMetadataConfig(path string) error {
-	data, err := yaml.Marshal(&metadataConfig)
-	if err != nil {
-		return fmt.Errorf("failed to write metadata file: %w", err)
-	}
-	return os.WriteFile(path, data, 0644)
-}
-
 // Watch metadata file and update JSON when changes occur
 func watchMetadata(stopWatcher chan bool) {
 	lastModified := time.Time{}
@@ -87,12 +79,22 @@ func watchMetadata(stopWatcher chan bool) {
 			if modTime.After(lastModified) {
 				log.Println("Metadata file changed, updating JSON...")
 
-				// Reload metadata
-				if err := loadMetadata(yamlFile); err != nil {
+				// Load updated metadata from YAML
+				var updatedMetadata MetadataConfig
+				if err := loadMetadata(yamlFile, &updatedMetadata); err != nil {
 					log.Printf("Failed to reload metadata: %v", err)
+					continue
 				}
 
-				// Save updated metadata to JSON
+				// Only update allowed fields
+				metadataMutex.Lock()
+				metadataConfig.Title = updatedMetadata.Title
+				metadataConfig.Summery = updatedMetadata.Summery
+				metadataConfig.Image = updatedMetadata.Image
+				metadataConfig.Tags = updatedMetadata.Tags
+				metadataMutex.Unlock()
+
+				// Save the updated metadata to JSON
 				if err := saveMetadata(metadataFile); err != nil {
 					log.Printf("Failed to save updated metadata: %v", err)
 				}
@@ -105,11 +107,11 @@ func watchMetadata(stopWatcher chan bool) {
 	}
 }
 
-// Load metadata from YAML
-func loadMetadata(filename string) error {
+// Load metadata from YAML into a provided struct
+func loadMetadata(filename string, dest *MetadataConfig) error {
 	file, err := os.ReadFile(filename)
 	if err != nil {
 		return err
 	}
-	return yaml.Unmarshal(file, &metadataConfig)
+	return yaml.Unmarshal(file, dest)
 }

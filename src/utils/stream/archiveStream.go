@@ -68,9 +68,4 @@ func archiveStream() {
 	}
 
 	log.Println("Archiving completed successfully.")
-
-	// Update metadata with recording URL
-	metadataConfig.RecordingURL = fmt.Sprintf("https://happytavern.co/.videos/past-streams/%s-%s",
-		time.Now().Format("1-2-2006"), metadataConfig.Dtag)
-	SaveMetadataConfig("stream.yml")
 }

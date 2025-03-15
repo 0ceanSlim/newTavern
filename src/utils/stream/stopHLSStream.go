@@ -18,18 +18,8 @@ func stopHLSStream() {
 	metadataConfig.Status = "ended"
 	metadataConfig.Ends = fmt.Sprintf("%d", time.Now().Unix())
 
-	// Save metadata to YAML
-	err := SaveMetadataConfig("stream.yml")
-	if err != nil {
-		log.Printf("Error saving metadata to YAML: %v", err)
-	}
-
 	// Save metadata to JSON before archiving
-	metadataFile := "web/live/metadata.json"
-	err = saveMetadata(metadataFile)
-	if err != nil {
-		log.Printf("Error saving metadata to JSON: %v", err)
-	}
+	saveMetadata("web/live/metadata.json")
 
 	if ffmpegCmd != nil && ffmpegCmd.Process != nil {
 		log.Println("Stopping FFmpeg process...")
