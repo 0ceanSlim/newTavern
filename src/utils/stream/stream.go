@@ -34,7 +34,6 @@ var (
 	streamConfig   StreamConfig
 	metadataConfig MetadataConfig
 	metadataMutex  sync.Mutex
-	lastMetadata   string // Store a hash or string representation of the last applied metadata
 )
 
 func LoadStreamConfig(path string) error {
