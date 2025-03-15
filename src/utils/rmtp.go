@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"math/rand"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"gopkg.in/yaml.v3"
@@ -19,23 +21,25 @@ type StreamConfig struct {
 }
 
 type MetadataConfig struct {
-	Dtag 		string `yaml:"dtag"` //dtag (unique identifier) of the stream, stays the same through updates
-	Pubkey 	string `yaml:"pubkey"`// author pubkey of stream
-	Title       string `yaml:"title"` //Title of Stream
-	Summery string `yaml:"summery"` //Summery of Stream
-	Image 	 string `yaml:"image"` // url of the Stream Thumbnail
-	Tags 	 []string `yaml:"tags"` // aray of tags [t] in stream event
-	StreamURL string `yaml:"stream_url"` // always https://happytavern.co/live/output.m3u8
-	RecordingURL string `yaml:"recording_url"`// url of the stream recording when handle existing files is called
-	Starts string `yaml:"starts"` //unix stamp when stream starts
-	Ends string `yaml:"ends"` //unix stamp when stream stops
-	Status string `yaml:"status"` //planned, live, ended
+	Dtag         string   `yaml:"dtag"`          //dtag (unique identifier) of the stream, stays the same through updates
+	Pubkey       string   `yaml:"pubkey"`        // author pubkey of stream
+	Title        string   `yaml:"title"`         //Title of Stream
+	Summery      string   `yaml:"summery"`       //Summery of Stream
+	Image        string   `yaml:"image"`         // url of the Stream Thumbnail
+	Tags         []string `yaml:"tags"`          // aray of tags [t] in stream event
+	StreamURL    string   `yaml:"stream_url"`    // always https://happytavern.co/live/output.m3u8
+	RecordingURL string   `yaml:"recording_url"` // url of the stream recording when handle existing files is called
+	Starts       string   `yaml:"starts"`        //unix stamp when stream starts
+	Ends         string   `yaml:"ends"`          //unix stamp when stream stops
+	Status       string   `yaml:"status"`        //planned, live, ended
 }
 
 var (
-	ffmpegCmd       *exec.Cmd
-	streamConfig    StreamConfig
-	metadataConfig  MetadataConfig
+	ffmpegCmd      *exec.Cmd
+	streamConfig   StreamConfig
+	metadataConfig MetadataConfig
+	metadataMutex  sync.Mutex
+	lastMetadata   string // Store a hash or string representation of the last applied metadata
 )
 
 func LoadStreamConfig(path string) error {
@@ -67,9 +71,10 @@ func SaveMetadataConfig(path string) error {
 }
 
 func generateDtag() string {
-	return fmt.Sprintf("%d", rand.Intn(900000) + 100000)
+	return fmt.Sprintf("%d", rand.Intn(900000)+100000)
 }
 
+// MonitorStream is the main function that handles the streaming process
 func MonitorStream() {
 	if err := LoadStreamConfig("config.yml"); err != nil {
 		log.Fatalf("Error loading stream config: %v", err)
@@ -78,19 +83,49 @@ func MonitorStream() {
 		log.Fatalf("Error loading metadata config: %v", err)
 	}
 
-	metadataConfig.Dtag = generateDtag()
-	metadataConfig.Starts = fmt.Sprintf("%d", time.Now().Unix())
-	metadataConfig.Status = "live"
-	SaveMetadataConfig("stream.yml")
-
 	for {
-		if isStreamActive(streamConfig.RTMPStreamURL) {
+		rtmpURL := streamConfig.RTMPStreamURL
+
+		if isStreamActive(rtmpURL) {
 			log.Println("Stream detected, starting HLS process...")
-			startHLSStream()
-			watchMetadataChanges()
-			waitForStreamToStop()
-			handleExistingFiles()
+
+			metadataMutex.Lock()
+			// Initialize stream metadata if this is a new stream
+			if metadataConfig.Status != "live" {
+				metadataConfig.Dtag = generateDtag()
+				metadataConfig.Starts = fmt.Sprintf("%d", time.Now().Unix())
+				metadataConfig.Status = "live"
+				metadataConfig.RecordingURL = fmt.Sprintf("https://happytavern.co/.videos/past-streams/%s-%s",
+					time.Now().Format("1-2-2006"), metadataConfig.Dtag)
+				SaveMetadataConfig("stream.yml")
+			}
+			metadataMutex.Unlock()
+
+			// Create a channel to signal the metadata watcher to stop
+			stopWatcher := make(chan bool)
+
+			// Start watching metadata changes in a goroutine
+			go watchMetadataChanges(stopWatcher)
+
+			// Start encoding the stream
+			encodeHLSStream()
+
+			// Wait for the stream to stop
+			log.Println("Beginning to monitor stream for inactivity...")
+			waitForStreamToStop(rtmpURL)
+
+			log.Println("Stream has been detected as inactive, beginning shutdown sequence...")
+
+			// Signal metadata watcher to stop
+			stopWatcher <- true
+
+			// Stop the HLS stream and perform cleanup
+			log.Println("Calling stopHLSStream function...")
+			stopHLSStream()
+
+			log.Println("Stream shutdown sequence completed")
 		}
+
 		time.Sleep(5 * time.Second)
 	}
 }
@@ -114,7 +149,7 @@ func isStreamActive(url string) bool {
 
 	if err != nil {
 		log.Printf("ffprobe error: %v", err)
-		//log.Printf("ffprobe output: %s", string(output))
+		log.Printf("ffprobe output: %s", string(output))
 		return false
 	}
 
@@ -159,30 +194,33 @@ func containsVideoStream(output []byte) bool {
 	return false
 }
 
-func watchMetadataChanges() {
-	for {
-		time.Sleep(10 * time.Second)
-		LoadMetadataConfig("stream.yml")
-	}
-}
-
-func startHLSStream() {
+func encodeHLSStream() {
 	log.Println("Starting HLS stream with metadata...")
 
-	// Update metadata before starting the stream
-	metadataConfig.Dtag = generateDtag()
-	metadataConfig.Starts = fmt.Sprintf("%d", time.Now().Unix())
-	metadataConfig.Status = "live"
-	metadataConfig.RecordingURL = fmt.Sprintf("https://happytavern.co/.videos/past-streams/%s-%s", time.Now().Format("1-2-2006"), metadataConfig.Dtag)
-	SaveMetadataConfig("stream.yml")
+	metadataMutex.Lock()
+	defer metadataMutex.Unlock()
 
-	// Start watching metadata changes in a goroutine
-	go watchMetadataChanges()
+	// Update the last applied metadata hash
+	lastMetadata = getMetadataHash()
 
-	encodeHLSStream()
-}
+	// Create a new output directory with timestamp to avoid conflicts
+	outputDir := "web/live"
+	outputFile := filepath.Join(outputDir, "output.m3u8")
 
-func encodeHLSStream() {
+	// Ensure the directory exists
+	if err := os.MkdirAll(outputDir, os.ModePerm); err != nil {
+		log.Fatalf("Failed to create output directory: %v", err)
+	}
+
+	// Convert tags slice to comma-separated string for metadata
+	tagString := ""
+	if len(metadataConfig.Tags) > 0 {
+		tagBytes, err := json.Marshal(metadataConfig.Tags)
+		if err == nil {
+			tagString = string(tagBytes)
+		}
+	}
+
 	ffmpegCmd = exec.Command("ffmpeg",
 		"-i", streamConfig.RTMPStreamURL,
 		"-c:v", "libx264",
@@ -195,7 +233,7 @@ func encodeHLSStream() {
 		"-metadata", fmt.Sprintf("title=%s", metadataConfig.Title),
 		"-metadata", fmt.Sprintf("summery=%s", metadataConfig.Summery),
 		"-metadata", fmt.Sprintf("image=%s", metadataConfig.Image),
-		"-metadata", fmt.Sprintf("tags=%s", metadataConfig.Tags),
+		"-metadata", fmt.Sprintf("tags=%s", tagString),
 		"-metadata", fmt.Sprintf("stream_url=%s", metadataConfig.StreamURL),
 		"-metadata", fmt.Sprintf("recording_url=%s", metadataConfig.RecordingURL),
 		"-metadata", fmt.Sprintf("starts=%s", metadataConfig.Starts),
@@ -204,76 +242,212 @@ func encodeHLSStream() {
 		"-f", "hls",
 		"-hls_time", "10",
 		"-hls_list_size", "0",
-		"web/live/output.m3u8",
+		outputFile,
 	)
+
+	// Start the FFmpeg process
 	if err := ffmpegCmd.Start(); err != nil {
 		log.Fatalf("Failed to start FFmpeg: %v", err)
 	}
-	log.Println("HLS stream started.")
+	log.Println("HLS stream started with updated metadata.")
 }
 
+func watchMetadataChanges(stopChan chan bool) {
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
 
-func waitForStreamToStop() {
-	inactiveChecks := 0
-	const maxInactiveChecks = 3
+	// Get initial metadata hash
+	lastMetadata = getMetadataHash()
 
 	for {
-		if !isStreamActive(streamConfig.RTMPStreamURL) {
-			inactiveChecks++
-			if inactiveChecks >= maxInactiveChecks {
-				log.Println("Stream stopped. Stopping HLS stream...")
-				stopHLSStream()
-				break
+		select {
+		case <-ticker.C:
+			// Load updated metadata
+			metadataMutex.Lock()
+			if err := LoadMetadataConfig("stream.yml"); err != nil {
+				log.Printf("Error loading metadata config: %v", err)
+				metadataMutex.Unlock()
+				continue
+			}
+
+			// Check if relevant metadata has changed
+			newHash := getMetadataHash()
+			if newHash != lastMetadata {
+				log.Println("Metadata changed, updating stream...")
+				lastMetadata = newHash
+
+				// Only if stream is already running
+				if ffmpegCmd != nil && ffmpegCmd.Process != nil {
+					// Create a new FFmpeg process with updated metadata
+					oldCmd := ffmpegCmd
+
+					// Start new process with updated metadata
+					encodeHLSStream()
+
+					// Give the new process a moment to start
+					time.Sleep(2 * time.Second)
+
+					// Terminate the old process
+					if oldCmd != nil && oldCmd.Process != nil {
+						log.Println("Stopping old FFmpeg process...")
+						if err := oldCmd.Process.Kill(); err != nil {
+							log.Printf("Failed to stop old FFmpeg process: %v", err)
+						}
+						oldCmd.Wait() // Wait for it to fully terminate
+					}
+				}
+			}
+			metadataMutex.Unlock()
+
+		case <-stopChan:
+			return
+		}
+	}
+}
+
+// Helper function to get a string representation of metadata fields we care about for stream updates
+func getMetadataHash() string {
+	return fmt.Sprintf("%s:%s:%s:%s:%v",
+		metadataConfig.Title,
+		metadataConfig.Summery,
+		metadataConfig.Image,
+		metadataConfig.Tags,
+		metadataConfig.Status)
+}
+
+// waitForStreamToStop monitors the RTMP stream and returns when it detects the stream has stopped
+func waitForStreamToStop(rtmpStreamURL string) {
+	consecutiveInactiveChecks := 0
+	const maxInactiveChecks = 3 // Require 3 consecutive inactive checks to confirm stop
+
+	for {
+		active := isStreamActive(rtmpStreamURL)
+
+		if !active {
+			consecutiveInactiveChecks++
+			log.Printf("Inactive check %d/%d", consecutiveInactiveChecks, maxInactiveChecks)
+
+			if consecutiveInactiveChecks >= maxInactiveChecks {
+				log.Println("Stream stopped after multiple inactive checks. Proceeding to cleanup...")
+				return // Exit the function to handle stream stop
 			}
 		} else {
-			inactiveChecks = 0
+			if consecutiveInactiveChecks > 0 {
+				log.Println("Stream is active again, resetting inactive checks.")
+			}
+			consecutiveInactiveChecks = 0 // Reset if the stream becomes active again
 		}
+
 		time.Sleep(5 * time.Second)
 	}
 }
 
+// stopHLSStream terminates the FFmpeg process and archives the stream files
 func stopHLSStream() {
+	log.Println("stopHLSStream: Beginning stream shutdown process...")
+
+	metadataMutex.Lock()
+	defer metadataMutex.Unlock()
+
+	// Update metadata for stream end
+	log.Println("Updating metadata for stream end...")
+	metadataConfig.Status = "ended"
+	metadataConfig.Ends = fmt.Sprintf("%d", time.Now().Unix())
+	err := SaveMetadataConfig("stream.yml")
+	if err != nil {
+		log.Printf("Error saving metadata: %v", err)
+	}
+
 	if ffmpegCmd != nil && ffmpegCmd.Process != nil {
-		log.Println("Stopping HLS stream...")
-		metadataConfig.Status = "ended"
-		metadataConfig.Ends = fmt.Sprintf("%d", time.Now().Unix())
-		SaveMetadataConfig("stream.yml")
+		log.Println("Stopping FFmpeg process...")
 
-		encodeHLSStream()
-
+		// Kill the FFmpeg process
 		err := ffmpegCmd.Process.Kill()
 		if err != nil {
 			log.Printf("Failed to stop FFmpeg process: %v", err)
 		} else {
-			log.Println("FFmpeg process stopped.")
+			log.Println("FFmpeg process kill signal sent successfully.")
 		}
+
+		// Wait for the process to fully terminate
+		log.Println("Waiting for FFmpeg process to fully terminate...")
+		err = ffmpegCmd.Wait()
+		if err != nil {
+			log.Printf("FFmpeg wait error: %v", err)
+		}
+		log.Println("FFmpeg process fully terminated.")
 		ffmpegCmd = nil
+	} else {
+		log.Println("No active FFmpeg process found to terminate.")
 	}
 
+	// Archive the stream files
+	log.Println("Beginning archive process for stream files...")
 	handleExistingFiles()
 }
 
+// handleExistingFiles archives the stream segments to a permanent location
 func handleExistingFiles() {
-	log.Println("Archiving existing files...")
-	archiveFolder := fmt.Sprintf("web/.videos/past-streams/%s-%s", time.Now().Format("1-2-2006"), metadataConfig.Dtag)
+	log.Println("handleExistingFiles: Archiving existing stream files...")
 
+	// Create a timestamped folder for this stream's archive
+	archiveFolder := fmt.Sprintf("web/.videos/past-streams/%s-%s",
+		time.Now().Format("1-2-2006"), metadataConfig.Dtag)
+
+	log.Printf("Creating archive directory: %s", archiveFolder)
 	if err := os.MkdirAll(archiveFolder, os.ModePerm); err != nil {
 		log.Fatalf("Failed to create archive folder: %v", err)
+		return
 	}
 
+	// Find all files in the live directory
 	files, err := filepath.Glob("web/live/*")
 	if err != nil {
 		log.Fatalf("Failed to list files in live directory: %v", err)
+		return
 	}
 
+	log.Printf("Found %d files to archive", len(files))
+
+	// Move each file to the archive location
 	for _, file := range files {
-		err := os.Rename(file, filepath.Join(archiveFolder, filepath.Base(file)))
+		destPath := filepath.Join(archiveFolder, filepath.Base(file))
+		log.Printf("Moving file from %s to %s", file, destPath)
+
+		err := os.Rename(file, destPath)
 		if err != nil {
 			log.Printf("Failed to move file %s: %v", file, err)
-		} else {
-			log.Printf("Moved file %s to %s", file, archiveFolder)
+
+			// Try to copy if move fails
+			srcFile, err := os.Open(file)
+			if err != nil {
+				log.Printf("Failed to open source file %s: %v", file, err)
+				continue
+			}
+			defer srcFile.Close()
+
+			destFile, err := os.Create(destPath)
+			if err != nil {
+				log.Printf("Failed to create destination file %s: %v", destPath, err)
+				continue
+			}
+			defer destFile.Close()
+
+			_, err = io.Copy(destFile, srcFile)
+			if err != nil {
+				log.Printf("Failed to copy file data: %v", err)
+				continue
+			}
+
+			// Try to remove original after successful copy
+			os.Remove(file)
 		}
 	}
 
-	log.Println("Archiving completed.")
+	log.Println("Archiving completed successfully.")
+
+	// Update metadata with recording URL
+	metadataConfig.RecordingURL = fmt.Sprintf("https://happytavern.co/.videos/past-streams/%s-%s",
+		time.Now().Format("1-2-2006"), metadataConfig.Dtag)
+	SaveMetadataConfig("stream.yml")
 }
