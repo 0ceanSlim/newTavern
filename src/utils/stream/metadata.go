@@ -41,7 +41,7 @@ func watchMetadata(stopWatcher chan bool) {
 				// Only update allowed fields
 				metadataMutex.Lock()
 				metadataConfig.Title = updatedMetadata.Title
-				metadataConfig.Summery = updatedMetadata.Summery
+				metadataConfig.Summary = updatedMetadata.Summary
 				metadataConfig.Image = updatedMetadata.Image
 				metadataConfig.Tags = updatedMetadata.Tags
 				metadataMutex.Unlock()

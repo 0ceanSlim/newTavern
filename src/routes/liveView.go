@@ -39,7 +39,7 @@ func LiveView(w http.ResponseWriter, r *http.Request) {
 		CustomData: map[string]interface{}{
 			"StreamURL":    streamData["StreamURL"],
 			"Title":        streamData["Title"],
-			"Summery":      streamData["Summery"],
+			"Summary":      streamData["Summary"],
 			"Image":        streamData["Image"],
 			"Tags":         streamData["Tags"],
 			"Status":       streamData["Status"],

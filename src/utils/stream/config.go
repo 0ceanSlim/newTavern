@@ -15,7 +15,7 @@ type StreamConfig struct {
 
 type MetadataConfig struct {
 	Title        string   `yaml:"title"`         //Title of Stream
-	Summery      string   `yaml:"summery"`       //Summery of Stream
+	Summary      string   `yaml:"summary"`       //Summary of Stream
 	Image        string   `yaml:"image"`         // url of the Stream Thumbnail
 	Tags         []string `yaml:"tags"`          // aray of tags [t] in stream event
 	Pubkey       string   `yaml:"pubkey"`        // author pubkey of stream
