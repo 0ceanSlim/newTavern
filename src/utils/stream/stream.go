@@ -65,65 +65,52 @@ func SaveMetadataConfig(path string) error {
 	return os.WriteFile(path, data, 0644)
 }
 
-func watchMetadataChanges(stopChan chan bool) {
-	ticker := time.NewTicker(5 * time.Second)
-	defer ticker.Stop()
-
-	// Get initial metadata hash
-	lastMetadata = getMetadataHash()
+// Watch metadata file and update JSON when changes occur
+func watchMetadata(stopWatcher chan bool) {
+	lastModified := time.Time{}
+	metadataFile := "web/live/metadata.json"
+	yamlFile := "stream.yml"
 
 	for {
 		select {
-		case <-ticker.C:
-			// Load updated metadata
-			metadataMutex.Lock()
-			if err := LoadMetadataConfig("stream.yml"); err != nil {
-				log.Printf("Error loading metadata config: %v", err)
-				metadataMutex.Unlock()
+		case <-stopWatcher:
+			log.Println("Stopping metadata watcher...")
+			return
+		default:
+			info, err := os.Stat(yamlFile)
+			if err != nil {
+				log.Printf("Error watching metadata file: %v", err)
+				time.Sleep(5 * time.Second)
 				continue
 			}
 
-			// Check if relevant metadata has changed
-			newHash := getMetadataHash()
-			if newHash != lastMetadata {
-				log.Println("Metadata changed, updating stream...")
-				lastMetadata = newHash
+			modTime := info.ModTime()
+			if modTime.After(lastModified) {
+				log.Println("Metadata file changed, updating JSON...")
 
-				// Only if stream is already running
-				if ffmpegCmd != nil && ffmpegCmd.Process != nil {
-					// Create a new FFmpeg process with updated metadata
-					oldCmd := ffmpegCmd
-
-					// Start new process with updated metadata
-					startHLSStream()
-
-					// Give the new process a moment to start
-					time.Sleep(2 * time.Second)
-
-					// Terminate the old process
-					if oldCmd != nil && oldCmd.Process != nil {
-						log.Println("Stopping old FFmpeg process...")
-						if err := oldCmd.Process.Kill(); err != nil {
-							log.Printf("Failed to stop old FFmpeg process: %v", err)
-						}
-						oldCmd.Wait() // Wait for it to fully terminate
-					}
+				// Reload metadata
+				if err := loadMetadata(yamlFile); err != nil {
+					log.Printf("Failed to reload metadata: %v", err)
 				}
-			}
-			metadataMutex.Unlock()
 
-		case <-stopChan:
-			return
+				// Save updated metadata to JSON
+				if err := saveMetadata(metadataFile); err != nil {
+					log.Printf("Failed to save updated metadata: %v", err)
+				}
+
+				lastModified = modTime
+			}
+
+			time.Sleep(2 * time.Second)
 		}
 	}
 }
 
-// Helper function to get a string representation of metadata fields we care about for stream updates
-func getMetadataHash() string {
-	return fmt.Sprintf("%s:%s:%s:%s:%v",
-		metadataConfig.Title,
-		metadataConfig.Summery,
-		metadataConfig.Image,
-		metadataConfig.Tags,
-		metadataConfig.Status)
+// Load metadata from YAML
+func loadMetadata(filename string) error {
+	file, err := os.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	return yaml.Unmarshal(file, &metadataConfig)
 }

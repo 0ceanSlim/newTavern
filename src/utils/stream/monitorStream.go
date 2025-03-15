@@ -25,6 +25,7 @@ func MonitorStream() {
 			// Initialize stream metadata if this is a new stream
 			if metadataConfig.Status != "live" {
 				metadataConfig.Dtag = generateDtag()
+				metadataConfig.Ends = ""
 				metadataConfig.Starts = fmt.Sprintf("%d", time.Now().Unix())
 				metadataConfig.Status = "live"
 				metadataConfig.RecordingURL = fmt.Sprintf("https://happytavern.co/.videos/past-streams/%s-%s",
@@ -37,7 +38,7 @@ func MonitorStream() {
 			stopWatcher := make(chan bool)
 
 			// Start watching metadata changes in a goroutine
-			go watchMetadataChanges(stopWatcher)
+			go watchMetadata(stopWatcher)
 
 			// Start encoding the stream
 			startHLSStream()
