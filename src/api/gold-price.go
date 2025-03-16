@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/cookiejar"
+	"os"
 	"strings"
 	"time"
 
@@ -13,7 +14,49 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-// Function to fetch the gold price
+const cacheFile = "web/logs/last-gold-price.json"
+
+// GoldPriceCache structure
+type GoldPriceCache struct {
+	Price     string    `json:"price"`
+	Timestamp time.Time `json:"timestamp"`
+}
+
+// Save price to cache
+func saveGoldPriceToCache(price string) {
+	data := GoldPriceCache{
+		Price:     price,
+		Timestamp: time.Now(),
+	}
+
+	file, err := os.Create(cacheFile)
+	if err != nil {
+		fmt.Println("Failed to save cache:", err)
+		return
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	_ = encoder.Encode(data)
+}
+
+// Load price from cache
+func loadGoldPriceFromCache() (string, error) {
+	file, err := os.Open(cacheFile)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	var data GoldPriceCache
+	if err := json.NewDecoder(file).Decode(&data); err != nil {
+		return "", err
+	}
+
+	return data.Price, nil
+}
+
 // Function to fetch the gold price
 func FetchGoldPrice() (string, error) {
 	url := "https://www.moneymetals.com/gold-price"
@@ -106,19 +149,38 @@ type GoldPriceResponse struct {
 	Error string `json:"error,omitempty"`
 }
 
-// Handler for the /gold-price route
+// GoldPriceHandler handles the /gold-price route
 func GoldPriceHandler(w http.ResponseWriter, r *http.Request) {
-	goldPrice, err := FetchGoldPrice()
-	response := GoldPriceResponse{}
+	var goldPrice string
+	var err error
 
+	// Try FetchGoldPrice first
+	goldPrice, err = FetchGoldPrice()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		response.Error = err.Error()
-	} else {
-		response.Price = goldPrice
+		fmt.Println("FetchGoldPrice failed:", err)
+
+		// Try FetchGoldPriceWithBrowser
+		goldPrice, err = FetchGoldPriceWithBrowser()
+		if err != nil {
+			fmt.Println("FetchGoldPriceWithBrowser failed:", err)
+
+			// Try loading from cache as the last resort
+			goldPrice, err = loadGoldPriceFromCache()
+			if err != nil {
+				fmt.Println("Failed to load price from cache:", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(GoldPriceResponse{Error: "Failed to fetch gold price"})
+				return
+			}
+		}
 	}
 
-	// Set Content-Type and send JSON response
+	// Cache the price if successfully fetched from any method except cache
+	if err == nil {
+		saveGoldPriceToCache(goldPrice)
+	}
+
+	// Send response
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(GoldPriceResponse{Price: goldPrice})
 }
