@@ -14,17 +14,17 @@ type StreamConfig struct {
 }
 
 type MetadataConfig struct {
-	Title        string   `yaml:"title"`         //Title of Stream
-	Summary      string   `yaml:"summary"`       //Summary of Stream
-	Image        string   `yaml:"image"`         // url of the Stream Thumbnail
-	Tags         []string `yaml:"tags"`          // aray of tags [t] in stream event
-	Pubkey       string   `yaml:"pubkey"`        // author pubkey of stream
-	Dtag         string   `yaml:"dtag"`          //dtag (unique identifier) of the stream, stays the same through updates
-	StreamURL    string   `yaml:"stream_url"`    // always https://happytavern.co/live/output.m3u8
-	RecordingURL string   `yaml:"recording_url"` // url of the stream recording when handle existing files is called
-	Starts       string   `yaml:"starts"`        //unix stamp when stream starts
-	Ends         string   `yaml:"ends"`          //unix stamp when stream stops
-	Status       string   `yaml:"status"`        //planned, live, ended
+	Title        string   `yaml:"title" json:"title"`
+	Summary      string   `yaml:"summary" json:"summary"`
+	Image        string   `yaml:"image" json:"image"`
+	Tags         []string `yaml:"tags" json:"tags"`
+	Pubkey       string   `yaml:"pubkey" json:"pubkey"`
+	Dtag         string   `yaml:"dtag" json:"dtag"`
+	StreamURL    string   `yaml:"stream_url" json:"stream_url"`
+	RecordingURL string   `yaml:"recording_url" json:"recording_url"`
+	Starts       string   `yaml:"starts" json:"starts"`
+	Ends         string   `yaml:"ends" json:"ends"`
+	Status       string   `yaml:"status" json:"status"`
 }
 
 var (
