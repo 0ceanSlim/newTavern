@@ -116,10 +116,7 @@
 
       if (!latestStream) throw new Error("No valid past streams found");
 
-      loadStream(
-        `${latestStream.recording_url}/output.m3u8`,
-        latestStream.image || ""
-      );
+      loadStream(`${latestStream.recording_url}`, latestStream.image || "");
 
       document.getElementById("streamTitle").textContent = latestStream.title;
       document.getElementById("streamSummary").textContent =
