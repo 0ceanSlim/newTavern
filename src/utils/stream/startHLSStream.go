@@ -1,7 +1,6 @@
 package stream
 
 import (
-	"encoding/json"
 	"log"
 	"os"
 	"os/exec"
@@ -43,13 +42,4 @@ func startHLSStream() {
 		log.Fatalf("Failed to start FFmpeg: %v", err)
 	}
 	log.Println("HLS stream started.")
-}
-
-// Save metadata as a JSON file
-func saveMetadata(filename string) error {
-	data, err := json.MarshalIndent(metadataConfig, "", "  ")
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(filename, data, 0644)
 }

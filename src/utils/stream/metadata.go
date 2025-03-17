@@ -1,11 +1,15 @@
 package stream
 
 import (
+	"encoding/json"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"gopkg.in/yaml.v3"
+
+	"goFrame/src/utils/stream/nostr"
 )
 
 // Watch metadata file and update JSON when changes occur
@@ -51,6 +55,9 @@ func watchMetadata(stopWatcher chan bool) {
 					log.Printf("Failed to save updated metadata: %v", err)
 				}
 
+				// Broadcast Nostr event for metadata update
+				nostr.BroadcastNostrUpdateEvent(metadataFile)
+
 				lastModified = modTime
 			}
 
@@ -66,4 +73,21 @@ func loadMetadata(filename string, dest *MetadataConfig) error {
 		return err
 	}
 	return yaml.Unmarshal(file, dest)
+}
+
+// Save metadata as a JSON file
+func saveMetadata(filename string) error {
+	metadataMap := structToMap(metadataConfig)
+
+	lowercaseMetadata := make(map[string]interface{})
+	for key, value := range metadataMap {
+		lowercaseKey := strings.ToLower(key)
+		lowercaseMetadata[lowercaseKey] = value
+	}
+
+	data, err := json.MarshalIndent(lowercaseMetadata, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filename, data, 0644)
 }

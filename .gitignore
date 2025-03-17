@@ -1,6 +1,7 @@
 /tmp
 config.yml
 stream.yml
+nostr.yml
 /logs
 /build
 /web/*

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"time"
+
+	"goFrame/src/utils/stream/nostr"
 )
 
 // stopHLSStream terminates the FFmpeg process and archives the stream files
@@ -20,6 +22,8 @@ func stopHLSStream() {
 
 	// Save metadata to JSON before archiving
 	saveMetadata("web/live/metadata.json")
+
+	nostr.BroadcastNostrEndEvent("web/live/metadata.json")
 
 	if ffmpegCmd != nil && ffmpegCmd.Process != nil {
 		log.Println("Stopping FFmpeg process...")

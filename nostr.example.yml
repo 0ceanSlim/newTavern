@@ -1,0 +1,6 @@
+public_key: "your public hey key" # use nostrcheck.me/converter to convert your npub
+private_key: "your private hex key"
+relays:
+  - "wss://wheat.happytavern.co"
+  - "wss://nos.lol"
+  - "wss://relay.damus.io"

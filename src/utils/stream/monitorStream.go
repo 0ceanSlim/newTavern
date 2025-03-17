@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"time"
+
+	"goFrame/src/utils/stream/nostr"
 )
 
 // MonitorStream is the main function that handles the streaming process
@@ -34,6 +36,8 @@ func MonitorStream() {
 
 				// Save to JSON immediately
 				saveMetadata("web/live/metadata.json")
+				log.Printf("MonitorStream: Initial StreamURL: %s", metadataConfig.StreamURL) //add log
+				nostr.BroadcastNostrStartEvent("web/live/metadata.json")
 			}
 			metadataMutex.Unlock()
 
@@ -41,7 +45,7 @@ func MonitorStream() {
 			stopWatcher := make(chan bool)
 
 			// Start watching metadata changes in a goroutine
-			go watchMetadata(stopWatcher)
+			go watchMetadata(stopWatcher) //add the nostr broadcast update to this function
 
 			// Start encoding the stream
 			startHLSStream()
@@ -60,6 +64,7 @@ func MonitorStream() {
 			stopHLSStream()
 
 			log.Println("Stream shutdown sequence completed")
+
 		}
 
 		time.Sleep(5 * time.Second)
