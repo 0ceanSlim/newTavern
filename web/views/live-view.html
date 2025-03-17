@@ -1,23 +1,25 @@
 {{define "view"}}
-<div id="streamStatus" class="max-w-32 rounded-lg font-bold text-xl mx-auto bg-red-500 my-2">{{ .CustomData.Status }}</div>
-<div class=" p-6 mx-auto bg-bgSecondary rounded-lg shadow-md mt-2">
-
+<div
+  id="streamStatus"
+  class="max-w-32 rounded-lg font-bold text-xl mx-auto bg-red-500 my-2"
+>
+  {{ .CustomData.Status }}
+</div>
+<div class="p-6 mx-auto bg-bgSecondary rounded-lg shadow-md mt-2">
   <h1 id="streamTitle" class="text-2xl font-bold">{{ .CustomData.Title }}</h1>
-  
+
   <video
-  id="videoPlayer"
-  controls
-  autoplay
-  class="w-full rounded-md"
-  poster=""
-></video>
-  
-  <p>
+    id="videoPlayer"
+    controls
+    autoplay
+    class="w-full rounded-md"
+    poster=""
+  ></video>
+
+  <div>
     <p id="streamSummary">{{ .CustomData.Summary }}</p>
     <span id="streamTags">{{ range .CustomData.Tags }} #{{ . }} {{ end }}</span>
-  </p>
-
-  
+  </div>
 </div>
 
 <script>
@@ -51,16 +53,16 @@
       if (!response.ok) throw new Error("Failed to fetch stream data");
 
       const data = await response.json();
-      if (data.Status.toLowerCase() === "live") {
-        document.getElementById("streamTitle").textContent = data.Title;
-        document.getElementById("streamSummary").textContent = data.Summary;
-        document.getElementById("streamStatus").textContent = data.Status;
-        document.getElementById("streamTags").innerHTML = data.Tags.map(
-          (tag) => `#${tag}`
-        ).join(" ");
+      if (data.status.toLowerCase() === "live") {
+        document.getElementById("streamTitle").textContent = data.title;
+        document.getElementById("streamSummary").textContent = data.summary;
+        document.getElementById("streamStatus").textContent = data.status;
+        document.getElementById("streamTags").innerHTML = data.tags
+          .map((tag) => `#${tag}`)
+          .join(" ");
 
         isLive = true;
-        loadStream(data.StreamURL);
+        loadStream(data.stream_url);
       } else {
         stopLiveUpdates();
         loadMostRecentPastStream();
@@ -100,7 +102,7 @@
           if (!metaResponse.ok) continue;
 
           const metadata = await metaResponse.json();
-          const endTime = parseInt(metadata.Ends, 10);
+          const endTime = parseInt(metadata.ends, 10);
 
           if (endTime > latestTimestamp) {
             latestTimestamp = endTime;
@@ -115,17 +117,17 @@
       if (!latestStream) throw new Error("No valid past streams found");
 
       loadStream(
-        `${latestStream.RecordingURL}/output.m3u8`,
-        latestStream.Image || ""
+        `${latestStream.recording_url}/output.m3u8`,
+        latestStream.image || ""
       );
 
-      document.getElementById("streamTitle").textContent = latestStream.Title;
+      document.getElementById("streamTitle").textContent = latestStream.title;
       document.getElementById("streamSummary").textContent =
-        latestStream.Summary;
+        latestStream.summary;
       document.getElementById("streamStatus").textContent = "Offline";
-      document.getElementById("streamTags").innerHTML = latestStream.Tags.map(
-        (tag) => `#${tag}`
-      ).join(" ");
+      document.getElementById("streamTags").innerHTML = latestStream.tags
+        .map((tag) => `#${tag}`)
+        .join(" ");
     } catch (error) {
       console.error("Error loading past stream:", error);
     }
