@@ -31,7 +31,7 @@ func MonitorStream() {
 				metadataConfig.Starts = fmt.Sprintf("%d", time.Now().Unix())
 				metadataConfig.Status = "live"
 				metadataConfig.StreamURL = ("https://happytavern.co/live/output.m3u8")
-				metadataConfig.RecordingURL = fmt.Sprintf("https://happytavern.co/.videos/past-streams/%s-%s",
+				metadataConfig.RecordingURL = fmt.Sprintf("https://happytavern.co/.videos/past-streams/%s-%s/output.m3u8",
 					time.Now().Format("1-2-2006"), metadataConfig.Dtag)
 
 				// Save to JSON immediately
