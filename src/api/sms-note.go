@@ -9,32 +9,31 @@ import (
 	"time"
 )
 
-// SMSMessage represents the expected incoming SMS format
-type SMSMessage struct {
-	From    string `json:"from"`
-	Message string `json:"message"`
+// WebhookPayload matches Textbelt's JSON structure
+type WebhookPayload struct {
+	TextID     string `json:"textId"`
+	FromNumber string `json:"fromNumber"`
+	Text       string `json:"text"`
 }
 
-// smsLogFile is the file where messages will be logged
 const smsLogFile = "sms_log.txt"
 
-// SMSHandler logs incoming SMS messages
 func SMSHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST requests are allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var sms SMSMessage
-	if err := json.NewDecoder(r.Body).Decode(&sms); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+	var payload WebhookPayload
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
 		return
 	}
 
-	logEntry := fmt.Sprintf("%s - From: %s | Message: %s\n",
-		time.Now().Format("2006-01-02 15:04:05"), sms.From, sms.Message)
+	logEntry := fmt.Sprintf("%s - TextID: %s | From: %s | Message: %s\n",
+		time.Now().Format("2006-01-02 15:04:05"), payload.TextID, payload.FromNumber, payload.Text)
 
-	// Append log to file
+	// Append to log file
 	file, err := os.OpenFile(smsLogFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		http.Error(w, "Could not write to log file", http.StatusInternalServerError)
@@ -49,5 +48,5 @@ func SMSHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Logged SMS:", logEntry)
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("SMS logged successfully"))
+	w.Write([]byte("SMS reply logged successfully"))
 }
