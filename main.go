@@ -35,6 +35,7 @@ func main() {
 	mux.HandleFunc("/check-name", api.CheckNameHandler)
 	mux.HandleFunc("/check-npub", api.CheckNpubHandler)
 	mux.HandleFunc("/api/stream-data", api.GetStreamMetadata)
+	mux.HandleFunc("/api/smsnotes", api.SMSHandler)
 
 	// Access-Control-Allow-Origin", "*" for nostr.json
 	mux.HandleFunc("/.well-known/nostr.json", utils.ServeWellKnownNostr)
