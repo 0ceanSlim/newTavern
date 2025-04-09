@@ -49,24 +49,32 @@ func main() {
 	// Initialize Routes
 	routes.InitializeRoutes(mux)
 
-	// LNURL endpoints with manual method checking
+	// LNURL-p endpoint for well-known URL
 	mux.HandleFunc("/.well-known/lnurlp/", func(w http.ResponseWriter, r *http.Request) {
-		// Path validation middleware
 		if r.Method != "GET" {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
-
-		// Pass through to handler
 		handlers.LNURLpHandler(w, r)
 	})
-
+	
+	// Original LNURL-pay endpoint with query parameters
 	mux.HandleFunc("/lnurl/pay", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		handlers.InvoiceRequest(w, r)
+	})
+	
+	// NEW: Path-based LNURL-pay endpoint for better client compatibility
+	// This will handle patterns like /lnurl/pay/username
+	mux.HandleFunc("/lnurl/pay/", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		handlers.PathInvoiceRequest(w, r)
 	})
 
 	// Start logging prices as a goroutine with 5 minute interval
