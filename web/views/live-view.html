@@ -53,7 +53,9 @@
       if (!response.ok) throw new Error("Failed to fetch stream data");
 
       const data = await response.json();
-      if (data.status.toLowerCase() === "live") {
+
+      // Check if stream is live and update accordingly
+      if (data.status && data.status.toLowerCase() === "live") {
         document.getElementById("streamTitle").textContent = data.title;
         document.getElementById("streamSummary").textContent = data.summary;
         document.getElementById("streamStatus").textContent = data.status;
@@ -63,8 +65,9 @@
 
         isLive = true;
         loadStream(data.stream_url);
-      } else {
-        stopLiveUpdates();
+      } else if (isLive && data.status.toLowerCase() !== "live") {
+        // If stream was live but now isn't, load past stream
+        isLive = false;
         loadMostRecentPastStream();
       }
     } catch (error) {
