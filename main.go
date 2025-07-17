@@ -30,6 +30,7 @@ func main() {
 	mux.HandleFunc("/api/btc-price", api.FetchBitcoinPrice)
 	mux.HandleFunc("/api/btc-price-log", api.ServePriceLogs)
 	mux.HandleFunc("/api/gold-price", api.GoldPriceHandler)
+	mux.HandleFunc("/api/file-upload", api.HandleFileUpload)
 	mux.HandleFunc("/create-invoice", api.HandleNostrInvoice)
 	mux.HandleFunc("/invoice-events", api.InvoiceEventsHandler)
 	mux.HandleFunc("/check-name", api.CheckNameHandler)
@@ -57,7 +58,7 @@ func main() {
 		}
 		handlers.LNURLpHandler(w, r)
 	})
-	
+
 	// Original LNURL-pay endpoint with query parameters
 	mux.HandleFunc("/lnurl/pay", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
@@ -66,7 +67,7 @@ func main() {
 		}
 		handlers.InvoiceRequest(w, r)
 	})
-	
+
 	// NEW: Path-based LNURL-pay endpoint for better client compatibility
 	// This will handle patterns like /lnurl/pay/username
 	mux.HandleFunc("/lnurl/pay/", func(w http.ResponseWriter, r *http.Request) {

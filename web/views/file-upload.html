@@ -1,0 +1,274 @@
+{{define "view"}}
+<main class="flex flex-col items-center my-16 space-y-12 md:my-32">
+  <!-- Header Section -->
+  <section class="text-center">
+    <h1 class="text-4xl font-bold md:text-6xl">File Upload</h1>
+    <p class="max-w-2xl mt-4 text-lg md:text-xl text-textMuted">
+      Upload files easily to 0x0.st. Files are kept for 30 days to 1 year
+      depending on size. Maximum file size is 512 MB.
+    </p>
+  </section>
+
+  <!-- Upload Section -->
+  <section class="w-full max-w-md">
+    <div
+      class="p-6 border rounded-lg shadow-md bg-bgSecondary border-bgTertiary"
+    >
+      <form id="uploadForm" class="space-y-6">
+        <!-- File Input -->
+        <div class="space-y-4">
+          <label class="block text-lg font-semibold text-textPrimary">
+            Select File
+          </label>
+          <input
+            type="file"
+            id="fileInput"
+            class="w-full p-3 border rounded-lg border-bgInverted bg-bgPrimary text-textPrimary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-bgTertiary file:text-textPrimary hover:file:bg-bgInverted"
+          />
+        </div>
+
+        <!-- Upload Button (Initially Hidden) -->
+        <button
+          type="submit"
+          id="uploadButton"
+          class="w-full px-6 py-3 font-semibold text-white transition duration-300 bg-green-600 rounded-lg hover:bg-green-700"
+          style="display: none"
+          disabled
+        >
+          Upload File
+        </button>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden text-center">
+          <div
+            class="inline-block w-8 h-8 border-4 border-purple-500 rounded-full border-t-transparent animate-spin"
+          ></div>
+          <p class="mt-2 text-textMuted">Uploading...</p>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Result Section -->
+  <section id="resultSection" class="hidden w-full max-w-2xl">
+    <div
+      class="p-6 border rounded-lg shadow-md bg-bgSecondary border-bgTertiary"
+    >
+      <h3 class="mb-4 text-xl font-semibold text-green-600">
+        Upload Successful!
+      </h3>
+
+      <!-- URL Display -->
+      <div class="space-y-4">
+        <label class="block text-sm font-semibold text-textMuted"
+          >File URL:</label
+        >
+        <div class="flex items-center space-x-2">
+          <input
+            type="text"
+            id="uploadedUrl"
+            readonly
+            class="flex-1 p-3 border rounded-lg border-bgInverted bg-bgPrimary text-textPrimary"
+          />
+          <button
+            id="copyButton"
+            class="px-4 py-3 text-white transition duration-300 bg-purple-600 rounded-lg hover:bg-purple-700"
+            title="Copy URL"
+          >
+            📋
+          </button>
+        </div>
+
+        <!-- Management Token Display -->
+        <div id="tokenSection" class="space-y-2">
+          <label class="block text-sm font-semibold text-textMuted"
+            >Management Token (save this to delete/modify the file
+            later):</label
+          >
+          <div class="flex items-center space-x-2">
+            <input
+              type="text"
+              id="managementToken"
+              readonly
+              class="flex-1 p-3 text-sm border rounded-lg border-bgInverted bg-bgPrimary text-textPrimary"
+            />
+            <button
+              id="copyTokenButton"
+              class="px-4 py-3 text-white transition duration-300 bg-purple-600 rounded-lg hover:bg-purple-700"
+              title="Copy Token"
+            >
+              📋
+            </button>
+          </div>
+        </div>
+
+        <!-- Direct Link -->
+        <div class="text-center">
+          <a
+            id="directLink"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-block px-6 py-3 text-white transition duration-300 bg-blue-600 rounded-lg hover:bg-blue-700"
+          >
+            Open File
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Error Section -->
+  <section id="errorSection" class="hidden w-full max-w-2xl">
+    <div class="p-6 bg-red-100 border border-red-300 rounded-lg shadow-md">
+      <h3 class="mb-4 text-xl font-semibold text-red-600">Upload Failed</h3>
+      <p id="errorMessage" class="text-red-700"></p>
+      <button
+        id="retryButton"
+        class="px-6 py-3 mt-4 text-white transition duration-300 bg-red-600 rounded-lg hover:bg-red-700"
+      >
+        Try Again
+      </button>
+    </div>
+  </section>
+</main>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("fileInput");
+    const uploadButton = document.getElementById("uploadButton");
+    const uploadForm = document.getElementById("uploadForm");
+    const loadingState = document.getElementById("loadingState");
+    const resultSection = document.getElementById("resultSection");
+    const errorSection = document.getElementById("errorSection");
+    const uploadedUrl = document.getElementById("uploadedUrl");
+    const managementToken = document.getElementById("managementToken");
+    const directLink = document.getElementById("directLink");
+    const copyButton = document.getElementById("copyButton");
+    const copyTokenButton = document.getElementById("copyTokenButton");
+    const retryButton = document.getElementById("retryButton");
+    const errorMessage = document.getElementById("errorMessage");
+
+    // Show upload button when file is selected
+    fileInput.addEventListener("change", function () {
+      if (fileInput.files && fileInput.files[0]) {
+        uploadButton.style.display = "block";
+        uploadButton.disabled = false;
+
+        // Hide previous results/errors
+        resultSection.classList.add("hidden");
+        errorSection.classList.add("hidden");
+      } else {
+        uploadButton.style.display = "none";
+        uploadButton.disabled = true;
+      }
+    });
+
+    // Handle form submission
+    uploadForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      // Check file size (512 MB limit)
+      const maxSize = 512 * 1024 * 1024; // 512 MB in bytes
+      if (file.size > maxSize) {
+        showError("File is too large. Maximum size is 512 MB.");
+        return;
+      }
+
+      // Show loading state
+      uploadButton.style.display = "none";
+      loadingState.classList.remove("hidden");
+      resultSection.classList.add("hidden");
+      errorSection.classList.add("hidden");
+
+      try {
+        // Create FormData
+        const formData = new FormData();
+        formData.append("file", file);
+
+        // Upload to our backend API (which proxies to 0x0.st)
+        const response = await fetch("/api/file-upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.error ||
+              `Upload failed: ${response.status} ${response.statusText}`
+          );
+        }
+
+        const result = await response.json();
+        if (result.error) {
+          throw new Error(result.error);
+        }
+
+        // Show success
+        showSuccess(result.url.trim(), result.token);
+      } catch (error) {
+        console.error("Upload error:", error);
+        showError(error.message || "Upload failed. Please try again.");
+      }
+    });
+
+    // Copy URL to clipboard
+    copyButton.addEventListener("click", async function () {
+      try {
+        await navigator.clipboard.writeText(uploadedUrl.value);
+        copyButton.textContent = "✅";
+        setTimeout(() => {
+          copyButton.textContent = "📋";
+        }, 2000);
+      } catch (err) {
+        console.error("Failed to copy:", err);
+      }
+    });
+
+    // Copy token to clipboard
+    copyTokenButton.addEventListener("click", async function () {
+      try {
+        await navigator.clipboard.writeText(managementToken.value);
+        copyTokenButton.textContent = "✅";
+        setTimeout(() => {
+          copyTokenButton.textContent = "📋";
+        }, 2000);
+      } catch (err) {
+        console.error("Failed to copy:", err);
+      }
+    });
+
+    // Retry upload
+    retryButton.addEventListener("click", function () {
+      errorSection.classList.add("hidden");
+      uploadButton.style.display = "block";
+      loadingState.classList.add("hidden");
+    });
+
+    function showSuccess(url, token) {
+      loadingState.classList.add("hidden");
+      resultSection.classList.remove("hidden");
+
+      uploadedUrl.value = url;
+      directLink.href = url;
+
+      if (token) {
+        managementToken.value = token;
+        document.getElementById("tokenSection").classList.remove("hidden");
+      } else {
+        document.getElementById("tokenSection").classList.add("hidden");
+      }
+    }
+
+    function showError(message) {
+      loadingState.classList.add("hidden");
+      errorSection.classList.remove("hidden");
+      errorMessage.textContent = message;
+    }
+  });
+</script>
+{{end}}

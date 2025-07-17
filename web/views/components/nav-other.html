@@ -57,6 +57,22 @@
       </li>
       <li>
         <a
+          href="/file-upload"
+          hx-push-url="/file-upload"
+          class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
+          hx-trigger="click"
+          hx-get="/file-upload"
+          hx-swap="outerHTML"
+          hx-target="body"
+          ><img
+            class="inline-block h-6 mx-1 align-text-bottom"
+            src="https://img.icons8.com/ios/50/upload--v1.png"
+          />
+          File Upload
+        </a>
+      </li>
+      <li>
+        <a
           href="/live/view"
           hx-push-url="/live/view"
           class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"

@@ -16,6 +16,7 @@ func InitializeRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/grain", Grain)
 	mux.HandleFunc("/gun-blog", GunBlog)
 	mux.HandleFunc("/gun-blog/ar15guide", ArGuide)
+	mux.HandleFunc("/file-upload", FileUpload)
 	mux.HandleFunc("/contact", Contact)
 	mux.HandleFunc("/live/view", LiveView)
 	mux.HandleFunc("/btc-dash", BitcoinDashboard)
