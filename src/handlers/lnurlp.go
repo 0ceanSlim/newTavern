@@ -3,11 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"goFrame/src/lightning"
 	"net/http"
-	"strconv"
 	"strings"
-
-	"goFrame/src/utils"
 )
 
 // LNURLpResponse represents the metadata returned from .well-known/lnurlp/{username}
@@ -43,14 +41,8 @@ func LNURLpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Load config to get nostr pubkey
-	if err := utils.LoadConfig("config.yml"); err != nil {
-		http.Error(w, "Configuration error", http.StatusInternalServerError)
-		return
-	}
-
-	// You'll need to add this to your config
-	nostrPubkey := utils.AppConfig.Nostr.PublicKey // Add this to your config structure
+	// Get the lightning service public key (auto-generated)
+	nostrPubkey := lightning.GetLightningPublicKey()
 
 	// Construct callback URL where the wallet will request an invoice
 	callback := fmt.Sprintf("https://%s/lnurl/pay?username=%s", r.Host, username)
@@ -70,55 +62,4 @@ func LNURLpHandler(w http.ResponseWriter, r *http.Request) {
 	// Send JSON response
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
-}
-
-// validateZapRequest validates a zap request according to NIP-57
-func validateZapRequest(zr *ZapRequest, amountMsats int64, username string) bool {
-	// Must be kind 9734
-	if zr.Kind != 9734 {
-		return false
-	}
-
-	// Must have valid signature (you'll need to implement signature verification)
-	// For now, we'll skip this check, but you should add it
-
-	// Must have tags
-	if len(zr.Tags) == 0 {
-		return false
-	}
-
-	// Check for required tags
-	var hasP, hasRelays bool
-	var zapAmount int64
-
-	for _, tag := range zr.Tags {
-		if len(tag) < 2 {
-			continue
-		}
-
-		switch tag[0] {
-		case "p":
-			hasP = true
-		case "relays":
-			hasRelays = true
-		case "amount":
-			if len(tag) > 1 {
-				if amt, err := strconv.ParseInt(tag[1], 10, 64); err == nil {
-					zapAmount = amt
-				}
-			}
-		}
-	}
-
-	// Must have exactly one 'p' tag and relays
-	if !hasP || !hasRelays {
-		return false
-	}
-
-	// If amount is specified in zap request, it must match
-	if zapAmount > 0 && zapAmount != amountMsats {
-		return false
-	}
-
-	return true
 }

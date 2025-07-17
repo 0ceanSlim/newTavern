@@ -6,13 +6,10 @@ lightning:
   type: "cln" # "lnd" or "eclair" support by others
   cln_rest_url: http://127.0.0.1:3030 # adjust port and host ip accordingly
   rune: "your rune here"
-
-rtmp_stream_url: "rtmp://127.0.0.1/"
-
-nostr:
-  public_key: "your public key in hex format" # use nostrcheck.me/converter to convert your npub
-  private_key: "your private hex key"
-  relays:
+  zap_relays: # Relays to publish zap receipts to
     - "wss://wheat.happytavern.co"
     - "wss://nos.lol"
     - "wss://relay.damus.io"
+    - "wss://relay.nostr.band"
+
+rtmp_stream_url: "rtmp://127.0.0.1/"

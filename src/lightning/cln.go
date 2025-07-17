@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
 	"time"
 
 	"goFrame/src/utils"
-	"goFrame/src/utils/stream/nostr"
 )
 
 // InvoiceRequest represents the JSON request sent to CLN REST API
@@ -44,16 +44,8 @@ type WaitInvoiceResponse struct {
 	Preimage    string `json:"payment_preimage"`
 }
 
-// ZapReceipt represents a Nostr zap receipt (kind 9735)
-type ZapReceipt struct {
-	ID        string     `json:"id"`
-	PubKey    string     `json:"pubkey"`
-	CreatedAt int64      `json:"created_at"`
-	Kind      int        `json:"kind"`
-	Tags      [][]string `json:"tags"`
-	Content   string     `json:"content"`
-	Sig       string     `json:"sig"`
-}
+// Invoice storage for zap receipts
+var invoiceStore = make(map[string]string) // label -> bolt11
 
 // FetchInvoice requests an invoice from CLN REST (for regular payments)
 func FetchInvoice(amountMsats int64, description string) (string, error) {
@@ -131,6 +123,9 @@ func fetchInvoiceInternal(amountMsats int64, description string, useDescriptionH
 	if err := json.Unmarshal(body, &response); err != nil {
 		return "", fmt.Errorf("failed to parse response: %w\nResponse: %s", err, string(body))
 	}
+
+	// Store the bolt11 for later use in zap receipts
+	invoiceStore[label] = response.Bolt11
 
 	// If this is a zap invoice, start monitoring for payment
 	if useDescriptionHash {
@@ -240,8 +235,8 @@ func createZapReceipt(zapRequestJSON string, payment WaitInvoiceResponse) error 
 		tags = append(tags, []string{"P", senderPubkey})
 	}
 
-	// Create the zap receipt event
-	zapReceipt, err := nostr.CreateEvent(9735, "", tags)
+	// Create the zap receipt event using lightning service keys
+	zapReceipt, err := createLightningEvent(9735, "", tags)
 	if err != nil {
 		return fmt.Errorf("failed to create zap receipt event: %w", err)
 	}
@@ -249,18 +244,28 @@ func createZapReceipt(zapRequestJSON string, payment WaitInvoiceResponse) error 
 	// Extract relays from the zap request to know where to publish
 	relays := extractRelaysFromZapRequest(zapRequest)
 
+	// Add configured lightning relays
+	lightningRelays := GetLightningRelays()
+	relays = append(relays, lightningRelays...)
+
+	// Remove duplicates
+	relays = removeDuplicateRelays(relays)
+
 	// Publish the zap receipt to the specified relays
-	nostr.SendEventToRelays(zapReceipt, relays)
+	sendLightningEventToRelays(zapReceipt, relays)
 
 	fmt.Printf("Zap receipt created and published: %s\n", zapReceipt.ID)
 	return nil
 }
 
 // getBolt11FromPayment extracts the bolt11 invoice from payment info
-// You might need to fetch this separately if it's not in the wait response
 func getBolt11FromPayment(payment WaitInvoiceResponse) string {
-	// You may need to implement this based on your CLN setup
-	// For now, return empty string - you might need to store the bolt11 when creating the invoice
+	// Return the stored bolt11 for this label
+	if bolt11, exists := invoiceStore[payment.Label]; exists {
+		// Clean up the stored invoice
+		delete(invoiceStore, payment.Label)
+		return bolt11
+	}
 	return ""
 }
 
@@ -284,14 +289,20 @@ func extractRelaysFromZapRequest(zapRequest map[string]interface{}) []string {
 		}
 	}
 
-	// Fallback to default relays if none specified
-	if len(relays) == 0 {
-		relays = []string{
-			"wss://wheat.happytavern.co",
-			"wss://nos.lol",
-			"wss://relay.damus.io",
+	return relays
+}
+
+// removeDuplicateRelays removes duplicate relays from a slice
+func removeDuplicateRelays(relays []string) []string {
+	keys := make(map[string]bool)
+	var result []string
+
+	for _, relay := range relays {
+		if !keys[relay] {
+			keys[relay] = true
+			result = append(result, relay)
 		}
 	}
 
-	return relays
+	return result
 }

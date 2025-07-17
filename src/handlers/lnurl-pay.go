@@ -159,3 +159,51 @@ func PathInvoiceRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
+
+// validateZapRequest validates a zap request according to NIP-57
+func validateZapRequest(zr *ZapRequest, amountMsats int64, username string) bool {
+	// Must be kind 9734
+	if zr.Kind != 9734 {
+		return false
+	}
+
+	// Must have tags
+	if len(zr.Tags) == 0 {
+		return false
+	}
+
+	// Check for required tags
+	var hasP, hasRelays bool
+	var zapAmount int64
+
+	for _, tag := range zr.Tags {
+		if len(tag) < 2 {
+			continue
+		}
+
+		switch tag[0] {
+		case "p":
+			hasP = true
+		case "relays":
+			hasRelays = true
+		case "amount":
+			if len(tag) > 1 {
+				if amt, err := strconv.ParseInt(tag[1], 10, 64); err == nil {
+					zapAmount = amt
+				}
+			}
+		}
+	}
+
+	// Must have exactly one 'p' tag and relays
+	if !hasP || !hasRelays {
+		return false
+	}
+
+	// If amount is specified in zap request, it must match
+	if zapAmount > 0 && zapAmount != amountMsats {
+		return false
+	}
+
+	return true
+}
