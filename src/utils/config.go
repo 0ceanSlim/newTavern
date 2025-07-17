@@ -21,10 +21,18 @@ type LightningConfig struct {
 	CLNRestURL string `yaml:"cln_rest_url"` // REST API URL
 }
 
+// NostrConfig holds Nostr-related settings
+type NostrConfig struct {
+	PublicKey  string   `yaml:"public_key"`  // Your Nostr public key (hex)
+	PrivateKey string   `yaml:"private_key"` // Your Nostr private key (hex)
+	Relays     []string `yaml:"relays"`      // Default relays to publish to
+}
+
 // Config holds the full application configuration
 type Config struct {
 	Server    ServerConfig    `yaml:"server"`
 	Lightning LightningConfig `yaml:"lightning"`
+	Nostr     NostrConfig     `yaml:"nostr"`
 }
 
 // Global variable to hold the config after loading

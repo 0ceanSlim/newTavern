@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 
+	"goFrame/src/utils"
+
 	"github.com/btcsuite/btcd/btcec/v2"
 	"gopkg.in/yaml.v3"
 )
@@ -21,7 +23,7 @@ type Event struct {
 	Sig       string     `json:"sig"`
 }
 
-// Config represents the structure of nostr.yml
+// Config represents the structure of nostr.yml (fallback)
 type Config struct {
 	PrivateKey string   `yaml:"private_key"`
 	PublicKey  string   `yaml:"public_key"`
@@ -34,14 +36,47 @@ var (
 	relays     []string
 )
 
-// Automatically loads config when the package is initialized
+// Initialize nostr configuration from main config or fallback to nostr.yml
 func init() {
-	if err := LoadConfig("nostr.yml"); err != nil {
-		log.Fatalf("Failed to load Nostr config: %v", err)
+	// Try to load from main config first
+	if err := LoadConfigFromMain(); err != nil {
+		// Fallback to nostr.yml
+		if err := LoadConfig("nostr.yml"); err != nil {
+			log.Printf("Warning: Failed to load Nostr config from both sources: %v", err)
+		}
 	}
 }
 
-// LoadConfig reads nostr.yml and loads the configuration
+// LoadConfigFromMain loads Nostr config from the main application config
+func LoadConfigFromMain() error {
+	// Check if main config is loaded and has Nostr settings
+	if utils.AppConfig.Nostr.PublicKey == "" || utils.AppConfig.Nostr.PrivateKey == "" {
+		return fmt.Errorf("nostr configuration not found in main config")
+	}
+
+	// Parse private key
+	keyBytes, err := hex.DecodeString(utils.AppConfig.Nostr.PrivateKey)
+	if err != nil {
+		return fmt.Errorf("error decoding private key from main config: %w", err)
+	}
+
+	privateKey, _ = btcec.PrivKeyFromBytes(keyBytes)
+
+	// Parse public key
+	publicKeyBytes, err := hex.DecodeString(utils.AppConfig.Nostr.PublicKey)
+	if err != nil {
+		return fmt.Errorf("error decoding public key from main config: %w", err)
+	}
+	publicKey = fmt.Sprintf("%x", publicKeyBytes)
+
+	// Set relays
+	relays = utils.AppConfig.Nostr.Relays
+
+	log.Println("Nostr configuration loaded from main config")
+	return nil
+}
+
+// LoadConfig reads nostr.yml and loads the configuration (fallback)
 func LoadConfig(configFile string) error {
 	data, err := os.ReadFile(configFile)
 	if err != nil {
@@ -66,5 +101,16 @@ func LoadConfig(configFile string) error {
 	publicKey = fmt.Sprintf("%x", publicKeyBytes)
 
 	relays = cfg.Relays
+	log.Println("Nostr configuration loaded from nostr.yml")
 	return nil
+}
+
+// GetPublicKey returns the configured public key
+func GetPublicKey() string {
+	return publicKey
+}
+
+// GetRelays returns the configured relays
+func GetRelays() []string {
+	return relays
 }

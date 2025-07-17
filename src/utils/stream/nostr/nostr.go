@@ -155,3 +155,69 @@ func sendEvent(event *Event) {
 	wg.Wait()
 	log.Printf("Event %s sent to all available relays", event.ID)
 }
+
+// CreateEvent creates a new Nostr event (exposed version of createEvent)
+func CreateEvent(kind int, content string, tags [][]string) (*Event, error) {
+	return createEvent(kind, content, tags)
+}
+
+// SendEventToRelays sends an event to specific relays
+func SendEventToRelays(event *Event, relayList []string) {
+	if event == nil {
+		log.Printf("Error: Attempted to send nil event")
+		return
+	}
+
+	log.Printf("Starting to send event ID %s to %d relays", event.ID, len(relayList))
+
+	if len(relayList) == 0 {
+		log.Printf("Warning: No relays specified to send to")
+		return
+	}
+
+	var wg sync.WaitGroup
+	for _, relayURL := range relayList {
+		wg.Add(1)
+		go func(relay string) {
+			defer wg.Done()
+			log.Printf("Connecting to relay: %s", relay)
+
+			conn, err := connectToRelay(relay)
+			if err != nil {
+				log.Printf("Error connecting to relay %s: %v", relay, err)
+				return
+			}
+			defer conn.Close()
+
+			msg, err := json.Marshal([]interface{}{"EVENT", event})
+			if err != nil {
+				log.Printf("Error encoding event for relay %s: %v", relay, err)
+				return
+			}
+
+			log.Printf("Sending to %s: %s", relay, string(msg))
+
+			n, err := conn.Write(msg)
+			if err != nil {
+				log.Printf("Error sending event to relay %s: %v", relay, err)
+				return
+			}
+
+			log.Printf("Successfully sent %d bytes to relay %s", n, relay)
+
+			// Add a response listener for confirmation
+			var response = make([]byte, 1024)
+			n, err = conn.Read(response)
+			if err != nil {
+				log.Printf("Error reading response from relay %s: %v", relay, err)
+				return
+			}
+
+			log.Printf("Received response from %s: %s", relay, string(response[:n]))
+		}(relayURL)
+	}
+
+	log.Printf("Waiting for all relay operations to complete...")
+	wg.Wait()
+	log.Printf("Event %s sent to all available relays", event.ID)
+}

@@ -7,6 +7,7 @@ import (
 	"goFrame/src/routes"
 	"goFrame/src/utils"
 	"goFrame/src/utils/stream"
+	"goFrame/src/utils/stream/nostr"
 	"log"
 	"net/http"
 	"time"
@@ -20,6 +21,16 @@ func main() {
 	// Load config
 	if err := utils.LoadConfig(configPath); err != nil {
 		log.Fatalf("Failed to load config: %v", err)
+	}
+
+	// Initialize Nostr configuration
+	if err := nostr.LoadConfig("nostr.yml"); err != nil {
+		// Try loading from main config if nostr.yml doesn't exist
+		if utils.AppConfig.Nostr.PublicKey != "" {
+			log.Println("Using Nostr config from main config file")
+		} else {
+			log.Printf("Warning: Failed to load Nostr config: %v", err)
+		}
 	}
 
 	// Start monitoring the RTMP stream

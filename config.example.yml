@@ -8,3 +8,11 @@ lightning:
   rune: "your rune here"
 
 rtmp_stream_url: "rtmp://127.0.0.1/"
+
+nostr:
+  public_key: "your public key in hex format" # use nostrcheck.me/converter to convert your npub
+  private_key: "your private hex key"
+  relays:
+    - "wss://wheat.happytavern.co"
+    - "wss://nos.lol"
+    - "wss://relay.damus.io"

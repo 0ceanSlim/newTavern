@@ -5,19 +5,19 @@ import (
 	"fmt"
 	"goFrame/src/lightning"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 )
 
-// InvoiceRequest handles LNURL-Pay invoice generation
+// InvoiceRequest handles LNURL-Pay invoice generation with zap support
 func InvoiceRequest(w http.ResponseWriter, r *http.Request) {
 	// Extract username
 	username := r.URL.Query().Get("username")
-	
-	// Handle clients that might append ?amount instead of &amount
 	amountStr := r.URL.Query().Get("amount")
-	
-	// Check if username contains an embedded amount parameter
+	nostrParam := r.URL.Query().Get("nostr")
+
+	// Handle clients that might append ?amount instead of &amount
 	if strings.Contains(username, "?amount=") {
 		parts := strings.Split(username, "?amount=")
 		if len(parts) > 1 {
@@ -39,8 +39,39 @@ func InvoiceRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetch invoice via CLN REST
-	invoice, err := lightning.FetchInvoice(amountMsats, fmt.Sprintf("Payment to %s", username))
+	var zapRequest *ZapRequest
+	var description string
+
+	// If nostr parameter is present, this is a zap request
+	if nostrParam != "" {
+		// Decode the nostr parameter
+		decodedNostr, err := url.QueryUnescape(nostrParam)
+		if err != nil {
+			http.Error(w, "Invalid nostr parameter encoding", http.StatusBadRequest)
+			return
+		}
+
+		// Parse the zap request
+		if err := json.Unmarshal([]byte(decodedNostr), &zapRequest); err != nil {
+			http.Error(w, "Invalid zap request JSON", http.StatusBadRequest)
+			return
+		}
+
+		// Validate the zap request
+		if !validateZapRequest(zapRequest, amountMsats, username) {
+			http.Error(w, "Invalid zap request", http.StatusBadRequest)
+			return
+		}
+
+		// Use the zap request as the description
+		description = decodedNostr
+	} else {
+		// Regular LNURL payment
+		description = fmt.Sprintf("Payment to %s", username)
+	}
+
+	// Create invoice with description
+	invoice, err := lightning.FetchInvoiceWithDescription(amountMsats, description)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to create invoice: %v", err), http.StatusInternalServerError)
 		return
@@ -55,27 +86,27 @@ func InvoiceRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 // PathInvoiceRequest handles LNURL-Pay invoice generation with username in the path
-// This can be used for endpoint like /lnurl/pay/{username}
 func PathInvoiceRequest(w http.ResponseWriter, r *http.Request) {
 	// Extract username from path
 	path := r.URL.Path
 	pathParts := strings.Split(path, "/")
-	
-	// The username should be the last part of the path
-	if len(pathParts) < 1 {
+
+	if len(pathParts) < 4 {
 		http.Error(w, "Username required", http.StatusBadRequest)
 		return
 	}
-	
+
 	username := pathParts[len(pathParts)-1]
-	
-	// Get amount from query parameter
+
+	// Get parameters
 	amountStr := r.URL.Query().Get("amount")
+	nostrParam := r.URL.Query().Get("nostr")
+
 	if amountStr == "" {
 		http.Error(w, "Amount required", http.StatusBadRequest)
 		return
 	}
-	
+
 	// Validate amount (must be in msats)
 	amountMsats, err := strconv.ParseInt(amountStr, 10, 64)
 	if err != nil || amountMsats < 1000 {
@@ -83,8 +114,39 @@ func PathInvoiceRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetch invoice via CLN REST
-	invoice, err := lightning.FetchInvoice(amountMsats, fmt.Sprintf("Payment to %s", username))
+	var zapRequest *ZapRequest
+	var description string
+
+	// If nostr parameter is present, this is a zap request
+	if nostrParam != "" {
+		// Decode the nostr parameter
+		decodedNostr, err := url.QueryUnescape(nostrParam)
+		if err != nil {
+			http.Error(w, "Invalid nostr parameter encoding", http.StatusBadRequest)
+			return
+		}
+
+		// Parse the zap request
+		if err := json.Unmarshal([]byte(decodedNostr), &zapRequest); err != nil {
+			http.Error(w, "Invalid zap request JSON", http.StatusBadRequest)
+			return
+		}
+
+		// Validate the zap request
+		if !validateZapRequest(zapRequest, amountMsats, username) {
+			http.Error(w, "Invalid zap request", http.StatusBadRequest)
+			return
+		}
+
+		// Use the zap request as the description
+		description = decodedNostr
+	} else {
+		// Regular LNURL payment
+		description = fmt.Sprintf("Payment to %s", username)
+	}
+
+	// Create invoice with description
+	invoice, err := lightning.FetchInvoiceWithDescription(amountMsats, description)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to create invoice: %v", err), http.StatusInternalServerError)
 		return
