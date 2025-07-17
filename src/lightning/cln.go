@@ -53,7 +53,6 @@ func FetchInvoice(amountMsats int64, description string) (string, error) {
 	return fetchInvoiceInternal(amountMsats, description, false)
 }
 
-// Add this new function to your existing file
 func FetchInvoiceWithDescription(amountMsats int64, description string) (string, error) {
 	restURL := utils.AppConfig.Lightning.CLNRestURL
 	runeToken := utils.AppConfig.Lightning.Rune
@@ -66,12 +65,12 @@ func FetchInvoiceWithDescription(amountMsats int64, description string) (string,
 	// Generate a unique label using timestamp
 	label := fmt.Sprintf("zap-%d-%d", amountMsats, time.Now().UnixNano())
 
-	// For zaps, use description_hash
-	descHash := sha256.Sum256([]byte(description))
-	request := map[string]interface{}{
-		"amount_msat":      amountMsats,
-		"label":            label,
-		"description_hash": hex.EncodeToString(descHash[:]),
+	// For now, use regular description instead of description_hash
+	// This works with older CLN versions
+	request := InvoiceRequest{
+		AmountMsat:  amountMsats,
+		Label:       label,
+		Description: description, // Use the zap request JSON as description
 	}
 
 	requestBody, err := json.Marshal(request)
@@ -79,6 +78,8 @@ func FetchInvoiceWithDescription(amountMsats int64, description string) (string,
 		log.Printf("Failed to marshal request JSON: %v", err)
 		return "", fmt.Errorf("failed to marshal JSON: %w", err)
 	}
+
+	log.Printf("Request body: %s", string(requestBody))
 
 	// Create HTTP request
 	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(requestBody))
@@ -117,7 +118,7 @@ func FetchInvoiceWithDescription(amountMsats int64, description string) (string,
 		return "", fmt.Errorf("CLN returned status %d: %s", resp.StatusCode, string(body))
 	}
 
-	// Parse JSON response - use the same response struct as your existing FetchInvoice
+	// Parse JSON response
 	var response InvoiceResponse
 	if err := json.Unmarshal(body, &response); err != nil {
 		log.Printf("Failed to parse CLN response JSON: %v", err)
@@ -130,6 +131,10 @@ func FetchInvoiceWithDescription(amountMsats int64, description string) (string,
 	}
 
 	log.Printf("Successfully created zap invoice: %s...", response.Bolt11[:50])
+
+	// For zap receipts, we'll store the description to use later
+	// You can add zap receipt creation here when payment is received
+
 	return response.Bolt11, nil
 }
 
