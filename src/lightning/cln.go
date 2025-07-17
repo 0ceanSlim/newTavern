@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 
 	"time"
@@ -52,9 +53,84 @@ func FetchInvoice(amountMsats int64, description string) (string, error) {
 	return fetchInvoiceInternal(amountMsats, description, false)
 }
 
-// FetchInvoiceWithDescription requests an invoice with a specific description (for zaps)
+// Add this new function to your existing file
 func FetchInvoiceWithDescription(amountMsats int64, description string) (string, error) {
-	return fetchInvoiceInternal(amountMsats, description, true)
+	restURL := utils.AppConfig.Lightning.CLNRestURL
+	runeToken := utils.AppConfig.Lightning.Rune
+
+	log.Printf("Creating zap invoice: amount=%d msats, CLN_URL=%s", amountMsats, restURL)
+
+	// Construct API URL
+	apiURL := fmt.Sprintf("%s/v1/invoice", restURL)
+
+	// Generate a unique label using timestamp
+	label := fmt.Sprintf("zap-%d-%d", amountMsats, time.Now().UnixNano())
+
+	// For zaps, use description_hash
+	descHash := sha256.Sum256([]byte(description))
+	request := map[string]interface{}{
+		"amount_msat":      amountMsats,
+		"label":            label,
+		"description_hash": hex.EncodeToString(descHash[:]),
+	}
+
+	requestBody, err := json.Marshal(request)
+	if err != nil {
+		log.Printf("Failed to marshal request JSON: %v", err)
+		return "", fmt.Errorf("failed to marshal JSON: %w", err)
+	}
+
+	// Create HTTP request
+	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(requestBody))
+	if err != nil {
+		log.Printf("Failed to create HTTP request: %v", err)
+		return "", fmt.Errorf("failed to create request: %w", err)
+	}
+
+	// Set headers (authorization uses Rune)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Rune", runeToken)
+
+	// Send request
+	client := &http.Client{}
+	log.Printf("Sending zap invoice request to CLN: %s", apiURL)
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("Failed to send request to CLN: %v", err)
+		return "", fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	log.Printf("CLN response status: %d", resp.StatusCode)
+
+	// Read response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("Failed to read CLN response: %v", err)
+		return "", fmt.Errorf("failed to read response: %w", err)
+	}
+
+	log.Printf("CLN response body: %s", string(body))
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		log.Printf("CLN returned error status %d: %s", resp.StatusCode, string(body))
+		return "", fmt.Errorf("CLN returned status %d: %s", resp.StatusCode, string(body))
+	}
+
+	// Parse JSON response - use the same response struct as your existing FetchInvoice
+	var response InvoiceResponse
+	if err := json.Unmarshal(body, &response); err != nil {
+		log.Printf("Failed to parse CLN response JSON: %v", err)
+		return "", fmt.Errorf("failed to parse response: %w\nResponse: %s", err, string(body))
+	}
+
+	if response.Bolt11 == "" {
+		log.Printf("CLN returned empty bolt11 invoice")
+		return "", fmt.Errorf("CLN returned empty bolt11 invoice")
+	}
+
+	log.Printf("Successfully created zap invoice: %s...", response.Bolt11[:50])
+	return response.Bolt11, nil
 }
 
 // fetchInvoiceInternal handles the actual invoice creation
