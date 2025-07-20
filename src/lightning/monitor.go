@@ -19,19 +19,12 @@ type WaitInvoiceResponse struct {
 	PaymentHash string `json:"payment_hash"`
 	AmountMsat  int64  `json:"amount_msat"`
 	PaidAt      int64  `json:"paid_at"`
-	Preimage    string `json:"preimage,omitempty"`
+	Preimage    string `json:"payment_preimage"` // Note: CLN uses "payment_preimage" not "preimage"
 }
 
 // MonitorZapPayment monitors a zap invoice for payment and creates zap receipt when paid
 func MonitorZapPayment(label, zapRequestJSON, bolt11 string) {
 	log.Printf("Starting to monitor zap payment for label: %s", label)
-
-	// Clean up stored zap request when done (whether successful or not)
-	defer func() {
-		// Import handlers package to access cleanup function
-		// Note: This creates a circular import issue, so we'll handle this differently
-		log.Printf("Cleaning up zap request storage for label: %s", label)
-	}()
 
 	// Wait for the invoice to be paid
 	paymentInfo, err := waitForInvoicePayment(label)
@@ -103,8 +96,8 @@ func waitForInvoicePayment(label string) (*WaitInvoiceResponse, error) {
 		return nil, fmt.Errorf("failed to read response: %w", err)
 	}
 
-	// Check status code
-	if resp.StatusCode != http.StatusOK {
+	// Check status code - Accept both 200 and 201 as success
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
 		return nil, fmt.Errorf("waitinvoice failed with status %d: %s", resp.StatusCode, string(body))
 	}
 
@@ -114,5 +107,6 @@ func waitForInvoicePayment(label string) (*WaitInvoiceResponse, error) {
 		return nil, fmt.Errorf("failed to parse response: %w\nResponse: %s", err, string(body))
 	}
 
+	log.Printf("Invoice %s status: %s, paid_at: %d", label, waitResp.Status, waitResp.PaidAt)
 	return &waitResp, nil
 }
