@@ -15,10 +15,11 @@ type ServerConfig struct {
 
 // LightningConfig holds settings for the Lightning backend (LND, CLN, or Eclair)
 type LightningConfig struct {
-	Type       string `yaml:"type"`         // "lnd", "cln", or "eclair"
-	PeerID     string `yaml:"peer_id"`      // Node address
-	Rune       string `yaml:"rune"`         // CLN Runes (if applicable)
-	CLNRestURL string `yaml:"cln_rest_url"` // REST API URL
+	Type       string   `yaml:"type"`         // "lnd", "cln", or "eclair"
+	PeerID     string   `yaml:"peer_id"`      // Node address
+	Rune       string   `yaml:"rune"`         // CLN Runes (if applicable)
+	CLNRestURL string   `yaml:"cln_rest_url"` // REST API URL
+	ZapRelays  []string `yaml:"zap_relays"`   // Relays to publish zap receipts to
 }
 
 // Config holds the full application configuration

@@ -23,8 +23,23 @@ type InvoiceResponse struct {
 	Bolt11 string `json:"bolt11"`
 }
 
-// FetchInvoice requests an invoice from CLN REST
+// InvoiceResult contains both the invoice and the label used
+type InvoiceResult struct {
+	Bolt11 string
+	Label  string
+}
+
+// FetchInvoice requests an invoice from CLN REST and returns both invoice and label
 func FetchInvoice(amountMsats int64, description string) (string, error) {
+	result, err := FetchInvoiceWithLabel(amountMsats, description)
+	if err != nil {
+		return "", err
+	}
+	return result.Bolt11, nil
+}
+
+// FetchInvoiceWithLabel requests an invoice from CLN REST and returns both invoice and label
+func FetchInvoiceWithLabel(amountMsats int64, description string) (*InvoiceResult, error) {
 	restURL := utils.AppConfig.Lightning.CLNRestURL
 	runeToken := utils.AppConfig.Lightning.Rune
 
@@ -41,13 +56,13 @@ func FetchInvoice(amountMsats int64, description string) (string, error) {
 		Description: description,
 	})
 	if err != nil {
-		return "", fmt.Errorf("failed to marshal JSON: %w", err)
+		return nil, fmt.Errorf("failed to marshal JSON: %w", err)
 	}
 
 	// Create HTTP request
 	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(requestBody))
 	if err != nil {
-		return "", fmt.Errorf("failed to create request: %w", err)
+		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	// Set headers (authorization uses Rune)
@@ -58,21 +73,24 @@ func FetchInvoice(amountMsats int64, description string) (string, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("failed to send request: %w", err)
+		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	// Read response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("failed to read response: %w", err)
+		return nil, fmt.Errorf("failed to read response: %w", err)
 	}
 
 	// Parse JSON response
 	var response InvoiceResponse
 	if err := json.Unmarshal(body, &response); err != nil {
-		return "", fmt.Errorf("failed to parse response: %w\nResponse: %s", err, string(body))
+		return nil, fmt.Errorf("failed to parse response: %w\nResponse: %s", err, string(body))
 	}
 
-	return response.Bolt11, nil
+	return &InvoiceResult{
+		Bolt11: response.Bolt11,
+		Label:  label,
+	}, nil
 }
