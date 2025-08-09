@@ -1,84 +1,178 @@
 {{define "view"}}
 <div
   id="streamStatus"
-  class="max-w-32 rounded-lg font-bold text-xl mx-auto bg-red-500 my-2"
+  class="px-4 py-2 mx-auto my-2 text-xl font-bold bg-gray-500 rounded-lg max-w-32"
 >
   {{ .CustomData.Status }}
 </div>
-<div class="p-6 mx-auto bg-bgSecondary rounded-lg shadow-md mt-2">
+
+<div class="p-6 mx-auto mt-2 rounded-lg shadow-md bg-bgSecondary">
   <h1 id="streamTitle" class="text-2xl font-bold">{{ .CustomData.Title }}</h1>
 
   <video
     id="videoPlayer"
     controls
     autoplay
+    muted
     class="w-full rounded-md"
     poster=""
   ></video>
 
-  <div>
-    <p id="streamSummary">{{ .CustomData.Summary }}</p>
-    <span id="streamTags">{{ range .CustomData.Tags }} #{{ . }} {{ end }}</span>
+  <div class="mt-4">
+    <p id="streamSummary" class="mb-2">{{ .CustomData.Summary }}</p>
+    <div id="streamTags" class="text-sm text-textMuted">
+      {{ range .CustomData.Tags }} #{{ . }} {{ end }}
+    </div>
+  </div>
+
+  <!-- Debug panel - remove this in production -->
+  <div id="debugPanel" class="p-3 mt-4 text-xs border rounded bg-bgPrimary">
+    <h4 class="mb-2 font-bold">Debug Info:</h4>
+    <div>Last Check: <span id="lastCheck">-</span></div>
+    <div>
+      Current Status: <span id="debugStatus">{{ .CustomData.Status }}</span>
+    </div>
+    <div>Checks Count: <span id="checksCount">0</span></div>
+    <div>
+      Stream URL:
+      <span id="debugStreamURL" class="break-all"
+        >{{ .CustomData.StreamURL }}</span
+      >
+    </div>
+    <div>Is Live: <span id="debugIsLive">false</span></div>
+    <div>Playing Live: <span id="debugPlayingLive">false</span></div>
+    <div class="mt-2">
+      <button
+        onclick="forceUpdate()"
+        class="px-2 py-1 text-xs text-white bg-blue-500 rounded"
+      >
+        Force Update
+      </button>
+      <button
+        onclick="toggleDebug()"
+        class="px-2 py-1 text-xs text-white bg-gray-500 rounded"
+      >
+        Hide Debug
+      </button>
+    </div>
   </div>
 </div>
 
 <script>
-  var video = document.getElementById("videoPlayer");
-  var streamURL = "{{ .CustomData.StreamURL }}";
-  var streamStatus = "{{ .CustomData.Status }}";
-  var isLive = streamStatus.toLowerCase() === "live";
-  var isPlayingLive = false;
-  var intervalId = null;
+  // Global variables
+  let video = document.getElementById("videoPlayer");
+  let currentStreamURL = "{{ .CustomData.StreamURL }}";
+  let currentStatus = "{{ .CustomData.Status }}".toLowerCase();
+  let isLive = currentStatus === "live";
+  let isPlayingLive = false;
+  let updateInterval = null;
+  let hls = null;
+  let checksCount = 0;
 
-  function loadStream(url, poster = "") {
-    if (isPlayingLive && isLive) return;
-
-    if (Hls.isSupported()) {
-      var hls = new Hls();
-      hls.loadSource(url);
-      hls.attachMedia(video);
-    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = url;
-    } else {
-      console.error("HLS not supported in this browser.");
-    }
-
-    video.poster = poster;
-    isPlayingLive = isLive;
+  // Debug functions
+  function updateDebugInfo() {
+    document.getElementById("lastCheck").textContent =
+      new Date().toLocaleTimeString();
+    document.getElementById("debugStatus").textContent = currentStatus;
+    document.getElementById("debugStreamURL").textContent = currentStreamURL;
+    document.getElementById("debugIsLive").textContent = isLive;
+    document.getElementById("debugPlayingLive").textContent = isPlayingLive;
+    document.getElementById("checksCount").textContent = checksCount;
   }
 
-  async function updateStreamMetadata() {
-    try {
-      const response = await fetch("/api/stream-data");
-      if (!response.ok) throw new Error("Failed to fetch stream data");
+  function log(message) {
+    console.log(`[${new Date().toLocaleTimeString()}] ${message}`);
+  }
 
-      const data = await response.json();
+  function toggleDebug() {
+    const panel = document.getElementById("debugPanel");
+    if (panel.style.display === "none") {
+      panel.style.display = "block";
+    } else {
+      panel.style.display = "none";
+    }
+  }
 
-      // Check if stream is live and update accordingly
-      if (data.status && data.status.toLowerCase() === "live") {
-        document.getElementById("streamTitle").textContent = data.title;
-        document.getElementById("streamSummary").textContent = data.summary;
-        document.getElementById("streamStatus").textContent = data.status;
-        document.getElementById("streamTags").innerHTML = data.tags
-          .map((tag) => `#${tag}`)
-          .join(" ");
+  // Stream status management
+  function updateStreamStatusDisplay(status) {
+    const statusElement = document.getElementById("streamStatus");
+    const normalizedStatus = status.toLowerCase();
 
-        isLive = true;
-        loadStream(data.stream_url);
-      } else if (isLive && data.status.toLowerCase() !== "live") {
-        // If stream was live but now isn't, load past stream
-        isLive = false;
-        loadMostRecentPastStream();
-      }
-    } catch (error) {
-      console.error("Error updating stream metadata:", error);
+    statusElement.textContent = status.toUpperCase();
+
+    // Remove existing status classes
+    statusElement.classList.remove(
+      "bg-red-500",
+      "bg-gray-500",
+      "animate-pulse"
+    );
+
+    if (normalizedStatus === "live") {
+      statusElement.classList.add("bg-red-500", "animate-pulse");
+      log("🔴 Status display updated to LIVE");
+    } else {
+      statusElement.classList.add("bg-gray-500");
+      log("⚫ Status display updated to OFFLINE");
+    }
+  }
+
+  // Video loading functions
+  function loadLiveStream(streamURL) {
+    if (isPlayingLive && currentStreamURL === streamURL) {
+      log("Already playing this live stream, skipping reload");
+      return;
+    }
+
+    log(`🔴 Loading live stream: ${streamURL}`);
+
+    // Destroy existing HLS instance
+    if (hls) {
+      hls.destroy();
+      hls = null;
+    }
+
+    if (Hls.isSupported()) {
+      hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: true,
+        backBufferLength: 30,
+        maxBufferLength: 60,
+      });
+
+      hls.loadSource(streamURL);
+      hls.attachMedia(video);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        log("✅ Live HLS manifest loaded successfully");
+        video.play().catch((e) => log(`Autoplay failed: ${e.message}`));
+        isPlayingLive = true;
+        currentStreamURL = streamURL;
+      });
+
+      hls.on(Hls.Events.ERROR, function (event, data) {
+        log(`❌ HLS Error: ${data.type} - ${data.details}`);
+        if (data.fatal) {
+          log("Fatal HLS error, will retry on next update");
+          isPlayingLive = false;
+        }
+      });
+    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      video.src = streamURL;
+      log("📱 Using native HLS support");
+      isPlayingLive = true;
+      currentStreamURL = streamURL;
+    } else {
+      log("❌ HLS not supported in this browser");
     }
   }
 
   async function loadMostRecentPastStream() {
+    log("📼 Loading most recent past stream...");
+
     try {
       const response = await fetch("/.videos/past-streams/");
-      if (!response.ok) throw new Error("Failed to fetch past streams");
+      if (!response.ok)
+        throw new Error("Failed to fetch past streams directory");
 
       const text = await response.text();
       const parser = new DOMParser();
@@ -87,21 +181,27 @@
         a.textContent.trim()
       );
 
+      // Look for stream folders with pattern: MM-DD-YYYY-XXXXXX
       const streamFolders = links.filter((name) =>
         /^\d{1,2}-\d{1,2}-\d{4}-\d{6}\/?$/.test(name)
       );
 
-      if (streamFolders.length === 0) throw new Error("No past streams found");
+      if (streamFolders.length === 0) {
+        throw new Error("No past stream folders found");
+      }
+
+      log(`Found ${streamFolders.length} past stream folders`);
 
       let latestStream = null;
       let latestTimestamp = 0;
 
+      // Find the most recent stream by checking metadata
       for (const folder of streamFolders) {
         const folderPath = folder.replace(/\/$/, "");
-        const metadataUrl = `/.videos/past-streams/${folderPath}/metadata.json`;
+        const metadataURL = `/.videos/past-streams/${folderPath}/metadata.json`;
 
         try {
-          const metaResponse = await fetch(metadataUrl);
+          const metaResponse = await fetch(metadataURL);
           if (!metaResponse.ok) continue;
 
           const metadata = await metaResponse.json();
@@ -110,47 +210,180 @@
           if (endTime > latestTimestamp) {
             latestTimestamp = endTime;
             latestStream = metadata;
-            latestStream.Folder = folderPath;
+            latestStream.folderPath = folderPath;
           }
         } catch (error) {
-          console.warn(`Skipping ${folderPath}: metadata.json fetch failed`);
+          log(`Skipping ${folderPath}: ${error.message}`);
         }
       }
 
-      if (!latestStream) throw new Error("No valid past streams found");
+      if (!latestStream) {
+        throw new Error("No valid past streams found");
+      }
 
-      loadStream(`${latestStream.recording_url}`, latestStream.image || "");
+      log(`📼 Loading past stream: ${latestStream.title}`);
 
+      // Load the past stream
+      if (hls) {
+        hls.destroy();
+        hls = null;
+      }
+
+      if (Hls.isSupported()) {
+        hls = new Hls();
+        hls.loadSource(latestStream.recording_url);
+        hls.attachMedia(video);
+
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
+          log("✅ Past stream HLS manifest loaded");
+        });
+      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = latestStream.recording_url;
+      }
+
+      // Update metadata display
       document.getElementById("streamTitle").textContent = latestStream.title;
       document.getElementById("streamSummary").textContent =
         latestStream.summary;
-      document.getElementById("streamStatus").textContent = "Offline";
-      document.getElementById("streamTags").innerHTML = latestStream.tags
-        .map((tag) => `#${tag}`)
-        .join(" ");
+
+      if (latestStream.tags && Array.isArray(latestStream.tags)) {
+        document.getElementById("streamTags").innerHTML = latestStream.tags
+          .map((tag) => `#${tag}`)
+          .join(" ");
+      }
+
+      if (latestStream.image) {
+        video.poster = latestStream.image;
+      }
+
+      isPlayingLive = false;
     } catch (error) {
-      console.error("Error loading past stream:", error);
+      log(`❌ Error loading past stream: ${error.message}`);
     }
   }
 
-  function startLiveUpdates() {
-    if (!intervalId) {
-      intervalId = setInterval(updateStreamMetadata, 30000);
+  // Main update function
+  async function updateStreamMetadata() {
+    checksCount++;
+    log(`🔍 Checking for updates (check #${checksCount})...`);
+
+    try {
+      const response = await fetch("/api/stream-data");
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      log(`📊 Received data: ${JSON.stringify(data)}`);
+
+      // Extract and normalize status
+      const newStatus = (data.status || "offline").toLowerCase();
+      const wasLive = isLive;
+      const nowLive = newStatus === "live";
+
+      // Update page content
+      if (data.title) {
+        document.getElementById("streamTitle").textContent = data.title;
+      }
+      if (data.summary) {
+        document.getElementById("streamSummary").textContent = data.summary;
+      }
+      if (data.tags && Array.isArray(data.tags)) {
+        document.getElementById("streamTags").innerHTML = data.tags
+          .map((tag) => `#${tag}`)
+          .join(" ");
+      }
+
+      // Handle status changes
+      if (nowLive !== wasLive) {
+        log(
+          `🚨 STATUS CHANGE: ${wasLive ? "LIVE" : "OFFLINE"} → ${
+            nowLive ? "LIVE" : "OFFLINE"
+          }`
+        );
+
+        if (nowLive) {
+          // Stream just went live
+          log("🎬 Stream just went LIVE!");
+          isLive = true;
+          currentStatus = "live";
+          updateStreamStatusDisplay("LIVE");
+
+          if (data.stream_url) {
+            loadLiveStream(data.stream_url);
+          }
+        } else {
+          // Stream just went offline
+          log("📺 Stream went OFFLINE");
+          isLive = false;
+          currentStatus = "offline";
+          updateStreamStatusDisplay("OFFLINE");
+          isPlayingLive = false;
+
+          // Load most recent past stream
+          loadMostRecentPastStream();
+        }
+      } else if (nowLive && data.stream_url !== currentStreamURL) {
+        // Stream URL changed while live
+        log(`🔄 Stream URL changed: ${currentStreamURL} → ${data.stream_url}`);
+        loadLiveStream(data.stream_url);
+      } else {
+        log(`✅ No status change (still ${nowLive ? "LIVE" : "OFFLINE"})`);
+      }
+
+      // Update global state
+      isLive = nowLive;
+      currentStatus = newStatus;
+    } catch (error) {
+      log(`❌ Error updating metadata: ${error.message}`);
     }
+
+    updateDebugInfo();
   }
 
-  function stopLiveUpdates() {
-    if (intervalId) {
-      clearInterval(intervalId);
-      intervalId = null;
-    }
+  // Force update function for debug button
+  function forceUpdate() {
+    log("🔄 Force update triggered");
+    updateStreamMetadata();
   }
 
-  if (isLive) {
-    loadStream(streamURL);
-    startLiveUpdates();
-  } else {
-    loadMostRecentPastStream();
+  // Initialize everything
+  function initialize() {
+    log("🚀 Initializing live view...");
+    log(`Initial status: ${currentStatus}`);
+    log(`Initial stream URL: ${currentStreamURL}`);
+
+    updateStreamStatusDisplay(currentStatus);
+
+    if (isLive && currentStreamURL) {
+      log("Loading initial live stream");
+      loadLiveStream(currentStreamURL);
+    } else {
+      log("Loading initial past stream");
+      loadMostRecentPastStream();
+    }
+
+    // Start regular updates every 15 seconds
+    updateInterval = setInterval(updateStreamMetadata, 15000);
+    log("📡 Started polling every 15 seconds");
+
+    // Do an immediate update check
+    setTimeout(updateStreamMetadata, 2000);
+
+    updateDebugInfo();
   }
+
+  // Cleanup
+  window.addEventListener("beforeunload", function () {
+    if (updateInterval) {
+      clearInterval(updateInterval);
+    }
+    if (hls) {
+      hls.destroy();
+    }
+  });
+
+  // Start everything
+  initialize();
 </script>
 {{end}}
