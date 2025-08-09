@@ -1,0 +1,472 @@
+{{define "past-streams"}}
+<div class="p-6 mt-8 rounded-lg shadow-md bg-bgSecondary">
+  <h2 class="mb-6 text-2xl font-bold text-textPrimary">Past Streams</h2>
+
+  <!-- Loading state -->
+  <div id="pastStreamsLoading" class="py-8 text-center">
+    <div
+      class="inline-block w-8 h-8 border-4 rounded-full border-textHighlighted border-t-transparent animate-spin"
+    ></div>
+    <p class="mt-2 text-textMuted">Loading past streams...</p>
+  </div>
+
+  <!-- Error state -->
+  <div id="pastStreamsError" class="hidden py-8 text-center">
+    <p class="mb-4 text-red-400">Failed to load past streams</p>
+    <button
+      onclick="loadPastStreams()"
+      class="px-4 py-2 rounded bg-textHighlighted text-textInverted hover:bg-opacity-80"
+    >
+      Retry
+    </button>
+  </div>
+
+  <!-- Streams grid -->
+  <div
+    id="pastStreamsGrid"
+    class="grid hidden grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+  >
+    <!-- Stream cards will be inserted here -->
+  </div>
+
+  <!-- Empty state -->
+  <div id="pastStreamsEmpty" class="hidden py-8 text-center">
+    <p class="text-textMuted">No past streams found</p>
+  </div>
+</div>
+
+<style>
+  .stream-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+
+  .stream-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    border-color: var(--color-textHighlighted);
+  }
+
+  .stream-card.selected {
+    border-color: var(--color-textHighlighted);
+    box-shadow: 0 0 20px rgba(149, 40, 244, 0.3);
+  }
+
+  .thumbnail-container {
+    position: relative;
+    aspect-ratio: 16/9;
+    background: linear-gradient(
+      135deg,
+      var(--color-bgTertiary),
+      var(--color-bgPrimary)
+    );
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .thumbnail-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 0, 0, 0.7) 100%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .stream-card:hover .thumbnail-overlay {
+    opacity: 1;
+  }
+
+  .play-button {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: scale(0.8);
+    transition: transform 0.2s ease;
+  }
+
+  .stream-card:hover .play-button {
+    transform: scale(1);
+  }
+
+  .duration-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .stream-date {
+    color: var(--color-textMuted);
+    font-size: 0.875rem;
+  }
+
+  .stream-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+  }
+
+  .stream-tag {
+    background: var(--color-bgTertiary);
+    color: var(--color-textMuted);
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+  }
+</style>
+
+<script>
+  let pastStreamsData = [];
+  let selectedStreamId = null;
+
+  // Format duration from seconds to readable format
+  function formatDuration(seconds) {
+    if (!seconds || seconds <= 0) return "Unknown";
+
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    } else {
+      return `${minutes}m`;
+    }
+  }
+
+  // Format date to readable format
+  function formatStreamDate(timestamp) {
+    if (!timestamp) return "Unknown date";
+
+    const date = new Date(parseInt(timestamp) * 1000);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  // Generate thumbnail URL (you can customize this based on your setup)
+  function getThumbnailUrl(streamData) {
+    // If you have actual thumbnails stored, use those
+    if (streamData.image && streamData.image !== "") {
+      return streamData.image;
+    }
+
+    // Otherwise, create a gradient thumbnail based on title
+    const colors = [
+      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+      "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+      "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+      "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+      "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+      "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
+      "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+    ];
+
+    const colorIndex =
+      Math.abs(
+        streamData.title.split("").reduce((a, b) => a + b.charCodeAt(0), 0)
+      ) % colors.length;
+    return colors[colorIndex];
+  }
+
+  // Create a stream card element
+  function createStreamCard(streamData, index) {
+    const duration =
+      streamData.starts && streamData.ends
+        ? parseInt(streamData.ends) - parseInt(streamData.starts)
+        : 0;
+
+    const thumbnailStyle =
+      streamData.image && streamData.image !== ""
+        ? `background-image: url('${streamData.image}'); background-size: cover; background-position: center;`
+        : `background: ${getThumbnailUrl(streamData)};`;
+
+    return `
+    <div class="overflow-hidden rounded-lg stream-card bg-bgPrimary" 
+         onclick="selectPastStream('${streamData.id}', '${
+      streamData.recording_url
+    }')" 
+         data-stream-id="${streamData.id}">
+      
+      <!-- Thumbnail -->
+      <div class="thumbnail-container" style="${thumbnailStyle}">
+        <div class="thumbnail-overlay">
+          <div class="play-button">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+        </div>
+        ${
+          duration > 0
+            ? `<div class="duration-badge">${formatDuration(duration)}</div>`
+            : ""
+        }
+      </div>
+      
+      <!-- Content -->
+      <div class="p-4">
+        <h3 class="mb-2 font-semibold text-textPrimary line-clamp-2" title="${
+          streamData.title
+        }">
+          ${streamData.title || "Untitled Stream"}
+        </h3>
+        
+        <p class="mb-3 text-sm text-textMuted line-clamp-2" title="${
+          streamData.summary
+        }">
+          ${streamData.summary || "No description available"}
+        </p>
+        
+        <div class="mb-2 stream-date">
+          ${formatStreamDate(streamData.starts)}
+        </div>
+        
+        ${
+          streamData.tags && streamData.tags.length > 0
+            ? `
+          <div class="stream-tags">
+            ${streamData.tags
+              .slice(0, 3)
+              .map((tag) => `<span class="stream-tag">#${tag}</span>`)
+              .join("")}
+            ${
+              streamData.tags.length > 3
+                ? `<span class="stream-tag">+${
+                    streamData.tags.length - 3
+                  }</span>`
+                : ""
+            }
+          </div>
+        `
+            : ""
+        }
+      </div>
+    </div>
+  `;
+  }
+
+  // Select and play a past stream
+  function selectPastStream(streamId, recordingUrl) {
+    console.log(`Playing past stream: ${streamId}`);
+
+    // Update selected state
+    document.querySelectorAll(".stream-card").forEach((card) => {
+      card.classList.remove("selected");
+    });
+
+    const selectedCard = document.querySelector(
+      `[data-stream-id="${streamId}"]`
+    );
+    if (selectedCard) {
+      selectedCard.classList.add("selected");
+    }
+
+    selectedStreamId = streamId;
+
+    // Find the stream data
+    const streamData = pastStreamsData.find((s) => s.id === streamId);
+    if (!streamData) return;
+
+    // Update main video player (call the function from parent)
+    if (typeof loadStreamInMainPlayer === "function") {
+      loadStreamInMainPlayer(recordingUrl, streamData);
+    } else {
+      // Fallback: directly manipulate the video element
+      loadPastStreamInMainPlayer(recordingUrl, streamData);
+    }
+
+    // Scroll back to video
+    document.getElementById("videoPlayer").scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }
+
+  // Fallback function to load stream directly
+  function loadPastStreamInMainPlayer(recordingUrl, streamData) {
+    const video = document.getElementById("videoPlayer");
+    if (!video) return;
+
+    console.log(`Loading past stream: ${recordingUrl}`);
+
+    // Update main container info
+    if (streamData.title) {
+      const titleEl = document.getElementById("streamTitle");
+      if (titleEl) titleEl.textContent = `📼 ${streamData.title}`;
+    }
+
+    if (streamData.summary) {
+      const summaryEl = document.getElementById("streamSummary");
+      if (summaryEl) summaryEl.textContent = streamData.summary;
+    }
+
+    if (streamData.tags) {
+      const tagsEl = document.getElementById("streamTags");
+      if (tagsEl) {
+        tagsEl.innerHTML = streamData.tags.map((tag) => `#${tag}`).join(" ");
+      }
+    }
+
+    // Update status to show it's a past stream
+    const statusEl = document.getElementById("streamStatus");
+    if (statusEl) {
+      statusEl.textContent = "ARCHIVE";
+      statusEl.className =
+        statusEl.className.replace(/bg-\w+-\d+/g, "") + " bg-blue-500";
+    }
+
+    // Load the video
+    if (typeof hls !== "undefined" && hls) {
+      hls.destroy();
+    }
+
+    if (Hls.isSupported()) {
+      window.hls = new Hls();
+      hls.loadSource(recordingUrl);
+      hls.attachMedia(video);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        console.log("Past stream loaded successfully");
+      });
+    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      video.src = recordingUrl;
+    }
+
+    if (streamData.image) {
+      video.poster = streamData.image;
+    }
+  }
+
+  // Load past streams from the server
+  async function loadPastStreams() {
+    const loadingEl = document.getElementById("pastStreamsLoading");
+    const errorEl = document.getElementById("pastStreamsError");
+    const gridEl = document.getElementById("pastStreamsGrid");
+    const emptyEl = document.getElementById("pastStreamsEmpty");
+
+    // Show loading state
+    loadingEl.classList.remove("hidden");
+    errorEl.classList.add("hidden");
+    gridEl.classList.add("hidden");
+    emptyEl.classList.add("hidden");
+
+    try {
+      console.log("Loading past streams...");
+
+      // Fetch the directory listing
+      const response = await fetch("/.videos/past-streams/");
+      if (!response.ok)
+        throw new Error("Failed to fetch past streams directory");
+
+      const html = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      const links = Array.from(doc.querySelectorAll("a")).map((a) =>
+        a.textContent.trim()
+      );
+
+      // Filter for stream folders (MM-DD-YYYY-XXXXXX format)
+      const streamFolders = links.filter((name) =>
+        /^\d{1,2}-\d{1,2}-\d{4}-\d{6}\/?$/.test(name)
+      );
+
+      console.log(`Found ${streamFolders.length} stream folders`);
+
+      if (streamFolders.length === 0) {
+        loadingEl.classList.add("hidden");
+        emptyEl.classList.remove("hidden");
+        return;
+      }
+
+      // Load metadata for each stream
+      const streamPromises = streamFolders.map(async (folder) => {
+        const folderPath = folder.replace(/\/$/, "");
+        const metadataUrl = `/.videos/past-streams/${folderPath}/metadata.json`;
+
+        try {
+          const metaResponse = await fetch(metadataUrl);
+          if (!metaResponse.ok)
+            throw new Error(`Failed to fetch ${folderPath} metadata`);
+
+          const metadata = await metaResponse.json();
+
+          // Add additional info
+          metadata.id = folderPath;
+          metadata.folderPath = folderPath;
+
+          // Ensure recording_url is correct
+          if (!metadata.recording_url) {
+            metadata.recording_url = `/.videos/past-streams/${folderPath}/output.m3u8`;
+          }
+
+          return metadata;
+        } catch (error) {
+          console.warn(`Skipping ${folderPath}: ${error.message}`);
+          return null;
+        }
+      });
+
+      const streams = (await Promise.all(streamPromises))
+        .filter((stream) => stream !== null)
+        .sort((a, b) => {
+          // Sort by end time (most recent first)
+          const aTime = parseInt(a.ends || a.starts || 0);
+          const bTime = parseInt(b.ends || b.starts || 0);
+          return bTime - aTime;
+        });
+
+      pastStreamsData = streams;
+      console.log(`Loaded ${streams.length} past streams`);
+
+      if (streams.length === 0) {
+        loadingEl.classList.add("hidden");
+        emptyEl.classList.remove("hidden");
+        return;
+      }
+
+      // Generate HTML for streams
+      const streamsHtml = streams
+        .map((stream, index) => createStreamCard(stream, index))
+        .join("");
+      gridEl.innerHTML = streamsHtml;
+
+      // Show the grid
+      loadingEl.classList.add("hidden");
+      gridEl.classList.remove("hidden");
+    } catch (error) {
+      console.error("Error loading past streams:", error);
+      loadingEl.classList.add("hidden");
+      errorEl.classList.remove("hidden");
+    }
+  }
+
+  // Initialize past streams when the component loads
+  document.addEventListener("DOMContentLoaded", function () {
+    // Load past streams after a short delay to let main page load first
+    setTimeout(loadPastStreams, 1000);
+  });
+</script>
+{{end}}
