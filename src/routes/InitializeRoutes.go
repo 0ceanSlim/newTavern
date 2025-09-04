@@ -18,7 +18,6 @@ func InitializeRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/gun-blog/ar15guide", ArGuide)
 	mux.HandleFunc("/file-upload", FileUpload)
 	mux.HandleFunc("/contact", Contact)
-	mux.HandleFunc("/live/view", LiveView)
 	mux.HandleFunc("/btc-dash", BitcoinDashboard)
 	mux.HandleFunc("/nostr-verified", NostrVerified)
 }

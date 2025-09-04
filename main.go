@@ -6,7 +6,6 @@ import (
 	"goFrame/src/handlers"
 	"goFrame/src/routes"
 	"goFrame/src/utils"
-	"goFrame/src/utils/stream"
 	"log"
 	"net/http"
 	"time"
@@ -22,9 +21,6 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	// Start monitoring the RTMP stream
-	go stream.MonitorStream()
-
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/api/btc-price", api.FetchBitcoinPrice)
@@ -35,17 +31,10 @@ func main() {
 	mux.HandleFunc("/invoice-events", api.InvoiceEventsHandler)
 	mux.HandleFunc("/check-name", api.CheckNameHandler)
 	mux.HandleFunc("/check-npub", api.CheckNpubHandler)
-	mux.HandleFunc("/api/stream-data", api.GetStreamMetadata)
 	mux.HandleFunc("/api/smsnotes", api.SMSHandler)
 
 	// Access-Control-Allow-Origin", "*" for nostr.json
 	mux.HandleFunc("/.well-known/nostr.json", utils.ServeWellKnownNostr)
-
-	// Serve .m3u8 file
-	mux.HandleFunc("/live/output.m3u8", utils.ServeHLS)
-
-	mux.Handle("/live/", http.StripPrefix("/live/", utils.ServeHLSFolderWithCORS("web/live/")))
-	mux.Handle("/.videos/past-streams/", http.StripPrefix("/.videos/past-streams/", utils.ServePastStreamsWithCORS("web/.videos/past-streams/")))
 
 	// Initialize Routes
 	routes.InitializeRoutes(mux)
