@@ -1,67 +1,118 @@
 {{define "view"}}
-<main
-  class="flex flex-col items-center my-4 px-4 py-4 md:py-8 md:px-8 space-y-4 md:my-8 rounded-md bg-bgSecondary"
->
-  <section class="text-center">
-    <h1 class="text-lg font-bold md:text-2xl mb-2">
-      What is a
-      <a
-        href="https://github.com/nostr-protocol/nips/blob/master/05.md"
-        class="hover:text-textHighlighted underline"
-        >nostr address (NIP-05)</a
-      >
-      for Happy Tavern ?
+<main class="w-full px-4 py-8">
+  <!-- Hero Section -->
+  <div class="text-center" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h1 class="text-4xl md:text-5xl font-bold text-textPrimary mb-4 neon-glow">
+      🎟️ Happy Tavern Membership
     </h1>
-    <p class="text-left">
-      It's a human readable identifier for your public key. It makes finding
-      your profile on Nostr easier. It makes identifying your account easier. A
-      NIP-05 ID also provides you with a shiny verified checkmark!
+    <p class="text-xl md:text-2xl italic text-orange-500 mb-6 neon-glow-orange">
+      Join the community and unlock exclusive Nostr services
     </p>
-  </section>
+  </div>
 
-  <section class="text-center">
-    <p class="text-1xl italic md:text-2xl mb-2">
-      Why get an identifier on Happy Tavern ? 🍻
-    </p>
-    <p class="text-left">
-      Happy Tavern is a Nostr address (NIP-05) and Nostr services provider built
-      by me for everyone. Everything I do is in my free time and is open source.
-      They are my contributions to bitcoin and nostr. If you would like to
-      support what I do, you can pay lightning invoice for a Happy Tavern NIP-05
-      nostr address. Happy Tavern instantly groups your profile among other
-      users, allowing new nostr users to easily find you and make you
-      identifiable. Being verified at Happy Tavern also instantly whitelists you
-      for the nostr relay
-      <a
-        href="https://wheat.happytavern.co"
-        class="hover:text-textHighlighted underline"
-        >wss://wheat.happytavern.co</a
-      >. With a whitelist position, I will permanantly store your notes on my
-      relay (Event purging not applied to the whitelist). My relay may also go
-      to a whitelist only relay at any point in the future. Being on the
-      whitelist will ensure you can always write to wheat. I'm always adding new
-      features for whitelisted users on my relay. So get verified now for the
-      best value. As more features are added, the price may increase for the
-      service. There is no subscription. This is a one time payment.
-    </p>
-  </section>
+  <!-- Benefits Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
 
-  <section class="text-center">
-    <p class="font-bold text-1xl md:text-2xl mb-2">
-      ⚡️ How much does it cost?
-    </p>
-    <p>
-      The current price for a Happy Tavern NIP-05 is 5k sats. Fill out the form
-      below to generate an invoice and claim your name now! This price won't
-      last long.
-    </p>
-  </section>
+    <!-- NIP-05 Verification -->
+    <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-6 mb-8 md:mb-0">
+      <div class="text-center mb-4">
+        <img src="/static/img/verified.png" alt="Verified" class="w-16 h-16 mx-auto mb-3">
+        <h3 class="text-xl font-bold text-textPrimary mb-3 neon-glow">NIP-05 Verification</h3>
+      </div>
+      <p class="text-sm text-textMuted">
+        Get a human-readable
+        <a
+          href="https://github.com/nostr-protocol/nips/blob/master/05.md"
+          target="_blank"
+          class="link-light-purple underline"
+        >nostr address</a>
+        like <code class="bg-bgPrimary px-1 py-0.5 rounded text-orange-500">you@happytavern.co</code>.
+        Makes your profile easy to find and gives you that shiny verified checkmark!
+      </p>
+    </div>
+
+    <!-- Relay Access -->
+    <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-6 mb-8 md:mb-0">
+      <div class="text-center mb-4">
+        <div class="text-4xl mb-3">💾</div>
+        <h3 class="text-xl font-bold text-textPrimary mb-3 neon-glow">Relay Whitelist</h3>
+      </div>
+      <p class="text-sm text-textMuted">
+        Permanent write access to
+        <a
+          href="https://wheat.happytavern.co"
+          target="_blank"
+          class="link-light-purple underline"
+        >wheat.happytavern.co</a>
+        relay. Your notes are stored forever (no purging). Future-proof access even if the relay goes whitelist-only.
+      </p>
+    </div>
+
+    <!-- Blossom Storage -->
+    <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-6 mb-8 md:mb-0">
+      <div class="text-center mb-4">
+        <div class="text-4xl mb-3">🌸</div>
+        <h3 class="text-xl font-bold text-textPrimary mb-3 neon-glow">8GB Blossom Storage</h3>
+      </div>
+      <p class="text-sm text-textMuted">
+        Store your media files with 8GB of storage and 100MB file size limit.
+        Add <a
+          href="https://blossom.happytavern.co"
+          target="_blank"
+          class="link-light-purple underline"
+        >blossom.happytavern.co</a>
+        to your Nostr client's media servers and start uploading.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Why Join Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-2xl font-bold text-textPrimary mb-4 text-center neon-glow">
+      Why Join Happy Tavern?
+    </h2>
+    <div class="text-textMuted space-y-3">
+      <p>
+        Happy Tavern is a Nostr services provider built by me for the community.
+        Everything I create is open source and done in my free time as my contribution to Bitcoin and Nostr.
+      </p>
+      <p>
+        By becoming a member, you're not just getting premium Nostr services—you're supporting continued development
+        and joining a community of freedom-minded individuals. I'm constantly adding new features for members,
+        and early adopters get the best value.
+      </p>
+      <p class="text-center font-bold text-orange-500 text-lg neon-glow-orange">
+        One-time payment. No subscription. Forever access.
+      </p>
+    </div>
+  </div>
+
+  <!-- Pricing Section -->
+  <div class="text-center" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-6">
+      <h2 class="text-3xl font-bold text-textPrimary mb-3 neon-glow">
+        ⚡️ 10,000 sats
+      </h2>
+      <p class="text-textMuted mb-4">
+        Current early adopter pricing. Fill out the form below to generate your invoice and claim your membership!
+      </p>
+      <p class="text-sm text-orange-500 italic">
+        This price won't last long as more features are added.
+      </p>
+    </div>
+  </div>
 
   {{template "verified-form"}}
 
-  <div id="spinner" class="hidden">Loading...</div>
+  <div id="spinner" class="hidden text-center" style="max-width: 600px; margin: 0 auto;">
+    <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8">
+      <p class="text-xl text-textPrimary animate-pulse">Loading...</p>
+    </div>
+  </div>
+
   <!-- Invoice Result (Shows PAID status) -->
-  <div id="invoiceResult" class="text-center mt-6"></div>
+  <div id="invoiceResult" class="text-center" style="max-width: 600px; margin: 0 auto;"></div>
 
   {{template "verified-invoice"}}
 </main>

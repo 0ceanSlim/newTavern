@@ -1,19 +1,24 @@
 {{define "verified-form"}}
-<form
-  id="invoiceForm"
-  class="space-y-6 border border-bgTertiary p-6 rounded-lg shadow-md max-w-md mx-auto"
-  hx-post="/create-invoice"
-  hx-trigger="submit"
-  hx-target="#invoiceResult"
-  hx-swap="innerHTML"
->
+<div style="max-width: 600px; margin: 0 auto 3rem auto;">
+  <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-8">
+    <h2 class="text-2xl font-bold text-textPrimary mb-6 text-center neon-glow">
+      Claim Your Membership
+    </h2>
+    <form
+      id="invoiceForm"
+      class="space-y-6"
+      hx-post="/create-invoice"
+      hx-trigger="submit"
+      hx-target="#invoiceResult"
+      hx-swap="innerHTML"
+    >
   <div class="relative">
     <input
       type="text"
       id="name"
       placeholder="name"
       required
-      class="w-full p-2 text-black pr-24 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+      class="w-full p-3 pr-40 bg-bgPrimary text-textPrimary border-2 border-textHighlighted rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
       hx-get="/check-name"
       hx-trigger="keyup changed delay:200ms"
       hx-target="#name-error"
@@ -21,7 +26,7 @@
       hx-on::after-request="handleNameCheck(event)"
       name="name"
     />
-    <span class="absolute right-2 top-2 text-gray-500">@happytavern.co</span>
+    <span class="absolute right-3 top-3 text-textMuted text-sm">@happytavern.co</span>
 
     <div id="name-error" class="mt-1"></div>
     <script>
@@ -43,9 +48,9 @@
     <input
       type="text"
       id="npub"
-      placeholder="npub1234"
+      placeholder="npub1234..."
       required
-      class="w-full p-2 border text-black rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+      class="w-full p-3 bg-bgPrimary text-textPrimary border-2 border-textHighlighted rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
       hx-get="/check-npub"
       hx-trigger="keyup changed delay:200ms"
       hx-target="#npub-error"
@@ -76,11 +81,13 @@
   <button
     type="submit"
     id="submit-btn"
-    class="w-full px-4 py-2 text-white bg-purple-500 rounded hover:bg-purple-600 transition duration-300"
+    class="cyber-button-primary w-full px-6 py-3 text-lg font-bold text-white rounded-lg"
   >
-    Get Verified!
+    🎟️ Generate Invoice
   </button>
 </form>
+  </div>
+</div>
 
 <script src="https://unpkg.com/htmx.org@1.9.5"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -187,7 +194,15 @@
         if (spinner) spinner.classList.add("hidden");
         document.getElementById(
           "invoiceResult"
-        ).innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+        ).innerHTML = `
+          <div class="cyber-card warm-glow rounded-xl border-2 border-red-500 p-6">
+            <div class="text-center">
+              <div class="text-4xl mb-3">❌</div>
+              <p class="text-red-500 text-lg font-bold">Error</p>
+              <p class="text-textMuted text-sm mt-2">${error.message}</p>
+            </div>
+          </div>
+        `;
       }
     });
 
@@ -211,10 +226,18 @@
     if (!invoiceResult) return;
 
     invoiceResult.innerHTML = `
-      <div class="flex flex-col items-center">
-        <div class="animate-spin w-16 h-16 border-5 border-green-500 border-t-transparent rounded-full mb-4"></div>
-        <h1 class="text-green-500 text-4xl font-bold animate-fadeInUp">PAID</h1>
-        <p class="mt-2 animate-fadeInUp">Your payment has been received! You can now set your nip05 in your profile to the name you paid for. If you need support please see the contact page in other stuff</p>
+      <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8">
+        <div class="flex flex-col items-center">
+          <div class="text-6xl mb-4">✅</div>
+          <h1 class="text-orange-500 text-4xl md:text-5xl font-bold mb-4 neon-glow-orange">PAID!</h1>
+          <p class="text-textPrimary text-lg mb-2">Your payment has been received!</p>
+          <p class="text-textMuted text-sm">
+            You can now set your NIP-05 in your Nostr profile to the name you paid for.
+          </p>
+          <p class="text-textMuted text-sm mt-4">
+            Need support? Check the contact page in Other Stuff.
+          </p>
+        </div>
       </div>
     `;
   }

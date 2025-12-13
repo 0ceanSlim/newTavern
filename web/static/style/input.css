@@ -108,3 +108,152 @@
     border-top: 1px solid var(--color-bgInverted);
   }
 }
+
+/* Cyberpunk + Tavern Blend Styles */
+@layer components {
+  /* Animated gradient borders for hero cards */
+  .cyber-card {
+    position: relative;
+    background: linear-gradient(145deg, var(--color-bgSecondary), rgba(149, 40, 244, 0.05));
+  }
+
+  .cyber-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(135deg, #9528f4, #f7931a, #ff6b35, #9528f4);
+    background-size: 300% 300%;
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0.6;
+    animation: gradient-border 6s ease infinite;
+    filter: blur(8px);
+  }
+
+  @keyframes gradient-border {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Warm glow effect for tavern feel */
+  .warm-glow {
+    box-shadow:
+      0 0 20px rgba(247, 147, 26, 0.3),
+      0 0 40px rgba(149, 40, 244, 0.2),
+      0 10px 30px rgba(0, 0, 0, 0.5);
+    margin-bottom: 3rem;
+  }
+
+  /* Neon text glow */
+  .neon-glow {
+    text-shadow:
+      0 0 10px rgba(149, 40, 244, 0.8),
+      0 0 20px rgba(149, 40, 244, 0.6),
+      0 0 30px rgba(149, 40, 244, 0.4);
+  }
+
+  .neon-glow-orange {
+    text-shadow:
+      0 0 10px rgba(247, 147, 26, 0.8),
+      0 0 20px rgba(247, 147, 26, 0.6),
+      0 0 30px rgba(255, 107, 53, 0.4);
+  }
+
+  /* Interactive button effects */
+  .cyber-button {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(149, 40, 244, 0.3), rgba(149, 40, 244, 0.1));
+    border: 1px solid rgba(149, 40, 244, 0.5);
+    transition: all 0.3s ease;
+  }
+
+  .cyber-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(247, 147, 26, 0.4), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .cyber-button:hover::before {
+    left: 100%;
+  }
+
+  .cyber-button:hover {
+    background: linear-gradient(135deg, rgba(149, 40, 244, 0.5), rgba(149, 40, 244, 0.3));
+    border-color: #9528f4;
+    box-shadow: 0 0 25px rgba(149, 40, 244, 0.6), 0 0 50px rgba(247, 147, 26, 0.3);
+    transform: translateY(-2px);
+  }
+
+  /* Primary action button */
+  .cyber-button-primary {
+    background: linear-gradient(135deg, #9528f4, #7c1fd4);
+    border: 1px solid #9528f4;
+    box-shadow:
+      0 4px 20px rgba(149, 40, 244, 0.5),
+      0 0 30px rgba(247, 147, 26, 0.2);
+  }
+
+  .cyber-button-primary:hover {
+    background: linear-gradient(135deg, #a642f5, #9528f4);
+    box-shadow:
+      0 6px 30px rgba(149, 40, 244, 0.7),
+      0 0 40px rgba(247, 147, 26, 0.4);
+    transform: translateY(-3px);
+  }
+
+  /* Scanline overlay for cyberpunk effect */
+  .scanlines::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.1) 0px,
+      transparent 1px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.1) 3px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Icon glow effects */
+  .icon-glow-purple {
+    filter: drop-shadow(0 0 15px rgba(149, 40, 244, 0.8))
+            drop-shadow(0 0 30px rgba(149, 40, 244, 0.4));
+  }
+
+  .icon-glow-orange {
+    filter: drop-shadow(0 0 15px rgba(247, 147, 26, 0.8))
+            drop-shadow(0 0 30px rgba(255, 107, 53, 0.4));
+  }
+
+  /* Tavern warmth overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(247, 147, 26, 0.03) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Lighter purple links for better visibility */
+  .link-light-purple {
+    color: rgb(180, 100, 255);
+  }
+
+  .link-light-purple:hover {
+    color: rgb(247, 147, 26);
+  }
+}

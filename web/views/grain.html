@@ -1,144 +1,252 @@
 {{define "view"}}
-<main class="flex flex-col items-center my-16 md:my-32 space-y-12">
-  <!-- Welcome Section -->
-  <section class="text-center">
-    <h1 class="text-4xl md:text-6xl font-bold">G.R.A.I.N. 🌾</h1>
-  </section>
-
-  <!-- Slogan Section -->
-  <section>
-    <p class="text-2xl md:text-3xl italic">
+<main class="w-full px-4 py-8">
+  <!-- Hero Section -->
+  <div class="text-center" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h1 class="text-4xl md:text-6xl font-bold text-textPrimary mb-4 neon-glow">
+      🌾 G.R.A.I.N.
+    </h1>
+    <p class="text-2xl md:text-3xl italic text-orange-500 mb-6 neon-glow-orange">
       Go Relay Architecture for Implementing Nostr
     </p>
-  </section>
-
-  <!-- Blurb Section -->
-  <section class="max-w-2xl">
-    <p class="flextext-lg md:text-xl">
-      Grain is a highly configurable nostr relay implementation written in
-      <a
-        class="text-textHighlighted hover:underline"
-        href="https://go.dev/"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        GO<img
-          src="https://download.logo.wine/logo/Go_(programming_language)/Go_(programming_language)-Logo.wine.png"
-          class="inline-block h-6 align-text-bottom mx-1" /></a
-      >that uses
-      <a
-        class="text-textHighlighted hover:underline"
-        href="https://www.mongodb.com/"
-        target="_blank"
-        rel="noopener noreferrer"
-        >MongoDB<img
-          src="https://cdn.icon-icons.com/icons2/2415/PNG/512/mongodb_original_logo_icon_146424.png"
-          class="inline-block h-6 align-text-bottom mx-1"
-      /></a>
-      (for now) as a database for nostr Events. It offers the flexibility to
-      meet various use cases with extensive rate and resource limits, whitelist
-      and blacklist configurations, and many other variables to ensure
-      reliability and performance.
+    <p class="text-lg text-textMuted max-w-3xl mx-auto">
+      A highly configurable Nostr relay implementation with a powerful Go client library
+      and built-in web frontend for relay status and client features.
     </p>
-  </section>
+  </div>
 
-  <!-- Slogan Section -->
-  <section>
-    <a
-      href="https://github.com/0ceanSlim/grain"
-      class="flex items-center justify-center w-80 rounded-md"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <img
-        src="https://camo.githubusercontent.com/f29ef55bf732d0eba7756f49161c4acd3551ed06a4555cf0d8c5fc846c3b37bd/68747470733a2f2f63656e736f72736869702e6e6f2f696d672f6769746875622d62616467652e706e67"
-        alt="View on Github"
-      />
-    </a>
-  </section>
+  <!-- Public Instance Banner -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-6 text-center" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-2xl font-bold text-textPrimary mb-3 neon-glow">
+      🌾 Try it Now: wss://wheat.happytavern.co
+    </h2>
+    <p class="text-textMuted mb-4">
+      My public GRAIN instance is live! Connect your Nostr client and start using it today.
+    </p>
+    <div class="flex flex-wrap justify-center gap-4 mb-4">
+      <a
+        href="https://wheat.happytavern.co"
+        target="_blank"
+        class="cyber-button-primary px-6 py-3 font-bold text-white rounded-lg inline-block"
+      >
+        Visit Relay Frontend
+      </a>
+    </div>
+    <div class="cyber-card rounded-lg border-2 border-textHighlighted p-4 bg-bgSecondary">
+      <p class="text-textMuted mb-2">
+        <span class="text-orange-500 font-semibold">Storage Policy:</span> This relay accepts any event and stores them for a set time before removal.
+      </p>
+      <p class="text-lg font-bold text-orange-500">
+        Want permanent storage?
+        <a href="/nostr-verified" class="link-light-purple underline hover:text-orange-400">Get a Happy Tavern Membership</a>
+        for whitelist access!
+      </p>
+    </div>
+  </div>
 
-  <!-- Feature Highlights Section -->
-  <section class="max-w-3xl space-y-4">
-    <h2 class="text-2xl md:text-3xl font-semibold">Key Features</h2>
-    <ul
-      class="list-disc list-inside text-md md:text-lg text-left text-textMuted"
-    >
-      <li>
-        Dynamic event handling with support for event deletion as per NIP-09.
-      </li>
-      <li>
-        Highly configurable through YAML-based settings for diverse use cases.
-      </li>
-      <li>
-        Efficient rate limiting for WebSocket messages, events, and requests.
-      </li>
-      <li>
-        Robust blacklisting and whitelisting capabilities for enhanced control.
-      </li>
-      <li>MongoDB integration for scalable, high-performance storage.</li>
-      <li>
-        Scalable architecture built with Go, ideal for high-throughput
-        scenarios.
-      </li>
-    </ul>
-  </section>
+  <!-- Why GRAIN Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-3xl font-bold text-textPrimary mb-6 text-center neon-glow">
+      Why GRAIN?
+    </h2>
+    <div class="text-textMuted space-y-4 max-w-4xl mx-auto">
+      <p class="text-center text-xl text-orange-500 font-bold neon-glow-orange">
+        The key to GRAIN is being highly configurable to fit multiple use cases.
+      </p>
+      <p class="text-lg">
+        GRAIN was created because existing Nostr relay solutions didn't offer the flexibility needed
+        for diverse deployment scenarios. At its core, GRAIN is a <span class="text-orange-500 font-semibold">powerful,
+        production-ready Nostr relay</span> that you can configure to meet any need—whether you're running
+        a public relay, a private community relay, or a specialized relay with custom rules.
+      </p>
+      <p class="text-lg">
+        But GRAIN is <span class="text-orange-500 font-semibold">more than just a relay</span>—it's also a
+        comprehensive <span class="text-orange-500 font-semibold">Go library for building all sorts of Nostr
+        applications and tools</span>. The client library handles connection pooling, event management,
+        authentication, and more, so you can focus on building your application instead of reinventing the wheel.
+      </p>
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-6 bg-bgSecondary">
+        <p class="text-center text-lg font-bold text-textPrimary mb-3">
+          🌾 GRAIN is Open Source
+        </p>
+        <p class="text-center">
+          GRAIN is completely <span class="text-orange-500 font-semibold">free and open source</span>.
+          You can run your own relay, customize it however you want, and contribute to the project.
+          That's what GRAIN is all about—giving you the freedom and tools to build on Nostr your way.
+        </p>
+      </div>
+    </div>
+  </div>
 
-  <!-- Configuration Overview Section -->
-  <section class="max-w-full space-y-4 px-4">
-    <h2
-      class="text-2xl md:text-3xl font-semibold underline underline-offset-2 text-center"
-    >
-      Configuration Preview
+  <!-- What is GRAIN Section -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+
+    <!-- Nostr Relay -->
+    <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-6">
+      <div class="text-center mb-4">
+        <div class="text-4xl mb-3">📡</div>
+        <h3 class="text-xl font-bold text-textPrimary mb-3 neon-glow">Nostr Relay</h3>
+      </div>
+      <ul class="text-sm text-textMuted space-y-2">
+        <li>✓ Highly configurable via YAML settings</li>
+        <li>✓ MongoDB-backed event storage</li>
+        <li>✓ Advanced rate limiting & resource controls</li>
+        <li>✓ Whitelist/blacklist filtering</li>
+        <li>✓ Hot configuration reloading</li>
+        <li>✓ Event purging with retention policies</li>
+        <li>✓ NIP support: 1, 2, 9, 11, 40, 42, 65</li>
+      </ul>
+    </div>
+
+    <!-- Go Client Library -->
+    <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-6">
+      <div class="text-center mb-4">
+        <div class="text-4xl mb-3">📚</div>
+        <h3 class="text-xl font-bold text-textPrimary mb-3 neon-glow">Go Client Library</h3>
+      </div>
+      <ul class="text-sm text-textMuted space-y-2">
+        <li>✓ Connection pooling & relay management</li>
+        <li>✓ Event signing & broadcasting</li>
+        <li>✓ Subscription management with filters</li>
+        <li>✓ Key generation & conversion utilities</li>
+        <li>✓ Session-based authentication</li>
+        <li>✓ Perfect for building Nostr apps in Go</li>
+        <li>✓ Production-grade with error handling</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Get Started Section -->
+  <div class="text-center" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8">
+      <h2 class="text-3xl font-bold text-textPrimary mb-6 neon-glow">
+        Get Started with GRAIN
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <a
+          href="https://github.com/0ceanSlim/grain"
+          target="_blank"
+          class="cyber-button-primary px-6 py-3 font-bold text-white rounded-lg"
+        >
+          GitHub Repository
+        </a>
+        <a
+          href="https://github.com/0ceanSlim/grain/blob/main/docs/installation.md"
+          target="_blank"
+          class="cyber-button px-6 py-3 font-bold rounded-lg"
+        >
+          Installation Guide
+        </a>
+        <a
+          href="https://github.com/0ceanSlim/grain/blob/main/docs/configuration.md"
+          target="_blank"
+          class="cyber-button px-6 py-3 font-bold rounded-lg"
+        >
+          Configuration Docs
+        </a>
+        <a
+          href="https://github.com/0ceanSlim/grain/blob/main/docs/api.md"
+          target="_blank"
+          class="cyber-button px-6 py-3 font-bold rounded-lg"
+        >
+          API Documentation
+        </a>
+      </div>
+      <p class="text-textMuted">
+        GRAIN is open source and built with ❤️ for the Nostr community.
+        Contributions and feedback are always welcome!
+      </p>
+    </div>
+  </div>
+
+  <!-- Frontend Features Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-2xl font-bold text-textPrimary mb-6 text-center neon-glow">
+      🖥️ Built-in Web Frontend
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div>
+        <h4 class="text-lg font-semibold text-orange-500 mb-2">Relay Dashboard</h4>
+        <ul class="text-sm text-textMuted space-y-1">
+          <li>• Real-time relay status</li>
+          <li>• Configuration management</li>
+          <li>• Connection monitoring</li>
+          <li>• Hot-reload interface</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-lg font-semibold text-orange-500 mb-2">Event & Profile Viewer</h4>
+        <ul class="text-sm text-textMuted space-y-1">
+          <li>• View user profiles</li>
+          <li>• Display event details</li>
+          <li>• Search functionality</li>
+          <li>• Profile caching</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-lg font-semibold text-orange-500 mb-2">Client Tools</h4>
+        <ul class="text-sm text-textMuted space-y-1">
+          <li>• Relay ping/latency testing</li>
+          <li>• Key generation & conversion</li>
+          <li>• Event publishing</li>
+          <li>• Multiple auth methods</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Configuration Examples Section -->
+  <section class="max-w-full space-y-4 px-4" style="margin: 0 auto 3rem auto;">
+    <h2 class="text-2xl md:text-3xl font-semibold text-textPrimary text-center neon-glow">
+      ⚙️ Configuration Examples
     </h2>
 
-    <p class="text-base md:text-lg text-textMuted text-center">
-      Grain is designed for simplicity and flexibility. You can customize
-      settings to suit your requirements by editing the YAML configuration
-      files.
+    <p class="text-base md:text-lg text-textMuted text-center max-w-3xl mx-auto">
+      GRAIN is designed for simplicity and flexibility. Customize settings to suit your requirements
+      by editing the YAML configuration files.
     </p>
 
-    <div class="bg-bgSecondary p-4 rounded border-bgInverted border-2">
+    <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-6" style="max-width: 1200px; margin: 0 auto;">
       <div class="flex flex-wrap justify-center gap-2 mb-4">
         <button
-          onclick="loadContent('https://raw.githubusercontent.com/0ceanSlim/grain/main/app/static/examples/config.example.yml')"
-          class="inline-block border-bgInverted border-2 p-4 my-4 mt-4 text-sm font-bold align-baseline rounded-md bg-bgSecondary hover:bg-bgTertiary hover:text-textHighlighted"
+          onclick="loadContent('https://raw.githubusercontent.com/0ceanSlim/grain/main/docs/examples/config.example.yml')"
+          class="cyber-button px-4 py-2 font-bold rounded-lg"
         >
           Config
         </button>
         <button
-          onclick="loadContent('https://raw.githubusercontent.com/0ceanSlim/grain/refs/heads/main/app/static/examples/whitelist.example.yml')"
-          class="inline-block border-bgInverted border-2 p-4 my-4 mt-4 text-sm font-bold align-baseline rounded-md bg-bgSecondary hover:bg-bgTertiary hover:text-textHighlighted"
+          onclick="loadContent('https://raw.githubusercontent.com/0ceanSlim/grain/main/docs/examples/whitelist.example.yml')"
+          class="cyber-button px-4 py-2 font-bold rounded-lg"
         >
           Whitelist
         </button>
         <button
-          onclick="loadContent('https://raw.githubusercontent.com/0ceanSlim/grain/refs/heads/main/app/static/examples/blacklist.example.yml')"
-          class="inline-block border-bgInverted border-2 p-4 my-4 mt-4 text-sm font-bold align-baseline rounded-md bg-bgSecondary hover:bg-bgTertiary hover:text-textHighlighted"
+          onclick="loadContent('https://raw.githubusercontent.com/0ceanSlim/grain/main/docs/examples/blacklist.example.yml')"
+          class="cyber-button px-4 py-2 font-bold rounded-lg"
         >
           Blacklist
+        </button>
+        <button
+          onclick="loadContent('https://raw.githubusercontent.com/0ceanSlim/grain/main/docs/examples/relay_metadata.example.json')"
+          class="cyber-button px-4 py-2 font-bold rounded-lg"
+        >
+          Relay Metadata
         </button>
       </div>
       <pre
         id="config-content"
-        class="border-bgInverted border-2 w-full max-w-full bg-bgPrimary text-textPrimary text-left rounded shadow overflow-x-auto p-4 text-sm break-words"
+        class="border-2 border-textHighlighted w-full max-w-full bg-bgPrimary text-textPrimary text-left rounded shadow overflow-x-auto p-4 text-sm break-words"
       ></pre>
     </div>
   </section>
 
-  <!-- Implementation Details Section -->
-  <section class="text-center max-w-2xl space-y-4">
-    <p class="text-lg md:text-xl">
-      I created Grain because existing solutions didn’t meet my expectations for
-      flexibility. Feedback and contributions are always welcome to help improve
-      this project!
-    </p>
-  </section>
 </main>
+
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     hljs.highlightAll();
     loadContent(
-      "https://raw.githubusercontent.com/0ceanSlim/grain/main/app/static/examples/config.example.yml"
+      "https://raw.githubusercontent.com/0ceanSlim/grain/main/docs/examples/config.example.yml"
     );
   });
 

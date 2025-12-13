@@ -4,6 +4,7 @@ import "net/http"
 
 func InitializeRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/", Index)
+	mux.HandleFunc("/index-mockup", IndexMockup)
 	mux.HandleFunc("/settings", Settings)
 	mux.HandleFunc("/what-is-nostr", WhatIsNostr)
 	mux.HandleFunc("/bitcoin-works", BitcoinWorks)

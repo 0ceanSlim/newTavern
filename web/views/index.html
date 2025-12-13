@@ -1,25 +1,277 @@
 {{define "view"}}
-<main class="flex flex-col items-center my-16 md:my-32 space-y-12">
-  <!-- Welcome Section -->
-  <section class="text-center">
-    <h1 class="text-4xl md:text-6xl font-bold">Welcome to Happy Tavern!</h1>
-  </section>
-
-  <!-- Slogan Section -->
-  <section class="text-center">
-    <p class="text-2xl md:text-3xl italic">
+<main class="w-full px-4 py-8">
+  <!-- Hero Section -->
+  <div class="text-center mb-8" style="max-width: 1400px; margin: 0 auto;">
+    <h1 class="text-4xl md:text-6xl font-bold text-textPrimary mb-4 neon-glow">
+      Welcome to Happy Tavern
+    </h1>
+    <p class="text-2xl md:text-3xl italic text-orange-500 mb-6 neon-glow-orange">
       Raise your glass to Self Sovereignty
     </p>
-  </section>
+    <div class="py-4">
+      <a
+        href="/nostr-verified"
+        hx-get="/nostr-verified"
+        hx-push-url="/nostr-verified"
+        hx-swap="outerHTML"
+        hx-target="body"
+        class="cyber-button-primary inline-block px-8 py-3 text-lg font-bold text-white rounded-lg"
+      >
+        🎟️ Get Tavern Membership
+      </a>
+    </div>
+  </div>
 
-  <!-- Blurb Section -->
-  <section class="text-center max-w-2xl">
-    <p class="text-lg md:text-xl text-textMuted">
-      Crack open a "cold snack," grab a seat, and enjoy your time here. Happy
-      Tavern is a gathering place for the ideas, projects, and resources I'm
-      passionate about—like Nostr, Bitcoin, and other ways to embrace
-      self-sovereignty.
-    </p>
-  </section>
+  <!-- Three Column Cards with Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12" style="max-width: 1400px; margin: 0 auto;">
+
+    <!-- Nostr Card -->
+    <div class="cyber-card warm-glow rounded-2xl border-2 border-textHighlighted transition-all duration-300">
+      <div class="p-6 relative z-10">
+        <!-- Icon & Title -->
+        <div class="text-center mb-6">
+          <div class="w-20 h-20 mx-auto mb-4">
+            <img
+              class="object-contain w-full h-full icon-glow-purple"
+              src="/static/img/nostr.png"
+              alt="nostr icon"
+            />
+          </div>
+          <h2 class="text-2xl md:text-3xl font-bold text-textPrimary mb-3 neon-glow">
+            nostr
+          </h2>
+          <div style="height: 60px;" class="flex items-center justify-center">
+            <p class="text-sm text-textMuted">
+              A decentralized social protocol putting you in control of your identity and data.
+            </p>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div class="space-y-3">
+          <a
+            href="/what-is-nostr"
+            hx-get="/what-is-nostr"
+            hx-push-url="/what-is-nostr"
+            hx-swap="outerHTML"
+            hx-target="body"
+            class="cyber-button-primary block px-4 py-3 text-center rounded-lg text-white font-bold"
+          >
+            What is nostr?
+          </a>
+          <a
+            href="/grain"
+            hx-get="/grain"
+            hx-push-url="/grain"
+            hx-swap="outerHTML"
+            hx-target="body"
+            class="cyber-button block px-4 py-2 text-center rounded-lg text-textPrimary"
+          >
+            🌾 grain
+          </a>
+          <a
+            href="/nostr-hero"
+            hx-get="/nostr-hero"
+            hx-push-url="/nostr-hero"
+            hx-swap="outerHTML"
+            hx-target="body"
+            class="cyber-button block px-4 py-2 text-center rounded-lg text-textPrimary"
+          >
+            🎮 Nostr Hero
+          </a>
+          <a
+            href="/gnostream"
+            hx-get="/gnostream"
+            hx-push-url="/gnostream"
+            hx-swap="outerHTML"
+            hx-target="body"
+            class="cyber-button block px-4 py-2 text-center rounded-lg text-textPrimary"
+          >
+            📡 gnostream
+          </a>
+          <a
+            href="/nostr-software"
+            hx-get="/nostr-software"
+            hx-push-url="/nostr-software"
+            hx-swap="outerHTML"
+            hx-target="body"
+            class="cyber-button block px-4 py-2 text-center rounded-lg text-textPrimary"
+          >
+            Other Software
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bitcoin Card -->
+    <div class="cyber-card warm-glow rounded-2xl border-2 border-orange-500 transition-all duration-300">
+      <div class="p-6 relative z-10">
+        <!-- Icon & Title -->
+        <div class="text-center mb-6">
+          <div class="w-20 h-20 mx-auto mb-4">
+            <img
+              class="object-contain w-full h-full icon-glow-orange"
+              src="/static/img/bitcoin.png"
+              alt="bitcoin icon"
+            />
+          </div>
+          <h2 class="text-2xl md:text-3xl font-bold text-textPrimary mb-3 neon-glow">
+            Bitcoin
+          </h2>
+          <div style="height: 60px;" class="flex flex-col items-center justify-center">
+            <p class="text-xs text-textMuted mb-1">Current Price</p>
+            <div
+              id="btc-price-home"
+              class="text-xl font-bold text-orange-500 neon-glow-orange"
+              hx-get="/api/btc-price"
+              hx-trigger="load, every 30s"
+              hx-swap="innerHTML"
+              hx-target="this"
+              _="on htmx:afterRequest
+                    set the innerHTML of me to '$' + JSON.parse(event.detail.xhr.responseText).Price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})"
+            >
+              Loading...
+            </div>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div class="space-y-3">
+          <a
+            href="/bitcoin-works"
+            hx-get="/bitcoin-works"
+            hx-push-url="/bitcoin-works"
+            hx-swap="outerHTML"
+            hx-target="body"
+            class="cyber-button-primary block px-4 py-3 text-center rounded-lg text-white font-bold"
+          >
+            How does it work?
+          </a>
+          <a
+            href="/btc-dash"
+            hx-get="/btc-dash"
+            hx-push-url="/btc-dash"
+            hx-swap="outerHTML"
+            hx-target="body"
+            class="cyber-button block px-4 py-2 text-center rounded-lg text-textPrimary"
+          >
+            📊 Dashboard
+          </a>
+          <a
+            href="/mempool"
+            hx-get="/mempool"
+            hx-push-url="/mempool"
+            hx-swap="outerHTML"
+            hx-target="body"
+            class="cyber-button block px-4 py-2 text-center rounded-lg text-textPrimary"
+          >
+            mempool
+          </a>
+          <a
+            href="https://books.happytavern.co"
+            target="_blank"
+            rel="noopener noreferrer"
+            onclick="return confirmNavigation(this)"
+            class="cyber-button block px-4 py-2 text-center rounded-lg text-textPrimary"
+          >
+            📚 Bitcoin Books
+          </a>
+          <a
+            href="/bitcoin-software"
+            hx-get="/bitcoin-software"
+            hx-push-url="/bitcoin-software"
+            hx-swap="outerHTML"
+            hx-target="body"
+            class="cyber-button block px-4 py-2 text-center rounded-lg text-textPrimary"
+          >
+            CLN Software
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Other Stuff Card -->
+    <div class="cyber-card warm-glow rounded-2xl border-2 border-textHighlighted transition-all duration-300">
+      <div class="p-6 relative z-10">
+        <!-- Icon & Title -->
+        <div class="text-center mb-6">
+          <div class="w-20 h-20 mx-auto mb-4">
+            <img
+              class="object-contain w-full h-full icon-glow-purple"
+              src="/static/img/otherstuff.png"
+              alt="other stuff icon"
+            />
+          </div>
+          <h2 class="text-2xl md:text-3xl font-bold text-textPrimary mb-3 neon-glow">
+            Other Stuff
+          </h2>
+          <div style="height: 60px;" class="flex items-center justify-center">
+            <p class="text-sm text-textMuted">
+              Projects, tools, and resources for the freedom-minded.
+            </p>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div class="space-y-3">
+          <a
+            href="/contact"
+            hx-get="/contact"
+            hx-push-url="/contact"
+            hx-swap="outerHTML"
+            hx-target="body"
+            class="cyber-button-primary block px-4 py-3 text-center rounded-lg text-white font-bold"
+          >
+            📧 Contact Me
+          </a>
+          <a
+            href="/file-upload"
+            hx-get="/file-upload"
+            hx-push-url="/file-upload"
+            hx-swap="outerHTML"
+            hx-target="body"
+            class="cyber-button block px-4 py-2 text-center rounded-lg text-textPrimary"
+          >
+            📤 File Upload
+          </a>
+          <a
+            href="https://live.happytavern.co"
+            target="_blank"
+            class="cyber-button block px-4 py-2 text-center rounded-lg text-textPrimary"
+          >
+            🔴 Live Stream
+          </a>
+          <a
+            href="/gun-blog"
+            hx-get="/gun-blog"
+            hx-push-url="/gun-blog"
+            hx-swap="outerHTML"
+            hx-target="body"
+            class="cyber-button block px-4 py-2 text-center rounded-lg text-textPrimary"
+          >
+            🔫 Gun Blog
+          </a>
+          <a
+            href="https://dwm.happytavern.co"
+            class="cyber-button block px-4 py-2 text-center rounded-lg text-textPrimary"
+          >
+            DWM app
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
 </main>
+
+<script>
+  function confirmNavigation(link) {
+    const confirmation = confirm('The guest login and password is "bitcoin"');
+    if (confirmation) {
+      window.open(link.href, "_blank", "noopener,noreferrer");
+    }
+    return false;
+  }
+</script>
 {{end}}

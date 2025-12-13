@@ -1,9 +1,9 @@
 {{define "nav-other"}}
-<li class="relative rounded-md group bg-bgSecondary text-textPrimary">
+<li class="relative rounded-md group text-textPrimary border border-transparent hover:border-textHighlighted transition-all duration-200">
   <a
     href="#"
     onclick="toggleDropdown('otherDropdown')"
-    class="flex items-center justify-between p-2 space-x-2 hover:rounded-md hover:text-textHighlighted"
+    class="flex items-center justify-between p-2 space-x-2 hover:text-textHighlighted"
   >
     <div class="w-12 h-12 md:w-14 md:h-14">
       <img
@@ -32,8 +32,8 @@
   <!-- Dropdown container -->
   <div
     id="otherDropdown"
-    class="absolute left-0 hidden mt-2 border rounded-md shadow-lg lg:left-auto lg:group-hover:block lg:m-2 border-bgInverted bg-bgSecondary"
-    style="min-width: 12rem; z-index: 10"
+    class="absolute left-0 hidden mt-2 border-2 rounded-lg shadow-lg lg:left-auto lg:group-hover:block lg:m-2 border-textHighlighted warm-glow bg-bgSecondary"
+    style="min-width: 12rem; z-index: 10;"
   >
     <!-- Pseudo-element for hover gap -->
     <div class="absolute w-full h-3 -top-3"></div>
@@ -43,39 +43,33 @@
         <a
           href="/gun-blog"
           hx-push-url="/gun-blog"
-          class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
+          class="block px-4 py-2 text-center hover:bg-bgTertiary hover:text-textHighlighted transition-all duration-200 rounded-md mx-1"
           hx-trigger="click"
           hx-get="/gun-blog"
           hx-swap="outerHTML"
           hx-target="body"
-          ><img
-            class="inline-block h-6 mx-1 align-text-bottom"
-            src="https://clipart-library.com/images_k/gun-png-transparent/gun-png-transparent-5.png"
-          />
-          Gun Blog
+        >
+          🔫 Gun Blog
         </a>
       </li>
       <li>
         <a
           href="/file-upload"
           hx-push-url="/file-upload"
-          class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
+          class="block px-4 py-2 text-center hover:bg-bgTertiary hover:text-textHighlighted transition-all duration-200 rounded-md mx-1"
           hx-trigger="click"
           hx-get="/file-upload"
           hx-swap="outerHTML"
           hx-target="body"
-          ><img
-            class="inline-block h-6 mx-1 align-text-bottom"
-            src="https://img.icons8.com/ios/50/upload--v1.png"
-          />
-          File Upload
+        >
+          📤 File Upload
         </a>
       </li>
       <li>
         <a
           href="https://live.happytavern.co"
           target="_blank"
-          class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
+          class="block px-4 py-2 text-center hover:bg-bgTertiary hover:text-textHighlighted transition-all duration-200 rounded-md mx-1"
         >
           🔴 Live Stream
         </a>
@@ -84,30 +78,21 @@
         <a
           href="/contact"
           hx-push-url="/contact"
-          class="block px-4 py-2 whitespace-nowrap hover:text-textHighlighted"
+          class="block px-4 py-2 text-center hover:bg-bgTertiary hover:text-textHighlighted transition-all duration-200 rounded-md mx-1"
           hx-trigger="click"
           hx-get="/contact"
           hx-swap="outerHTML"
           hx-target="body"
-          ><img
-            class="inline-block h-6 mx-1 align-text-bottom"
-            src="https://static.vecteezy.com/system/resources/previews/012/627/941/non_2x/3d-open-mail-icon-free-png.png"
-          />
-          Contact Me
+        >
+          📧 Contact Me
         </a>
       </li>
       <li>
         <a
-          class="flex items-center px-4 py-2 space-x-2 whitespace-nowrap hover:text-textHighlighted"
-          hx-push-url="https://dwm.happytavern.co"
+          class="block px-4 py-2 text-center hover:bg-bgTertiary hover:text-textHighlighted transition-all duration-200 rounded-md mx-1"
           href="https://dwm.happytavern.co"
         >
-          <img
-            src="https://happytavern.co/.pictures/dwm/monster/slime.png"
-            alt="slime"
-            class="w-6 h-6 rounded-sm"
-          />
-          <span>DWM app</span>
+          DWM app
         </a>
       </li>
     </ul>

@@ -1,18 +1,15 @@
 {{define "header"}}
 
-<header class="bg-bgSecondary rounded-b-md p-4">
-  <div class="flex justify-center items-center space-x-4">
+<header class="cyber-card warm-glow rounded-b-2xl p-4 mb-6 border-2 border-textHighlighted">
+  <div class="flex justify-center items-center space-x-4 mb-3">
     {{template "header-btc"}}{{template "header-gold"}}
   </div>
-  <div class="relative flex items-center justify-between mb-4 bg-bgSecondary">
+  <div class="relative flex items-center justify-between bg-transparent">
     <!-- Left: Logo -->
     {{template "app-name"}}
 
     <!-- Center: Navigation -->
     {{template "navigation"}}
-
-    <!-- Right: Settings -->
-    {{template "theme-swap"}}
   </div>
 </header>
 <script>
@@ -25,5 +22,4 @@
     dropdown.classList.toggle("hidden");
   }
 </script>
-<script src="/static/js/theme.js"></script>
 {{end}}

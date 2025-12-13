@@ -8,3 +8,4 @@ nostr.yml
 !/web/static/
 !/web/views/
 /web/.logs/
+/.claude

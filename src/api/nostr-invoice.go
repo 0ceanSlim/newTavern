@@ -62,14 +62,15 @@ func generateUniqueLabel() string {
 	return fmt.Sprintf("nostr-%d", r.Intn(1000000))
 }
 
-func CLNInvoice(sats int) (string, string, error) {
+func CLNInvoice(sats int, name string) (string, string, error) {
 	label := generateUniqueLabel()
 	url := fmt.Sprintf("%s/v1/invoice", CLN_REST_URL)
 
+	description := fmt.Sprintf("Payment for service from %s", name)
 	requestData := InvoiceRequest{
 		Amount: int64(sats * 1000), // Convert sats to msats
 		Label:  label,
-		Desc:   "Payment for service",
+		Desc:   description,
 	}
 
 	jsonData, err := json.Marshal(requestData)
@@ -234,7 +235,7 @@ func HandleNostrInvoice(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Received input:", input) // Log input data
 
-	bolt11, label, err := CLNInvoice(5000)
+	bolt11, label, err := CLNInvoice(10000, input.Name)
 	if err != nil {
 		fmt.Println("Error creating invoice:", err) // Log error
 		http.Error(w, "Error creating invoice", http.StatusInternalServerError)

@@ -4,7 +4,7 @@
 <div class="relative inline-block">
   <!-- Dropdown Toggle Button -->
   <button
-    class="rounded-md p-2 w-8 bg-bgSecondary hover:bg-bgTertiary"
+    class="rounded-md p-2 w-8 bg-bgSecondary hover:bg-bgTertiary border border-transparent hover:border-textHighlighted transition-all duration-300"
     _="on click toggle .hidden on #themeDropdown"
   >
     <img src="/static/img/themes/paint.png" alt="Theme Selector" class="" />
@@ -13,29 +13,30 @@
   <!-- Dropdown Menu -->
   <div id="themeDropdown" class="hidden">
     <div
-      class="flex absolute right-2 mt-8 flex-col gap-2 border-bgInverted border rounded-md bg-bgSecondary p-2"
+      class="flex absolute right-2 mt-8 flex-col gap-2 border-2 border-textHighlighted rounded-lg bg-bgSecondary p-2 warm-glow"
+      style="background: linear-gradient(145deg, var(--color-bgSecondary), rgba(149, 40, 244, 0.1));"
     >
       <!-- Theme Swatches -->
       <button
-        class="swatch w-12 h-12 hover:bg-bgTertiary rounded-md"
+        class="swatch w-12 h-12 hover:bg-bgTertiary rounded-md border border-transparent hover:border-textHighlighted transition-all duration-200"
         data-theme=""
       >
         <img src="/static/img/themes/dark.png" alt="Dark Theme" class="p-2" />
       </button>
       <button
-        class="swatch w-12 h-12 hover:bg-bgTertiary rounded-md"
+        class="swatch w-12 h-12 hover:bg-bgTertiary rounded-md border border-transparent hover:border-textHighlighted transition-all duration-200"
         data-theme="light"
       >
         <img src="/static/img/themes/light.png" alt="Light Theme" class="p-2" />
       </button>
       <button
-        class="swatch w-12 h-12 hover:bg-bgTertiary rounded-md"
+        class="swatch w-12 h-12 hover:bg-bgTertiary rounded-md border border-transparent hover:border-textHighlighted transition-all duration-200"
         data-theme="lava"
       >
         <img src="/static/img/themes/lava.png" alt="Lava Theme" class="p-2" />
       </button>
       <button
-        class="swatch w-12 h-12 hover:bg-bgTertiary rounded-md"
+        class="swatch w-12 h-12 hover:bg-bgTertiary rounded-md border border-transparent hover:border-textHighlighted transition-all duration-200"
         data-theme="midnight"
       >
         <img
@@ -45,7 +46,7 @@
         />
       </button>
       <button
-        class="swatch w-12 h-12 hover:bg-bgTertiary rounded-md"
+        class="swatch w-12 h-12 hover:bg-bgTertiary rounded-md border border-transparent hover:border-textHighlighted transition-all duration-200"
         data-theme="solar"
       >
         <img src="/static/img/themes/solar.png" alt="Solar Theme" class="p-2" />

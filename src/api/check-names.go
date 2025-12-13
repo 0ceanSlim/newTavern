@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func CheckNameHandler(w http.ResponseWriter, r *http.Request) {
@@ -34,12 +35,16 @@ func CheckNameHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Ensure case-sensitive and exact match for name lookup
-	if _, exists := logs.Names[name]; exists {
-		w.WriteHeader(http.StatusConflict)
-		fmt.Fprint(w, `<p class="text-red-500">❌ Name is already taken</p>`)
-	} else {
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, `<p class="text-green-500">✅ Name is available</p>`)
+	// Case-insensitive name lookup
+	nameLower := strings.ToLower(name)
+	for existingName := range logs.Names {
+		if strings.ToLower(existingName) == nameLower {
+			w.WriteHeader(http.StatusConflict)
+			fmt.Fprint(w, `<p class="text-red-500">❌ Name is already taken</p>`)
+			return
+		}
 	}
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprint(w, `<p class="text-green-500">✅ Name is available</p>`)
 }
