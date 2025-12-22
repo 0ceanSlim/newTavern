@@ -67,7 +67,7 @@
       </li>
       <li>
         <a
-          class="block px-4 py-2 text-center hover:bg-bgTertiary hover:text-textHighlighted transition-all duration-200 rounded-md mx-1"
+          class="flex items-center justify-center gap-2 px-4 py-2 hover:bg-bgTertiary hover:text-textHighlighted transition-all duration-200 rounded-md mx-1"
           hx-trigger="click"
           hx-get="/mempool"
           hx-push-url="/mempool"
@@ -75,6 +75,7 @@
           hx-swap="outerHTML"
           hx-target="body"
         >
+          <img src="https://mempool.space/resources/favicons/favicon-32x32.png" alt="mempool" class="w-4 h-4 inline-block">
           mempool
         </a>
       </li>
@@ -86,7 +87,21 @@
           class="block px-4 py-2 text-center hover:bg-bgTertiary hover:text-textHighlighted transition-all duration-200 rounded-md mx-1"
           onclick="return confirmNavigation(this)"
         >
-          📚 Bitcoin Books
+          📖 Bitcoin Books
+        </a>
+      </li>
+      <li>
+        <a
+          class="flex items-center justify-center gap-2 px-4 py-2 hover:bg-bgTertiary hover:text-textHighlighted transition-all duration-200 rounded-md mx-1"
+          hx-trigger="click"
+          hx-get="/core-lnurl"
+          hx-push-url="/core-lnurl"
+          href="/core-lnurl"
+          hx-swap="outerHTML"
+          hx-target="body"
+        >
+          <img src="https://getumbrel.github.io/umbrel-apps-gallery/core-lightning/icon.svg" alt="Core Lightning" class="w-4 h-4 inline-block">
+          LNURL Server
         </a>
       </li>
     </ul>

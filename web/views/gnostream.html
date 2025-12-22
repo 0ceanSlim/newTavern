@@ -1,0 +1,300 @@
+{{define "view"}}
+<main class="w-full px-4 py-8">
+  <!-- Hero Section -->
+  <div class="text-center" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h1 class="text-4xl md:text-6xl font-bold text-textPrimary mb-4 neon-glow">
+      📡 GNOSTREAM
+    </h1>
+    <p class="text-2xl md:text-3xl italic text-orange-500 mb-6 neon-glow-orange">
+      Self-Hosted Live Streaming Made Simple
+    </p>
+    <p class="text-lg text-textMuted max-w-3xl mx-auto">
+      A powerful RTMP streaming server with automatic Nostr broadcasting, HLS conversion, and built-in web viewer.
+      Stream seamlessly to your own infrastructure.
+    </p>
+  </div>
+
+  <!-- Live Instance Banner -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-6 text-center" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-2xl font-bold text-textPrimary mb-3 neon-glow">
+      📺 Watch My Live Streams
+    </h2>
+    <p class="text-textMuted mb-4">
+      My public GNOSTREAM instance is live! Watch streams and explore past broadcasts with a full cyberpunk-themed interface.
+    </p>
+    <div class="flex flex-wrap justify-center gap-4 mb-4">
+      <a
+        href="https://live.happytavern.co"
+        target="_blank"
+        class="cyber-button-primary px-6 py-3 font-bold text-white rounded-lg inline-block"
+      >
+        Visit Live Stream Viewer
+      </a>
+    </div>
+    <div class="cyber-card rounded-lg border-2 border-textHighlighted p-4 bg-bgSecondary">
+      <p class="text-textMuted">
+        <span class="text-orange-500 font-semibold">Features:</span> Real-time stream status, Nostr-based authentication, stream archives, and automatic event broadcasting to Nostr relays.
+      </p>
+    </div>
+  </div>
+
+  <!-- Why GNOSTREAM Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-3xl font-bold text-textPrimary mb-6 text-center neon-glow">
+      Why GNOSTREAM?
+    </h2>
+    <div class="text-textMuted space-y-4 max-w-4xl mx-auto">
+      <p class="text-center text-xl text-orange-500 font-bold neon-glow-orange">
+        Own your streaming infrastructure. No platform, no restrictions, no middlemen.
+      </p>
+      <p class="text-lg">
+        GNOSTREAM was built to make <span class="text-orange-500 font-semibold">self-hosted live streaming accessible
+        to everyone</span>. Whether you're a content creator tired of platform restrictions, a developer building
+        streaming features, or someone who values sovereignty over their content—GNOSTREAM gives you complete control.
+      </p>
+      <p class="text-lg">
+        It's not just a streaming server—it's a <span class="text-orange-500 font-semibold">complete solution</span> that
+        handles RTMP ingestion, HLS conversion, automatic Nostr event broadcasting, recording management, and provides
+        a sleek web interface for viewers. Set it up once, and you're ready to stream.
+      </p>
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-6 bg-bgSecondary">
+        <p class="text-center text-lg font-bold text-textPrimary mb-3">
+          📡 GNOSTREAM is Open Source
+        </p>
+        <p class="text-center">
+          GNOSTREAM is <span class="text-orange-500 font-semibold">completely free and open source</span>.
+          Deploy it on your own server, customize the interface, integrate with your own relays—it's all yours.
+          Built with Go for performance and reliability.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+
+    <!-- Streaming Features -->
+    <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-6">
+      <div class="text-center mb-4">
+        <div class="text-4xl mb-3">🎥</div>
+        <h3 class="text-xl font-bold text-textPrimary mb-3 neon-glow">Streaming Core</h3>
+      </div>
+      <ul class="text-sm text-textMuted space-y-2">
+        <li>✓ Built-in RTMP server (port 1935)</li>
+        <li>✓ Automatic HLS conversion for web playback</li>
+        <li>✓ Configurable segment time and playlist size</li>
+        <li>✓ Toggle recording on/off per stream</li>
+        <li>✓ Automatic archive system for recordings</li>
+        <li>✓ FFmpeg-powered processing</li>
+        <li>✓ Simple web viewer interface</li>
+      </ul>
+    </div>
+
+    <!-- Nostr Integration -->
+    <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-6">
+      <div class="text-center mb-4">
+        <div class="text-4xl mb-3">🌐</div>
+        <h3 class="text-xl font-bold text-textPrimary mb-3 neon-glow">Nostr Broadcasting</h3>
+      </div>
+      <ul class="text-sm text-textMuted space-y-2">
+        <li>✓ Automatic event publishing to relays</li>
+        <li>✓ Start/update/end event lifecycle</li>
+        <li>✓ Real-time metadata updates while streaming</li>
+        <li>✓ Multi-relay support</li>
+        <li>✓ Auto-delete events for non-recorded streams</li>
+        <li>✓ Nostr-based viewer authentication</li>
+        <li>✓ NIP-07 extension support</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- How It Works Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-3xl font-bold text-textPrimary mb-6 text-center neon-glow">
+      🔧 How It Works
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <div class="text-center">
+        <div class="text-4xl mb-3">1️⃣</div>
+        <h3 class="text-xl font-bold text-orange-500 mb-3">Configure & Deploy</h3>
+        <p class="text-sm text-textMuted">
+          Set up your config.yml with Nostr keys and relay list. Configure stream-info.yml with your stream metadata.
+          Deploy to your server or run locally.
+        </p>
+      </div>
+
+      <div class="text-center">
+        <div class="text-4xl mb-3">2️⃣</div>
+        <h3 class="text-xl font-bold text-orange-500 mb-3">Start Streaming</h3>
+        <p class="text-sm text-textMuted">
+          Point your streaming software (OBS, Streamlabs, etc.) to your RTMP endpoint. GNOSTREAM automatically
+          converts to HLS and broadcasts events to Nostr.
+        </p>
+      </div>
+
+      <div class="text-center">
+        <div class="text-4xl mb-3">3️⃣</div>
+        <h3 class="text-xl font-bold text-orange-500 mb-3">Share & Watch</h3>
+        <p class="text-sm text-textMuted">
+          Viewers access your stream via the built-in web interface. Edit metadata in real-time. Recordings are
+          automatically archived and accessible anytime.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Configuration Example Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-2xl font-bold text-textPrimary mb-6 text-center neon-glow">
+      ⚙️ Simple Configuration
+    </h2>
+    <p class="text-textMuted text-center mb-6">
+      GNOSTREAM uses straightforward YAML configuration files. No complex setup required.
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-4 bg-bgSecondary">
+        <h4 class="text-lg font-semibold text-orange-500 mb-3">Server Configuration</h4>
+        <pre class="text-xs text-textMuted overflow-x-auto"><code>server:
+  port: 8181
+  host: "0.0.0.0"
+  external_url: "https://live.yourdomain.com"
+
+rtmp:
+  port: 1935
+  host: "0.0.0.0"
+
+nostr:
+  private_key: "nsec1abc..."
+  relays:
+    - "wss://relay.damus.io"
+    - "wss://wheat.happytavern.co"</code></pre>
+      </div>
+
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-4 bg-bgSecondary">
+        <h4 class="text-lg font-semibold text-orange-500 mb-3">Stream Metadata</h4>
+        <pre class="text-xs text-textMuted overflow-x-auto"><code>title: "My Live Stream"
+summary: "Stream description here"
+image: "https://example.com/thumbnail.jpg"
+tags: ["live", "gaming", "tech"]
+
+# Toggle recording
+record: true
+
+hls:
+  segment_time: 10
+  playlist_size: 10</code></pre>
+      </div>
+
+    </div>
+    <p class="text-center text-sm text-orange-500 italic mt-4">
+      Edit stream-info.yml while streaming to update title, description, and tags in real-time!
+    </p>
+  </div>
+
+  <!-- Getting Started Section -->
+  <div class="text-center" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8">
+      <h2 class="text-3xl font-bold text-textPrimary mb-6 neon-glow">
+        Get Started with GNOSTREAM
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <a
+          href="https://github.com/0ceanSlim/gnostream"
+          target="_blank"
+          class="cyber-button-primary px-6 py-3 font-bold text-white rounded-lg"
+        >
+          GitHub Repository
+        </a>
+        <a
+          href="https://github.com/0ceanSlim/gnostream/releases"
+          target="_blank"
+          class="cyber-button px-6 py-3 font-bold rounded-lg"
+        >
+          Download Releases
+        </a>
+        <a
+          href="https://github.com/0ceanSlim/gnostream/blob/main/readme.md"
+          target="_blank"
+          class="cyber-button px-6 py-3 font-bold rounded-lg"
+        >
+          Documentation
+        </a>
+        <a
+          href="https://live.happytavern.co"
+          target="_blank"
+          class="cyber-button px-6 py-3 font-bold rounded-lg"
+        >
+          Live Demo
+        </a>
+      </div>
+      <p class="text-textMuted mb-4">
+        GNOSTREAM is open source and built for the Nostr streaming community.
+        Pre-built binaries available for Linux, macOS, and Windows.
+      </p>
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-4 bg-bgSecondary">
+        <p class="text-sm text-textMuted mb-2">
+          <span class="text-orange-500 font-semibold">Requirements:</span> FFmpeg must be installed for stream processing.
+        </p>
+        <p class="text-sm text-textMuted">
+          <span class="text-orange-500 font-semibold">Supported Platforms:</span> Linux (amd64), macOS (Intel & Apple Silicon), Windows (amd64)
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Use Cases Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-2xl font-bold text-textPrimary mb-6 text-center neon-glow">
+      💡 Perfect For
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <div>
+        <h4 class="text-lg font-semibold text-orange-500 mb-2">Content Creators</h4>
+        <ul class="text-sm text-textMuted space-y-1">
+          <li>• Own your streaming platform</li>
+          <li>• No platform censorship or restrictions</li>
+          <li>• Automatic archiving of your content</li>
+          <li>• Reach Nostr audience directly</li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-lg font-semibold text-orange-500 mb-2">Developers</h4>
+        <ul class="text-sm text-textMuted space-y-1">
+          <li>• Easy to integrate into projects</li>
+          <li>• Built in Go for performance</li>
+          <li>• Open source and customizable</li>
+          <li>• Simple REST API</li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-lg font-semibold text-orange-500 mb-2">Communities</h4>
+        <ul class="text-sm text-textMuted space-y-1">
+          <li>• Host events and meetings</li>
+          <li>• Private or public streams</li>
+          <li>• Nostr-integrated authentication</li>
+          <li>• Self-hosted infrastructure</li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-lg font-semibold text-orange-500 mb-2">Privacy Advocates</h4>
+        <ul class="text-sm text-textMuted space-y-1">
+          <li>• Full control over your data</li>
+          <li>• No third-party tracking</li>
+          <li>• Decentralized broadcasting via Nostr</li>
+          <li>• Run on your own hardware</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+{{end}}

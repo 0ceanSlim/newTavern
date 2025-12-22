@@ -1,0 +1,205 @@
+{{define "view"}}
+<main class="w-full px-4 py-8">
+  <!-- Hero Section -->
+  <div class="text-center" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <div class="flex items-center justify-center gap-4 mb-4">
+      <img src="https://getumbrel.github.io/umbrel-apps-gallery/core-lightning/icon.svg" alt="Core Lightning" class="w-16 h-16 md:w-20 md:h-20">
+      <h1 class="text-4xl md:text-6xl font-bold text-textPrimary neon-glow">
+        Core LNURL
+      </h1>
+    </div>
+    <p class="text-2xl md:text-3xl italic text-orange-500 mb-6 neon-glow-orange">
+      LNURL Server for Core Lightning
+    </p>
+    <p class="text-lg text-textMuted max-w-3xl mx-auto">
+      A lightweight Go application that enables Lightning Network invoice generation through Core Lightning's REST API using the LNURL-Pay protocol.
+    </p>
+  </div>
+
+  <!-- What is Core LNURL Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-3xl font-bold text-textPrimary mb-6 text-center neon-glow">
+      What is Core LNURL?
+    </h2>
+    <div class="text-textMuted space-y-4 max-w-4xl mx-auto">
+      <p class="text-lg">
+        Core LNURL is a <span class="text-orange-500 font-semibold">self-custodial LNURL server</span> designed to work with Core Lightning (CLN) nodes. It provides a simple HTTP endpoint that generates Lightning invoices dynamically, making it easy to accept Lightning payments without giving up control of your funds.
+      </p>
+      <p class="text-lg">
+        Unlike custodial services, Core LNURL runs on <span class="text-orange-500 font-semibold">your own infrastructure</span>, communicating directly with your Core Lightning node via its REST API. This means you maintain full sovereignty over your Bitcoin while providing a clean LNURL interface for payments.
+      </p>
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-6 bg-bgSecondary">
+        <p class="text-center text-lg font-bold text-textPrimary mb-3">
+          ⚡ Built for Self-Sovereignty
+        </p>
+        <p class="text-center">
+          Core LNURL is <span class="text-orange-500 font-semibold">open source and self-hosted</span>.
+          No third-party dependencies, no custodial risks—just you and your Lightning node.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+
+    <!-- Core Features -->
+    <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-6">
+      <div class="text-center mb-4">
+        <div class="text-4xl mb-3">⚡</div>
+        <h3 class="text-xl font-bold text-textPrimary mb-3 neon-glow">Lightning Integration</h3>
+      </div>
+      <ul class="text-sm text-textMuted space-y-2">
+        <li>✓ Dynamic invoice generation</li>
+        <li>✓ Direct CLN REST API integration</li>
+        <li>✓ LNURL-Pay protocol compatible</li>
+        <li>✓ Works with any LNURL wallet</li>
+        <li>✓ Unique invoices per request</li>
+        <li>✓ Configurable payment amounts</li>
+      </ul>
+    </div>
+
+    <!-- Security & Configuration -->
+    <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-6">
+      <div class="text-center mb-4">
+        <div class="text-4xl mb-3">🔐</div>
+        <h3 class="text-xl font-bold text-textPrimary mb-3 neon-glow">Security & Setup</h3>
+      </div>
+      <ul class="text-sm text-textMuted space-y-2">
+        <li>✓ Runes-based authentication</li>
+        <li>✓ Restricted command permissions</li>
+        <li>✓ Configurable ports and URLs</li>
+        <li>✓ Simple YAML configuration</li>
+        <li>✓ Pre-built binaries available</li>
+        <li>✓ Minimal attack surface</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- How It Works Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-3xl font-bold text-textPrimary mb-6 text-center neon-glow">
+      🔧 How It Works
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <div class="text-center">
+        <div class="text-4xl mb-3">1️⃣</div>
+        <h3 class="text-xl font-bold text-orange-500 mb-3">Setup Your Node</h3>
+        <p class="text-sm text-textMuted">
+          Run a Core Lightning node with REST API enabled. Create a rune (restricted auth token) that allows only invoice generation.
+        </p>
+      </div>
+
+      <div class="text-center">
+        <div class="text-4xl mb-3">2️⃣</div>
+        <h3 class="text-xl font-bold text-orange-500 mb-3">Configure & Deploy</h3>
+        <p class="text-sm text-textMuted">
+          Edit the YAML config with your node URL, rune, and server port. Run the pre-built binary or build from source.
+        </p>
+      </div>
+
+      <div class="text-center">
+        <div class="text-4xl mb-3">3️⃣</div>
+        <h3 class="text-xl font-bold text-orange-500 mb-3">Accept Payments</h3>
+        <p class="text-sm text-textMuted">
+          Share your LNURL endpoint. Wallets scan it, request an invoice, and you receive payments directly to your node.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- API Endpoint Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-2xl font-bold text-textPrimary mb-6 text-center neon-glow">
+      📡 API Endpoint
+    </h2>
+    <div class="text-textMuted space-y-4 max-w-4xl mx-auto">
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-4 bg-bgSecondary">
+        <p class="text-sm text-orange-500 font-bold mb-2">GET /lnurl/pay</p>
+        <p class="text-sm mb-3">Accepts username and amount parameters, returns a Lightning payment request.</p>
+        <pre class="text-xs text-textMuted overflow-x-auto"><code>https://your-server.com/lnurl/pay?username=satoshi&amount=1000</code></pre>
+      </div>
+      <p class="text-sm text-center">
+        The server communicates with your Core Lightning node's REST API to generate fresh invoices on each request.
+      </p>
+    </div>
+  </div>
+
+  <!-- Requirements Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-2xl font-bold text-textPrimary mb-6 text-center neon-glow">
+      ⚙️ Requirements
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <div class="cyber-card rounded-lg border-2 border-orange-500 p-4 bg-bgSecondary">
+        <h4 class="text-lg font-semibold text-orange-500 mb-3">Infrastructure</h4>
+        <ul class="text-sm text-textMuted space-y-2">
+          <li>• Bitcoin full node (Bitcoin Core, etc.)</li>
+          <li>• Core Lightning node with open channels</li>
+          <li>• CLN REST server enabled</li>
+          <li>• Server or VPS to host the LNURL server</li>
+        </ul>
+      </div>
+
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-4 bg-bgSecondary">
+        <h4 class="text-lg font-semibold text-orange-500 mb-3">Configuration</h4>
+        <ul class="text-sm text-textMuted space-y-2">
+          <li>• Rune with invoice generation permissions</li>
+          <li>• YAML config file with node details</li>
+          <li>• Domain or IP for public access</li>
+          <li>• Optional: Reverse proxy for HTTPS</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Get Started Section -->
+  <div class="text-center" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8">
+      <h2 class="text-3xl font-bold text-textPrimary mb-6 neon-glow">
+        Get Started with Core LNURL
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <a
+          href="https://github.com/0ceanSlim/core-lnurl"
+          target="_blank"
+          class="cyber-button-primary px-6 py-3 font-bold text-white rounded-lg"
+        >
+          GitHub Repository
+        </a>
+        <a
+          href="https://github.com/0ceanSlim/core-lnurl/releases"
+          target="_blank"
+          class="cyber-button px-6 py-3 font-bold rounded-lg"
+        >
+          Download Releases
+        </a>
+        <a
+          href="https://github.com/0ceanSlim/core-lnurl/blob/main/README.md"
+          target="_blank"
+          class="cyber-button px-6 py-3 font-bold rounded-lg"
+        >
+          Documentation
+        </a>
+      </div>
+      <p class="text-textMuted mb-4">
+        Core LNURL is open source and built for Lightning node operators who value self-custody.
+        Pre-built binaries available for Linux, macOS, and Windows.
+      </p>
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-4 bg-bgSecondary">
+        <p class="text-sm text-textMuted">
+          <span class="text-orange-500 font-semibold">License:</span> MIT •
+          <span class="text-orange-500 font-semibold">Language:</span> Go •
+          <span class="text-orange-500 font-semibold">Status:</span> Production Ready
+        </p>
+      </div>
+    </div>
+  </div>
+
+</main>
+{{end}}

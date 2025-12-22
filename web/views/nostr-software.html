@@ -1,0 +1,312 @@
+{{define "view"}}
+<main class="w-full px-4 py-8">
+  <!-- Hero Section -->
+  <div class="text-center" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h1 class="text-4xl md:text-6xl font-bold text-textPrimary mb-4 neon-glow">
+      🛠️ Nostr Tools & Software
+    </h1>
+    <p class="text-2xl md:text-3xl italic text-orange-500 mb-6 neon-glow-orange">
+      Open Source Tools for the Nostr Ecosystem
+    </p>
+    <p class="text-lg text-textMuted max-w-3xl mx-auto">
+      A collection of utilities, bridges, and monitoring tools built to enhance and expand Nostr functionality.
+      All free and open source.
+    </p>
+  </div>
+
+  <!-- Introduction -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <div class="text-textMuted space-y-4 max-w-4xl mx-auto">
+      <p class="text-center text-xl text-orange-500 font-bold neon-glow-orange">
+        Building tools to connect Nostr with the rest of the internet.
+      </p>
+      <p class="text-lg">
+        These are <span class="text-orange-500 font-semibold">practical utilities</span> I've built to solve real problems
+        in the Nostr ecosystem—from bridging external platforms to monitoring infrastructure and sharing content.
+        Each tool is designed to be simple, reliable, and easy to self-host.
+      </p>
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-6 bg-bgSecondary">
+        <p class="text-center text-lg font-bold text-textPrimary mb-3">
+          🌐 All Open Source
+        </p>
+        <p class="text-center">
+          Every project is <span class="text-orange-500 font-semibold">free and open source</span>.
+          Use them, modify them, learn from them, or contribute back to the community.
+          Built with ❤️ for Nostr.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- go-nostrss -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-3xl font-bold text-textPrimary neon-glow">
+        📰 go-nostrss
+      </h2>
+      <a
+        href="https://github.com/0ceanSlim/go-nostrss"
+        target="_blank"
+        class="cyber-button-primary px-6 py-3 font-bold text-white rounded-lg"
+      >
+        View on GitHub
+      </a>
+    </div>
+    <p class="text-xl text-orange-500 font-semibold mb-4">
+      RSS Feed to Nostr Bridge
+    </p>
+    <div class="text-textMuted space-y-3">
+      <p class="text-lg">
+        Automatically publish RSS feeds to Nostr relays. Perfect for syndicating blog posts, news feeds, or any RSS content
+        to the Nostr network without manual intervention.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <div>
+          <h4 class="text-lg font-semibold text-orange-500 mb-2">Features</h4>
+          <ul class="text-sm text-textMuted space-y-1">
+            <li>✓ Automated RSS feed monitoring</li>
+            <li>✓ Converts articles to Nostr events</li>
+            <li>✓ Configurable refresh intervals</li>
+            <li>✓ Duplicate detection & prevention</li>
+            <li>✓ Multi-relay publishing</li>
+            <li>✓ Interactive setup wizard</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-lg font-semibold text-orange-500 mb-2">Technical Details</h4>
+          <ul class="text-sm text-textMuted space-y-1">
+            <li>• Language: Go (98%)</li>
+            <li>• JSON-based cache system</li>
+            <li>• Simple YAML configuration</li>
+            <li>• Self-hosted solution</li>
+            <li>• MIT License</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cyber-card rounded-lg border-2 border-orange-500 p-4 bg-bgSecondary mt-4">
+        <p class="text-sm text-textPrimary">
+          <span class="font-semibold">Use Case:</span> Run a bot that automatically shares your blog's RSS feed to Nostr,
+          or create dedicated accounts for news sources, podcasts, or content creators.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ndmBridge -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-3xl font-bold text-textPrimary neon-glow">
+        💬 ndmBridge
+      </h2>
+      <a
+        href="https://github.com/0ceanSlim/ndmBridge"
+        target="_blank"
+        class="cyber-button-primary px-6 py-3 font-bold text-white rounded-lg"
+      >
+        View on GitHub
+      </a>
+    </div>
+    <p class="text-xl text-orange-500 font-semibold mb-4">
+      Discord to Nostr Bridge
+    </p>
+    <div class="text-textMuted space-y-3">
+      <p class="text-lg">
+        Bridge Discord channels to Nostr in real-time. Watch any Discord channel and automatically repost messages
+        as Nostr events, bringing Discord conversations to the decentralized web.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <div>
+          <h4 class="text-lg font-semibold text-orange-500 mb-2">Features</h4>
+          <ul class="text-sm text-textMuted space-y-1">
+            <li>✓ Discord bot integration</li>
+            <li>✓ Real-time message monitoring</li>
+            <li>✓ Automatic Nostr event creation (kind1)</li>
+            <li>✓ Multi-channel support</li>
+            <li>✓ Configurable relay publishing</li>
+            <li>✓ One-way bridging (Discord → Nostr)</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-lg font-semibold text-orange-500 mb-2">Technical Details</h4>
+          <ul class="text-sm text-textMuted space-y-1">
+            <li>• Language: Go (100%)</li>
+            <li>• Discord Bot API integration</li>
+            <li>• Modular architecture</li>
+            <li>• YAML configuration</li>
+            <li>• Easy Discord Developer Portal setup</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cyber-card rounded-lg border-2 border-orange-500 p-4 bg-bgSecondary mt-4">
+        <p class="text-sm text-textPrimary">
+          <span class="font-semibold">Use Case:</span> Mirror your Discord community's announcements to Nostr,
+          archive important Discord conversations, or create a public Nostr feed from private Discord channels.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- nostpy_emoji -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-3xl font-bold text-textPrimary neon-glow">
+        😀 nostpy_emoji
+      </h2>
+      <a
+        href="https://github.com/0ceanSlim/nostpy_emoji"
+        target="_blank"
+        class="cyber-button-primary px-6 py-3 font-bold text-white rounded-lg"
+      >
+        View on GitHub
+      </a>
+    </div>
+    <p class="text-xl text-orange-500 font-semibold mb-4">
+      Nostr Emoji Pack Sender
+    </p>
+    <div class="text-textMuted space-y-3">
+      <p class="text-lg">
+        A simple GUI application for creating and distributing custom emoji packs to Nostr relays. Share your emoji collections
+        with the Nostr community through an easy-to-use interface.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <div>
+          <h4 class="text-lg font-semibold text-orange-500 mb-2">Features</h4>
+          <ul class="text-sm text-textMuted space-y-1">
+            <li>✓ User-friendly GUI interface</li>
+            <li>✓ CSV file import for emoji data</li>
+            <li>✓ Custom emoji set naming</li>
+            <li>✓ Multi-relay distribution</li>
+            <li>✓ Dark-themed ttkbootstrap UI</li>
+            <li>✓ Simple two-column CSV format</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-lg font-semibold text-orange-500 mb-2">Technical Details</h4>
+          <ul class="text-sm text-textMuted space-y-1">
+            <li>• Language: Python (100%)</li>
+            <li>• GUI: ttkbootstrap framework</li>
+            <li>• YAML configuration files</li>
+            <li>• Windows executable available</li>
+            <li>• Released: v1.0 (Jan 2025)</li>
+            <li>• MIT License</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cyber-card rounded-lg border-2 border-orange-500 p-4 bg-bgSecondary mt-4">
+        <p class="text-sm text-textPrimary">
+          <span class="font-semibold">Use Case:</span> Create custom emoji packs for your community, share branded emojis
+          across Nostr clients, or distribute themed emoji collections to multiple relays at once.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- crum -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-3xl font-bold text-textPrimary neon-glow">
+        🍞 crum
+      </h2>
+      <a
+        href="https://github.com/0ceanSlim/crum"
+        target="_blank"
+        class="cyber-button-primary px-6 py-3 font-bold text-white rounded-lg"
+      >
+        View on GitHub
+      </a>
+    </div>
+    <p class="text-xl text-orange-500 font-semibold mb-4">
+      Continuous Relay Uptime Monitoring
+    </p>
+    <div class="text-textMuted space-y-3">
+      <p class="text-lg">
+        A NIP-66 monitoring bot that tracks Nostr relay availability and uptime. Keep tabs on relay infrastructure
+        health and ensure your relays stay online and responsive.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <div>
+          <h4 class="text-lg font-semibold text-orange-500 mb-2">Features</h4>
+          <ul class="text-sm text-textMuted space-y-1">
+            <li>✓ Continuous relay monitoring</li>
+            <li>✓ NIP-66 protocol implementation</li>
+            <li>✓ Uptime tracking & reporting</li>
+            <li>✓ Availability status checks</li>
+            <li>✓ Configurable monitoring intervals</li>
+            <li>✓ Infrastructure health insights</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-lg font-semibold text-orange-500 mb-2">Technical Details</h4>
+          <ul class="text-sm text-textMuted space-y-1">
+            <li>• Language: Go (100%)</li>
+            <li>• NIP-66 compliance</li>
+            <li>• YAML configuration</li>
+            <li>• Lightweight & efficient</li>
+            <li>• Open source monitoring</li>
+            <li>• MIT License</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cyber-card rounded-lg border-2 border-orange-500 p-4 bg-bgSecondary mt-4">
+        <p class="text-sm text-textPrimary">
+          <span class="font-semibold">Use Case:</span> Monitor your own relay infrastructure, track the health of public relays,
+          or contribute uptime data to the Nostr ecosystem for better network visibility.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Get Started Section -->
+  <div class="text-center" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8">
+      <h2 class="text-3xl font-bold text-textPrimary mb-6 neon-glow">
+        🚀 Explore & Contribute
+      </h2>
+      <p class="text-textMuted mb-6">
+        All of these projects are open source and available on GitHub. Feel free to explore the code, open issues,
+        submit pull requests, or use them in your own projects.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <a
+          href="https://github.com/0ceanSlim/go-nostrss"
+          target="_blank"
+          class="cyber-button px-6 py-3 font-bold rounded-lg"
+        >
+          go-nostrss
+        </a>
+        <a
+          href="https://github.com/0ceanSlim/ndmBridge"
+          target="_blank"
+          class="cyber-button px-6 py-3 font-bold rounded-lg"
+        >
+          ndmBridge
+        </a>
+        <a
+          href="https://github.com/0ceanSlim/nostpy_emoji"
+          target="_blank"
+          class="cyber-button px-6 py-3 font-bold rounded-lg"
+        >
+          nostpy_emoji
+        </a>
+        <a
+          href="https://github.com/0ceanSlim/crum"
+          target="_blank"
+          class="cyber-button px-6 py-3 font-bold rounded-lg"
+        >
+          crum
+        </a>
+      </div>
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-6 bg-bgSecondary">
+        <p class="text-textMuted">
+          <span class="text-orange-500 font-semibold">Want to see more?</span>
+          Check out my other projects:
+          <a href="/grain" class="link-light-purple underline hover:text-orange-400">GRAIN</a>,
+          <a href="/gnostream" class="link-light-purple underline hover:text-orange-400">GNOSTREAM</a>, and
+          <a href="/nostr-hero" class="link-light-purple underline hover:text-orange-400">Nostr Hero</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</main>
+{{end}}

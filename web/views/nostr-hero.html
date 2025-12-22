@@ -1,0 +1,244 @@
+{{define "view"}}
+<main class="w-full px-4 py-8">
+  <!-- Hero Section -->
+  <div class="text-center" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h1 class="text-4xl md:text-6xl font-bold text-textPrimary mb-4 neon-glow">
+      ⚔️ Nostr Hero
+    </h1>
+    <p class="text-2xl md:text-3xl italic text-orange-500 mb-6 neon-glow-orange">
+      A Web-Based D&D-Style RPG on Nostr
+    </p>
+    <p class="text-lg text-textMuted max-w-3xl mx-auto">
+      Your Nostr identity becomes a unique character in a persistent fantasy world. Generate your hero from your public key and embark on adventures stored directly on Nostr relays.
+    </p>
+  </div>
+
+  <!-- Play Now Banner -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-6 text-center" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-2xl font-bold text-textPrimary mb-3 neon-glow">
+      🎮 Join the Adventure
+    </h2>
+    <p class="text-textMuted mb-4">
+      Nostr Hero is currently in <span class="text-orange-500 font-semibold">pre-alpha development</span>. The game is actively being built with early testing available!
+    </p>
+    <div class="flex flex-wrap justify-center gap-4 mb-4">
+      <a
+        href="https://nostrhero.quest"
+        target="_blank"
+        class="cyber-button-primary px-6 py-3 font-bold text-white rounded-lg inline-block"
+      >
+        Learn More at nostrhero.quest
+      </a>
+      <a
+        href="https://test.nostrhero.quest"
+        target="_blank"
+        class="cyber-button px-6 py-3 font-bold rounded-lg inline-block"
+      >
+        Test Server (Whitelisted)
+      </a>
+    </div>
+    <div class="cyber-card rounded-lg border-2 border-textHighlighted p-4 bg-bgSecondary">
+      <p class="text-textMuted mb-2">
+        <span class="text-orange-500 font-semibold">Early Test Server:</span> Want to help test Nostr Hero? The test server is currently whitelisted.
+      </p>
+      <p class="text-lg">
+        <a href="https://formstr.app/f/naddr1qvzqqqr4mqpzpssxaejy0t8pr0zfum94q29trdgqj5zs3emk4pqt5anwnq7reuxgqydhwumn8ghj7amgv4shgtngv9c8q7t5v9mx2unw9e3k7tcpzamhxue69uhhyetvv9ujumn0wd68ytnzv9hxgtcpzdmhxue69uhk7enxvd5xz6tw9ec82c30qythwumn8ghj7un9d3shjt3s0p3ksct59e3k7mf0qyfhwumn8ghj7ur4wfcxcetsv9njuetn9uq32amnwvaz7tmjv4kxz7fwv3sk6atn9e5k7tcpzamhxue69uhhyetvv9ujuurjd9kkzmpwdejhgtcpp4mhxue69uhkummn9ekx7mqpremhxue69uhhyetvv9ujumn0wd68ytnhd9ex2erwv46zu6ns9uq3camnwvaz7tmwdaehgu3dxqcju7tpdd5ksmmwdejjucm0d5q3samnwvaz7tmjv4kxz7fwwdhx7un59eek7cmfv9kqz9nhwden5te0wfjkccte9ehx7um5wghxyctwvsq3zamnwvaz7tmwdaehgu3jxyhxxmmdqqrxku3eda64w6ssnau?viewKey=5d9e580f8dc28418e69b0c86d550c328aed03d025c077a994d36380568dc94e6" target="_blank" class="link-light-purple underline hover:text-orange-400 font-bold">Fill out the form</a>
+        to join the Early Test Server!
+      </p>
+    </div>
+  </div>
+
+  <!-- What is Nostr Hero Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-3xl font-bold text-textPrimary mb-6 text-center neon-glow">
+      What is Nostr Hero?
+    </h2>
+    <div class="text-textMuted space-y-4 max-w-4xl mx-auto">
+      <p class="text-lg">
+        Nostr Hero is a <span class="text-orange-500 font-semibold">nostalgic RPG experience</span> that combines classic D&D 5e mechanics with Nostr's decentralized protocol. Your cryptographic identity deterministically generates a unique adventurer with stats, equipment, and abilities.
+      </p>
+      <p class="text-lg">
+        The game derives your <span class="text-orange-500 font-semibold">race, class, background, alignment, and ability scores</span> directly from your Nostr public key. Every player gets a unique character, but the same pubkey always generates the same hero—your identity is your destiny.
+      </p>
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-6 bg-bgSecondary">
+        <p class="text-center text-lg font-bold text-textPrimary mb-3">
+          ⚔️ Open Source & Community-Driven
+        </p>
+        <p class="text-center">
+          Nostr Hero is <span class="text-orange-500 font-semibold">completely free and open source</span>.
+          Clone the repo and run your own server anytime. Build mods, create custom content, and share with the community.
+          The code is yours to explore and extend forever.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+
+    <!-- Character Generation -->
+    <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-6">
+      <div class="text-center mb-4">
+        <div class="text-4xl mb-3">🎲</div>
+        <h3 class="text-xl font-bold text-textPrimary mb-3 neon-glow">Deterministic Character Generation</h3>
+      </div>
+      <ul class="text-sm text-textMuted space-y-2">
+        <li>✓ Race, class, background, and alignment from your pubkey</li>
+        <li>✓ D&D 5e ability scores (STR, DEX, CON, INT, WIS, CHA)</li>
+        <li>✓ Weighted distributions for realistic combinations</li>
+        <li>✓ Class-based starting equipment and spells</li>
+        <li>✓ Unique narrative introductions for each character</li>
+        <li>✓ Same pubkey = same character, always</li>
+      </ul>
+    </div>
+
+    <!-- Nostr Integration -->
+    <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-6">
+      <div class="text-center mb-4">
+        <div class="text-4xl mb-3">🌐</div>
+        <h3 class="text-xl font-bold text-textPrimary mb-3 neon-glow">Nostr Integration</h3>
+      </div>
+      <ul class="text-sm text-textMuted space-y-2">
+        <li>✓ Save games stored as Nostr events (planned)</li>
+        <li>✓ Cross-client gameplay with validated saves</li>
+        <li>✓ Achievement badges via NIP-58</li>
+        <li>✓ Write notes and articles in-game</li>
+        <li>✓ Highscore integration with gamestr.io</li>
+        <li>✓ Dungeon Master npub for announcements</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Development Roadmap Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-3xl font-bold text-textPrimary mb-6 text-center neon-glow">
+      🗺️ Development Roadmap
+    </h2>
+    <div class="space-y-6">
+
+      <!-- Pre-Alpha (Current) -->
+      <div class="cyber-card rounded-lg border-2 border-orange-500 p-6 bg-bgSecondary">
+        <h3 class="text-xl font-bold text-orange-500 mb-3">Pre-Alpha (Current)</h3>
+        <p class="text-textMuted mb-3">
+          <span class="font-semibold">Status:</span> Actively building core game mechanics and systems.
+        </p>
+        <p class="text-textMuted">
+          <span class="font-semibold">Access:</span> Test server available via whitelist. <a href="https://formstr.app/f/naddr1qvzqqqr4mqpzpssxaejy0t8pr0zfum94q29trdgqj5zs3emk4pqt5anwnq7reuxgqydhwumn8ghj7amgv4shgtngv9c8q7t5v9mx2unw9e3k7tcpzamhxue69uhhyetvv9ujumn0wd68ytnzv9hxgtcpzdmhxue69uhk7enxvd5xz6tw9ec82c30qythwumn8ghj7un9d3shjt3s0p3ksct59e3k7mf0qyfhwumn8ghj7ur4wfcxcetsv9njuetn9uq32amnwvaz7tmjv4kxz7fwv3sk6atn9e5k7tcpzamhxue69uhhyetvv9ujuurjd9kkzmpwdejhgtcpp4mhxue69uhkummn9ekx7mqpremhxue69uhhyetvv9ujumn0wd68ytnhd9ex2erwv46zu6ns9uq3camnwvaz7tmwdaehgu3dxqcju7tpdd5ksmmwdejjucm0d5q3samnwvaz7tmjv4kxz7fwwdhx7un59eek7cmfv9kqz9nhwden5te0wfjkccte9ehx7um5wghxyctwvsq3zamnwvaz7tmwdaehgu3jxyhxxmmdqqrxku3eda64w6ssnau?viewKey=5d9e580f8dc28418e69b0c86d550c328aed03d025c077a994d36380568dc94e6" target="_blank" class="link-light-purple underline">Apply here</a> for Early Test Server access.
+        </p>
+      </div>
+
+      <!-- Alpha Release -->
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-6 bg-bgSecondary">
+        <h3 class="text-xl font-bold text-textPrimary mb-3">Alpha Release</h3>
+        <p class="text-textMuted mb-3">
+          <span class="font-semibold">Features:</span> Core gameplay mechanics fully implemented—inventory, combat, spells, quests, and NPC interactions.
+        </p>
+        <p class="text-textMuted">
+          <span class="font-semibold">Access:</span> Available at the production server exclusively for <a href="/nostr-verified" class="link-light-purple underline hover:text-orange-400">Happy Tavern members</a>.
+        </p>
+      </div>
+
+      <!-- Beta Release -->
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-6 bg-bgSecondary">
+        <h3 class="text-xl font-bold text-textPrimary mb-3">Beta Release</h3>
+        <p class="text-textMuted mb-3">
+          <span class="font-semibold">Features:</span> Full Nostr integration, relay-based saves, quest system, achievements, and cross-client gameplay.
+        </p>
+        <div class="text-textMuted space-y-2">
+          <p>
+            <span class="font-semibold">Free Server:</span> Free to play for everyone with validated official saves.
+          </p>
+          <p>
+            <span class="font-semibold">Modded Server:</span> Custom game rules, modded save files, and experimental features—exclusive to <a href="/nostr-verified" class="link-light-purple underline hover:text-orange-400">Happy Tavern members</a>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Tech Stack Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <h2 class="text-2xl font-bold text-textPrimary mb-6 text-center neon-glow">
+      🛠️ Built With
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div>
+        <h4 class="text-lg font-semibold text-orange-500 mb-2">Backend (Go)</h4>
+        <ul class="text-sm text-textMuted space-y-1">
+          <li>• HTTP server with Go templates</li>
+          <li>• Deterministic character generation</li>
+          <li>• Grain client for Nostr auth</li>
+          <li>• REST API for game data</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-lg font-semibold text-orange-500 mb-2">Frontend</h4>
+        <ul class="text-sm text-textMuted space-y-1">
+          <li>• Vanilla JavaScript</li>
+          <li>• TailwindCSS (retro Win95 theme)</li>
+          <li>• Server-side rendering</li>
+          <li>• Nostr session management</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-lg font-semibold text-orange-500 mb-2">Game Content</h4>
+        <ul class="text-sm text-textMuted space-y-1">
+          <li>• 200+ items from D&D 5e SRD</li>
+          <li>• Full spell database</li>
+          <li>• Monster & location data</li>
+          <li>• Pixel art sprites (64x64)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Links & Resources Section -->
+  <div class="text-center" style="max-width: 1200px; margin: 0 auto 3rem auto;">
+    <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8">
+      <h2 class="text-3xl font-bold text-textPrimary mb-6 neon-glow">
+        Get Involved
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <a
+          href="https://nostrhero.quest"
+          target="_blank"
+          class="cyber-button-primary px-6 py-3 font-bold text-white rounded-lg"
+        >
+          Official Website
+        </a>
+        <a
+          href="https://github.com/0ceanSlim/nostr-hero"
+          target="_blank"
+          class="cyber-button px-6 py-3 font-bold rounded-lg"
+        >
+          GitHub Repository
+        </a>
+        <a
+          href="https://gamestr.io/developers"
+          target="_blank"
+          class="cyber-button px-6 py-3 font-bold rounded-lg"
+        >
+          Gamestr Integration
+        </a>
+        <a
+          href="https://test.nostrhero.quest"
+          target="_blank"
+          class="cyber-button px-6 py-3 font-bold rounded-lg"
+        >
+          Test Server
+        </a>
+      </div>
+      <p class="text-textMuted mb-4">
+        Nostr Hero is open source and built with passion for the Nostr gaming community.
+        Contributions, playtesting, and feedback are always welcome!
+      </p>
+      <p class="text-sm text-orange-500 italic">
+        Want to support development? Become a <a href="/nostr-verified" class="link-light-purple underline hover:text-orange-400">Happy Tavern member</a> and get early access to alpha and beta builds, plus exclusive modded server access.
+      </p>
+    </div>
+  </div>
+
+</main>
+{{end}}
