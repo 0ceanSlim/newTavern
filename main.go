@@ -67,7 +67,7 @@ func main() {
 		handlers.PathInvoiceRequest(w, r)
 	})
 
-	// Start logging prices as a goroutine with 5 minute interval
+	// Start logging Bitcoin prices as a goroutine with 5 minute interval
 	go func() {
 		ticker := time.NewTicker(5 * time.Minute)
 		defer ticker.Stop()
@@ -75,6 +75,20 @@ func main() {
 		for {
 			utils.LogBitcoinPrice()
 			<-ticker.C
+		}
+	}()
+
+	// Start logging Gold prices as a goroutine with 5 minute interval
+	go func() {
+		// Log immediately on startup
+		utils.LogGoldPrice()
+
+		ticker := time.NewTicker(5 * time.Minute)
+		defer ticker.Stop()
+
+		for {
+			<-ticker.C
+			utils.LogGoldPrice()
 		}
 	}()
 
