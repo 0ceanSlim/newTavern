@@ -1,0 +1,677 @@
+{{define "view"}}
+<main class="w-full px-4 py-8">
+  <!-- Hero Section -->
+  <div class="text-center mb-8" style="max-width: 1400px; margin: 0 auto;">
+    <h1 class="text-4xl md:text-6xl font-bold text-textPrimary mb-4 neon-glow">
+      RuneScape Gold Tracker
+    </h1>
+    <p class="text-xl md:text-2xl italic text-yellow-500 mb-6" style="text-shadow: 0 0 10px rgba(234, 179, 8, 0.5);">
+      Track OSRS bond prices and convert between BTC, USD, and RSG
+    </p>
+  </div>
+
+  <!-- Current RSG Price Card -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-yellow-500 p-8 mb-8" style="max-width: 1400px; margin: 0 auto 2rem auto;">
+    <h2 class="text-2xl font-bold text-textPrimary mb-4 text-center neon-glow">Current OSRS Bond Price</h2>
+    <div class="text-center mb-6">
+      <div
+        id="bond-price-gp"
+        class="text-4xl md:text-6xl font-bold text-yellow-500 mb-2"
+        style="text-shadow: 0 0 20px rgba(234, 179, 8, 0.5);"
+        hx-get="/api/rsg-price"
+        hx-trigger="load, every 60s"
+        hx-swap="innerHTML"
+        hx-target="this"
+        _="on htmx:afterRequest
+              set response to JSON.parse(event.detail.xhr.responseText)
+              if response.bondPriceGP
+                set the innerHTML of me to response.bondPriceGP.toLocaleString('en-US') + ' GP'
+              end"
+      >
+        Loading...
+      </div>
+      <div id="usd-per-million" class="text-lg text-textMuted mt-2">
+        Calculating USD per million...
+      </div>
+      <div id="gp-per-usd" class="text-sm text-textMuted mt-1">
+        Calculating GP per USD...
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-4 bg-bgSecondary text-center">
+        <p class="text-sm text-textMuted mb-1">Bond Cost (Jagex)</p>
+        <p class="text-xl font-bold text-yellow-500">$6.99 USD</p>
+      </div>
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-4 bg-bgSecondary text-center">
+        <p class="text-sm text-textMuted mb-1">USD per Million GP</p>
+        <p class="text-xl font-bold text-yellow-500" id="stat-usd-per-m">--</p>
+      </div>
+      <div class="cyber-card rounded-lg border-2 border-textHighlighted p-4 bg-bgSecondary text-center">
+        <p class="text-sm text-textMuted mb-1">GP per $1 USD</p>
+        <p class="text-xl font-bold text-yellow-500" id="stat-gp-per-usd">--</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calculator Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8" style="max-width: 1400px; margin: 0 auto;">
+
+    <!-- BTC to RSG Calculator -->
+    <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8">
+      <h2 class="text-2xl font-bold text-textPrimary text-center mb-6 neon-glow">
+        BTC to RSG Calculator
+      </h2>
+
+      <div class="space-y-6">
+        <!-- Sats Input -->
+        <div>
+          <label class="text-textMuted text-sm mb-2 block text-center">Satoshis</label>
+          <div class="flex items-center space-x-3">
+            <input
+              type="number"
+              id="sats-input"
+              class="flex-1 p-4 text-xl text-textPrimary bg-bgSecondary border-2 border-textHighlighted rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-center"
+              placeholder="0"
+              oninput="calculateFromSats()"
+            />
+            <div class="text-xl font-bold text-orange-500 neon-glow-orange min-w-[80px] text-center">
+              sats
+            </div>
+          </div>
+        </div>
+
+        <!-- Exchange Icon -->
+        <div class="text-center">
+          <div class="text-3xl text-orange-500">↕</div>
+        </div>
+
+        <!-- RSG Input -->
+        <div>
+          <label class="text-textMuted text-sm mb-2 block text-center">RuneScape Gold</label>
+          <div class="flex items-center space-x-3">
+            <input
+              type="number"
+              id="rsg-input"
+              class="flex-1 p-4 text-xl text-textPrimary bg-bgSecondary border-2 border-textHighlighted rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 text-center"
+              placeholder="0"
+              oninput="calculateFromRSG()"
+            />
+            <div class="text-xl font-bold text-yellow-500 min-w-[80px] text-center" style="text-shadow: 0 0 10px rgba(234, 179, 8, 0.5);">
+              GP
+            </div>
+          </div>
+        </div>
+
+        <!-- Exchange Rate Display -->
+        <div class="cyber-card rounded-lg border-2 border-textHighlighted p-4 bg-bgSecondary text-center">
+          <p class="text-sm text-textMuted mb-1">Current Exchange Rate</p>
+          <p class="text-lg font-bold text-orange-500" id="btc-rsg-rate">
+            Loading...
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- USD to RSG Calculator -->
+    <div class="cyber-card warm-glow rounded-xl border-2 border-green-500 p-8">
+      <h2 class="text-2xl font-bold text-textPrimary text-center mb-6 neon-glow">
+        USD to RSG Calculator
+      </h2>
+
+      <div class="space-y-6">
+        <!-- USD Input -->
+        <div>
+          <label class="text-textMuted text-sm mb-2 block text-center">US Dollars</label>
+          <div class="flex items-center space-x-3">
+            <input
+              type="number"
+              id="usd-input"
+              class="flex-1 p-4 text-xl text-textPrimary bg-bgSecondary border-2 border-textHighlighted rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-center"
+              placeholder="0.00"
+              step="0.01"
+              oninput="calculateFromUSD()"
+            />
+            <div class="text-xl font-bold text-green-500 min-w-[80px] text-center">
+              USD
+            </div>
+          </div>
+        </div>
+
+        <!-- Exchange Icon -->
+        <div class="text-center">
+          <div class="text-3xl text-green-500">↕</div>
+        </div>
+
+        <!-- RSG Input 2 -->
+        <div>
+          <label class="text-textMuted text-sm mb-2 block text-center">RuneScape Gold</label>
+          <div class="flex items-center space-x-3">
+            <input
+              type="number"
+              id="rsg-input-2"
+              class="flex-1 p-4 text-xl text-textPrimary bg-bgSecondary border-2 border-textHighlighted rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 text-center"
+              placeholder="0"
+              oninput="calculateFromRSG2()"
+            />
+            <div class="text-xl font-bold text-yellow-500 min-w-[80px] text-center" style="text-shadow: 0 0 10px rgba(234, 179, 8, 0.5);">
+              GP
+            </div>
+          </div>
+        </div>
+
+        <!-- Exchange Rate Display -->
+        <div class="cyber-card rounded-lg border-2 border-textHighlighted p-4 bg-bgSecondary text-center">
+          <p class="text-sm text-textMuted mb-1">Current Exchange Rate</p>
+          <p class="text-lg font-bold text-green-500" id="usd-rsg-rate">
+            Loading...
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bitcoin Unit of Account Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-orange-500 p-8 mb-8" style="max-width: 1400px; margin: 0 auto;">
+    <h2 class="text-2xl font-bold text-textPrimary text-center mb-6 neon-glow">
+      Bitcoin as Unit of Account
+    </h2>
+    <p class="text-center text-textMuted mb-6">How much of each asset equals 1 Bitcoin?</p>
+
+    <!-- 1 BTC = Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="cyber-card rounded-xl border-2 border-yellow-500 p-6 text-center">
+        <div class="text-3xl mb-2">Au</div>
+        <h3 class="text-lg font-bold text-textPrimary mb-2">Gold (oz)</h3>
+        <div id="btc-to-gold" class="text-2xl font-bold text-yellow-500">
+          Loading...
+        </div>
+        <div class="text-xs text-textMuted mt-1">troy ounces</div>
+      </div>
+
+      <div class="cyber-card rounded-xl border-2 border-yellow-500 p-6 text-center">
+        <div class="text-3xl mb-2">GP</div>
+        <h3 class="text-lg font-bold text-textPrimary mb-2">RuneScape Gold</h3>
+        <div id="btc-to-rsg" class="text-2xl font-bold text-yellow-500">
+          Loading...
+        </div>
+        <div class="text-xs text-textMuted mt-1">OSRS GP</div>
+      </div>
+
+      <div class="cyber-card rounded-xl border-2 border-green-500 p-6 text-center">
+        <div class="text-3xl mb-2">$</div>
+        <h3 class="text-lg font-bold text-textPrimary mb-2">US Dollars</h3>
+        <div id="btc-to-usd" class="text-2xl font-bold text-green-500">
+          Loading...
+        </div>
+        <div class="text-xs text-textMuted mt-1">USD</div>
+      </div>
+    </div>
+
+    <!-- Inverse: X = 1 sat -->
+    <h3 class="text-xl font-bold text-textPrimary text-center mb-4 neon-glow">
+      What does 1 satoshi buy?
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="cyber-card rounded-xl border-2 border-textHighlighted p-6 text-center">
+        <h3 class="text-lg font-bold text-textPrimary mb-2">Gold</h3>
+        <div id="sat-to-gold" class="text-xl font-bold text-yellow-500">
+          Loading...
+        </div>
+        <div class="text-xs text-textMuted mt-1">milligrams</div>
+      </div>
+
+      <div class="cyber-card rounded-xl border-2 border-textHighlighted p-6 text-center">
+        <h3 class="text-lg font-bold text-textPrimary mb-2">RuneScape Gold</h3>
+        <div id="sat-to-rsg" class="text-xl font-bold text-yellow-500">
+          Loading...
+        </div>
+        <div class="text-xs text-textMuted mt-1">GP</div>
+      </div>
+
+      <div class="cyber-card rounded-xl border-2 border-textHighlighted p-6 text-center">
+        <h3 class="text-lg font-bold text-textPrimary mb-2">US Dollars</h3>
+        <div id="sat-to-usd" class="text-xl font-bold text-green-500">
+          Loading...
+        </div>
+        <div class="text-xs text-textMuted mt-1">USD</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historical Chart Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-yellow-500 p-8 mb-8" style="max-width: 1400px; margin: 0 auto;">
+    <h2 class="text-2xl font-bold text-textPrimary text-center mb-6 neon-glow">
+      Bitcoin Unit of Account Chart
+    </h2>
+    <p class="text-center text-textMuted mb-4">Value of 1 BTC expressed in different assets over time</p>
+
+    <!-- Timeframe buttons -->
+    <div class="flex flex-wrap justify-center gap-2 mb-6">
+      <button onclick="updateChart('1D')" class="cyber-button px-4 py-2 text-sm font-bold rounded-lg" id="btn-1D">1D</button>
+      <button onclick="updateChart('1W')" class="cyber-button px-4 py-2 text-sm font-bold rounded-lg" id="btn-1W">1W</button>
+      <button onclick="updateChart('1M')" class="cyber-button px-4 py-2 text-sm font-bold rounded-lg" id="btn-1M">1M</button>
+      <button onclick="updateChart('3M')" class="cyber-button px-4 py-2 text-sm font-bold rounded-lg" id="btn-3M">3M</button>
+      <button onclick="updateChart('1Y')" class="cyber-button px-4 py-2 text-sm font-bold rounded-lg" id="btn-1Y">1Y</button>
+      <button onclick="updateChart('ALL')" class="cyber-button-primary px-4 py-2 text-sm font-bold rounded-lg text-white" id="btn-ALL">ALL</button>
+    </div>
+
+    <!-- Asset toggle buttons -->
+    <div class="flex flex-wrap justify-center gap-2 mb-6">
+      <button onclick="toggleDataset('gold')" class="px-4 py-2 text-sm font-bold rounded-lg border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black transition-all" id="toggle-gold">Gold (oz)</button>
+      <button onclick="toggleDataset('rsg')" class="px-4 py-2 text-sm font-bold rounded-lg border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black transition-all" id="toggle-rsg">RSG (B)</button>
+      <button onclick="toggleDataset('usd')" class="px-4 py-2 text-sm font-bold rounded-lg border-2 border-green-500 text-green-500 hover:bg-green-500 hover:text-black transition-all" id="toggle-usd">USD (K)</button>
+    </div>
+
+    <div class="cyber-card rounded-lg border-2 border-textHighlighted p-4 bg-bgSecondary" style="position: relative; height: 400px;">
+      <canvas id="unitChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Info Section -->
+  <div class="cyber-card warm-glow rounded-xl border-2 border-textHighlighted p-8" style="max-width: 1400px; margin: 0 auto;">
+    <h2 class="text-2xl font-bold text-textPrimary text-center mb-6 neon-glow">
+      How It Works
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="cyber-card rounded-lg border-2 border-yellow-500 p-4 bg-bgSecondary">
+        <h3 class="text-lg font-bold text-yellow-500 mb-2">OSRS Bonds</h3>
+        <p class="text-sm text-textMuted">
+          Old School RuneScape bonds can be purchased from Jagex for $6.99 USD and sold on the Grand Exchange for in-game gold.
+          This creates a real-world price for RuneScape gold based on official channels.
+        </p>
+      </div>
+      <div class="cyber-card rounded-lg border-2 border-orange-500 p-4 bg-bgSecondary">
+        <h3 class="text-lg font-bold text-orange-500 mb-2">Bitcoin Standard</h3>
+        <p class="text-sm text-textMuted">
+          By expressing all values in satoshis (the smallest unit of Bitcoin), we can compare the purchasing power of different
+          currencies and assets over time using Bitcoin as the unit of account.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Load Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+  let btcPriceUSD = 0;
+  let goldPriceUSD = 0;
+  let rsgData = { bondPriceGP: 0, usdPerMillion: 0, gpPerUSD: 0 };
+  let unitChart = null;
+  let btcPriceLog = [];
+  let currentTimeframe = 'ALL';
+  let datasetVisibility = { gold: true, rsg: true, usd: true };
+
+  // Fetch all price data
+  async function fetchAllPrices() {
+    try {
+      // Fetch BTC price
+      const btcResponse = await fetch('/api/btc-price');
+      const btcData = await btcResponse.json();
+      btcPriceUSD = parseFloat(btcData.Price) || 0;
+
+      // Fetch Gold price
+      const goldResponse = await fetch('/api/gold-price');
+      const goldData = await goldResponse.json();
+      goldPriceUSD = parseFloat(goldData.price) || 0;
+
+      // Fetch RSG price
+      const rsgResponse = await fetch('/api/rsg-price');
+      rsgData = await rsgResponse.json();
+
+      updateDisplays();
+    } catch (error) {
+      console.error('Error fetching prices:', error);
+    }
+  }
+
+  // Update all display elements
+  function updateDisplays() {
+    // Update RSG stats
+    if (rsgData.bondPriceGP > 0) {
+      document.getElementById('usd-per-million').textContent =
+        `$${rsgData.usdPerMillion.toFixed(2)} per million GP`;
+      document.getElementById('gp-per-usd').textContent =
+        `${Math.round(rsgData.gpPerUSD).toLocaleString()} GP per $1 USD`;
+      document.getElementById('stat-usd-per-m').textContent =
+        `$${rsgData.usdPerMillion.toFixed(2)}`;
+      document.getElementById('stat-gp-per-usd').textContent =
+        Math.round(rsgData.gpPerUSD).toLocaleString();
+      document.getElementById('usd-rsg-rate').textContent =
+        `1 USD = ${Math.round(rsgData.gpPerUSD).toLocaleString()} GP`;
+    }
+
+    // Update BTC to RSG rate
+    if (btcPriceUSD > 0 && rsgData.gpPerUSD > 0) {
+      const gpPerBTC = btcPriceUSD * rsgData.gpPerUSD;
+      const gpPerSat = gpPerBTC / 100_000_000;
+      document.getElementById('btc-rsg-rate').textContent =
+        `1 sat = ${gpPerSat.toFixed(2)} GP`;
+    }
+
+    // Update Bitcoin unit of account displays
+    if (btcPriceUSD > 0) {
+      // 1 BTC = X USD
+      document.getElementById('btc-to-usd').textContent =
+        '$' + btcPriceUSD.toLocaleString('en-US', { maximumFractionDigits: 0 });
+
+      // 1 sat = X USD
+      const usdPerSat = btcPriceUSD / 100_000_000;
+      document.getElementById('sat-to-usd').textContent =
+        '$' + usdPerSat.toFixed(6);
+
+      if (goldPriceUSD > 0) {
+        // 1 BTC = X oz gold
+        const ozGoldPerBTC = btcPriceUSD / goldPriceUSD;
+        document.getElementById('btc-to-gold').textContent =
+          ozGoldPerBTC.toFixed(2);
+
+        // 1 sat = X mg gold (1 troy oz = 31.1035 grams = 31103.5 mg)
+        const mgGoldPerSat = (btcPriceUSD / 100_000_000 / goldPriceUSD) * 31103.5;
+        document.getElementById('sat-to-gold').textContent =
+          mgGoldPerSat.toFixed(4);
+      }
+
+      if (rsgData.gpPerUSD > 0) {
+        // 1 BTC = X GP
+        const gpPerBTC = btcPriceUSD * rsgData.gpPerUSD;
+        document.getElementById('btc-to-rsg').textContent =
+          (gpPerBTC / 1_000_000_000).toFixed(2) + 'B';
+
+        // 1 sat = X GP
+        const gpPerSat = gpPerBTC / 100_000_000;
+        document.getElementById('sat-to-rsg').textContent =
+          gpPerSat.toFixed(2);
+      }
+    }
+  }
+
+  // Calculator functions
+  function calculateFromSats() {
+    const satsInput = document.getElementById('sats-input');
+    const rsgInput = document.getElementById('rsg-input');
+    const sats = parseFloat(satsInput.value);
+
+    if (isNaN(sats) || sats < 0 || btcPriceUSD <= 0 || rsgData.gpPerUSD <= 0) {
+      rsgInput.value = '';
+      return;
+    }
+
+    const usdValue = (sats / 100_000_000) * btcPriceUSD;
+    const gpValue = usdValue * rsgData.gpPerUSD;
+    rsgInput.value = Math.round(gpValue);
+  }
+
+  function calculateFromRSG() {
+    const satsInput = document.getElementById('sats-input');
+    const rsgInput = document.getElementById('rsg-input');
+    const gp = parseFloat(rsgInput.value);
+
+    if (isNaN(gp) || gp < 0 || btcPriceUSD <= 0 || rsgData.gpPerUSD <= 0) {
+      satsInput.value = '';
+      return;
+    }
+
+    const usdValue = gp / rsgData.gpPerUSD;
+    const sats = (usdValue / btcPriceUSD) * 100_000_000;
+    satsInput.value = Math.round(sats);
+  }
+
+  function calculateFromUSD() {
+    const usdInput = document.getElementById('usd-input');
+    const rsgInput = document.getElementById('rsg-input-2');
+    const usd = parseFloat(usdInput.value);
+
+    if (isNaN(usd) || usd < 0 || rsgData.gpPerUSD <= 0) {
+      rsgInput.value = '';
+      return;
+    }
+
+    const gpValue = usd * rsgData.gpPerUSD;
+    rsgInput.value = Math.round(gpValue);
+  }
+
+  function calculateFromRSG2() {
+    const usdInput = document.getElementById('usd-input');
+    const rsgInput = document.getElementById('rsg-input-2');
+    const gp = parseFloat(rsgInput.value);
+
+    if (isNaN(gp) || gp < 0 || rsgData.gpPerUSD <= 0) {
+      usdInput.value = '';
+      return;
+    }
+
+    const usdValue = gp / rsgData.gpPerUSD;
+    usdInput.value = usdValue.toFixed(2);
+  }
+
+  // Fetch historical price data
+  async function fetchPriceHistory() {
+    try {
+      const response = await fetch('/api/btc-price-log');
+      btcPriceLog = await response.json();
+      updateChart('ALL');
+    } catch (error) {
+      console.error('Error fetching price history:', error);
+    }
+  }
+
+  // Filter data by timeframe
+  function filterDataByTimeframe(timeframe) {
+    const now = Date.now() / 1000;
+    let cutoffTime;
+
+    switch(timeframe) {
+      case '1D': cutoffTime = now - (24 * 60 * 60); break;
+      case '1W': cutoffTime = now - (7 * 24 * 60 * 60); break;
+      case '1M': cutoffTime = now - (30 * 24 * 60 * 60); break;
+      case '3M': cutoffTime = now - (90 * 24 * 60 * 60); break;
+      case '1Y': cutoffTime = now - (365 * 24 * 60 * 60); break;
+      case 'ALL':
+      default: return btcPriceLog;
+    }
+
+    return btcPriceLog.filter(entry => entry.unixTimestamp >= cutoffTime);
+  }
+
+  // Toggle dataset visibility
+  function toggleDataset(dataset) {
+    datasetVisibility[dataset] = !datasetVisibility[dataset];
+
+    const btn = document.getElementById(`toggle-${dataset}`);
+    if (datasetVisibility[dataset]) {
+      btn.style.opacity = '1';
+    } else {
+      btn.style.opacity = '0.4';
+    }
+
+    if (unitChart) {
+      const datasetIndex = dataset === 'gold' ? 0 : (dataset === 'rsg' ? 1 : 2);
+      unitChart.data.datasets[datasetIndex].hidden = !datasetVisibility[dataset];
+      unitChart.update();
+    }
+  }
+
+  // Update chart
+  function updateChart(timeframe) {
+    currentTimeframe = timeframe;
+
+    // Update button styles
+    ['1D', '1W', '1M', '3M', '1Y', 'ALL'].forEach(tf => {
+      const btn = document.getElementById(`btn-${tf}`);
+      if (tf === timeframe) {
+        btn.classList.remove('cyber-button');
+        btn.classList.add('cyber-button-primary', 'text-white');
+      } else {
+        btn.classList.remove('cyber-button-primary', 'text-white');
+        btn.classList.add('cyber-button');
+      }
+    });
+
+    const filteredData = filterDataByTimeframe(timeframe);
+
+    // Sample data for performance
+    let samplingRate = 1;
+    if (filteredData.length > 500) {
+      samplingRate = Math.ceil(filteredData.length / 500);
+    }
+
+    const sampledData = filteredData.filter((_, index) => index % samplingRate === 0);
+
+    const labels = sampledData.map(entry => {
+      const date = new Date(entry.unixTimestamp * 1000);
+      if (timeframe === '1D') {
+        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      } else {
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      }
+    });
+
+    // Calculate values for each asset (using current gold price as approximation for historical)
+    // In reality, you'd want historical gold and RSG prices
+    const goldValues = sampledData.map(entry => {
+      const btcPrice = parseFloat(entry.price);
+      return goldPriceUSD > 0 ? btcPrice / goldPriceUSD : 0;
+    });
+
+    const rsgValues = sampledData.map(entry => {
+      const btcPrice = parseFloat(entry.price);
+      const gpPerBTC = btcPrice * rsgData.gpPerUSD;
+      return gpPerBTC / 1_000_000_000; // In billions
+    });
+
+    const usdValues = sampledData.map(entry => {
+      return parseFloat(entry.price) / 1000; // In thousands
+    });
+
+    if (unitChart) {
+      unitChart.destroy();
+    }
+
+    const ctx = document.getElementById('unitChart').getContext('2d');
+
+    unitChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Gold (oz)',
+            data: goldValues,
+            borderColor: '#eab308',
+            backgroundColor: 'rgba(234, 179, 8, 0.1)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.1,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            hidden: !datasetVisibility.gold,
+            yAxisID: 'y'
+          },
+          {
+            label: 'RSG (Billions)',
+            data: rsgValues,
+            borderColor: '#facc15',
+            backgroundColor: 'rgba(250, 204, 21, 0.1)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.1,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            hidden: !datasetVisibility.rsg,
+            yAxisID: 'y1'
+          },
+          {
+            label: 'USD (Thousands)',
+            data: usdValues,
+            borderColor: '#22c55e',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.1,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            hidden: !datasetVisibility.usd,
+            yAxisID: 'y2'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              color: '#a0aec0'
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            borderColor: '#f97316',
+            borderWidth: 1,
+            padding: 12
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(128, 90, 213, 0.2)', drawBorder: false },
+            ticks: { color: '#a0aec0', maxRotation: 0, autoSkipPadding: 20 }
+          },
+          y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            grid: { color: 'rgba(128, 90, 213, 0.2)', drawBorder: false },
+            ticks: { color: '#eab308' },
+            title: { display: true, text: 'Gold (oz)', color: '#eab308' }
+          },
+          y1: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            grid: { drawOnChartArea: false },
+            ticks: { color: '#facc15' },
+            title: { display: true, text: 'RSG (B)', color: '#facc15' }
+          },
+          y2: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            grid: { drawOnChartArea: false },
+            ticks: { color: '#22c55e' },
+            title: { display: true, text: 'USD (K)', color: '#22c55e' },
+            offset: true
+          }
+        }
+      }
+    });
+  }
+
+  // Update RSG display when HTMX updates
+  document.addEventListener("htmx:afterRequest", function (event) {
+    if (event.target.id === "bond-price-gp") {
+      fetchAllPrices();
+    }
+  });
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchAllPrices();
+    fetchPriceHistory();
+
+    // Refresh prices every 60 seconds
+    setInterval(fetchAllPrices, 60000);
+  });
+</script>
+{{end}}

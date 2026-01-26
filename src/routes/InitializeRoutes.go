@@ -20,4 +20,5 @@ func InitializeRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/btc-dash", BitcoinDashboard)
 	mux.HandleFunc("/nostr-verified", NostrVerified)
 	mux.HandleFunc("/core-lnurl", CoreLnurl)
+	mux.HandleFunc("/runescape-gold", RunescapeGold)
 }

@@ -26,6 +26,8 @@ func main() {
 	mux.HandleFunc("/api/btc-price", api.FetchBitcoinPrice)
 	mux.HandleFunc("/api/btc-price-log", api.ServePriceLogs)
 	mux.HandleFunc("/api/gold-price", api.GoldPriceHandler)
+	mux.HandleFunc("/api/rsg-price", api.RSGPriceHandler)
+	mux.HandleFunc("/api/rsg-price-log", api.ServeRSGPriceLogs)
 	mux.HandleFunc("/api/file-upload", api.HandleFileUpload)
 	mux.HandleFunc("/create-invoice", api.HandleNostrInvoice)
 	mux.HandleFunc("/invoice-events", api.InvoiceEventsHandler)
@@ -89,6 +91,20 @@ func main() {
 		for {
 			<-ticker.C
 			utils.LogGoldPrice()
+		}
+	}()
+
+	// Start logging RSG (RuneScape Gold) prices as a goroutine with 5 minute interval
+	go func() {
+		// Log immediately on startup
+		utils.LogRSGPrice()
+
+		ticker := time.NewTicker(5 * time.Minute)
+		defer ticker.Stop()
+
+		for {
+			<-ticker.C
+			utils.LogRSGPrice()
 		}
 	}()
 
