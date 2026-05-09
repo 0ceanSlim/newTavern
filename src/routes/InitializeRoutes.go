@@ -10,6 +10,7 @@ func InitializeRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/bitcoin-works", BitcoinWorks)
 	mux.HandleFunc("/mempool", Mempool)
 	mux.HandleFunc("/grain", Grain)
+	mux.HandleFunc("/mill", Mill)
 	mux.HandleFunc("/nostr-hero", NostrHero)
 	mux.HandleFunc("/gnostream", Gnostream)
 	mux.HandleFunc("/nostr-software", NostrSoftware)
