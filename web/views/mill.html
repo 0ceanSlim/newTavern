@@ -445,7 +445,7 @@
 </div></div>
 
 <!-- Mill itself -->
-<script src="https://cdn.jsdelivr.net/npm/nostr-mill@0.1.0-beta.6/dist/mill.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/nostr-mill@0.1.0-beta.9/dist/mill.umd.min.js"></script>
 
 <script>
 // ── Built-in themes ──────────────────────────────────────────────────────────
@@ -536,8 +536,8 @@ const CUSTOM_THEMES = {
 const SHOWCASES = [
   {
     name: 'Pixel Quest',
-    sub: 'Pubkey-quest aesthetic + grid layout + hidden read-only. Custom labels rebrand the methods for an in-game feel.',
-    traits: ['theme: pubkeyQuest', 'layout: grid', 'callout: nip07', 'methods: 4'],
+    sub: 'Pubkey-quest aesthetic + grid layout. Custom labels rebrand the methods for an in-game feel.',
+    traits: ['theme: pubkeyQuest', 'layout: grid', 'callout: nip07', 'methods: 3'],
     preview: { bg: 'rgb(45,45,45)', text: 'rgb(212,212,212)', accent: 'rgb(86,156,214)', font: '"VT323", monospace', label: 'PIXEL QUEST', tag: '> select hero method' },
     snippet: `MILL.<span class="acc">open</span>({
   theme: pubkeyQuestTokens,
@@ -546,7 +546,6 @@ const SHOWCASES = [
   methods: [
     { id: <span class="str">'nip07'</span>, label: <span class="str">'Hero Extension'</span>, icon: <span class="str">'⚔️'</span>, secLabel: <span class="str">'Recommended'</span> },
     { id: <span class="str">'nip46'</span>, label: <span class="str">'Remote Tome'</span>, icon: <span class="str">'📜'</span> },
-    { id: <span class="str">'nip55'</span>, label: <span class="str">'Mobile Talisman'</span>, icon: <span class="str">'📱'</span> },
     { id: <span class="str">'newkey'</span>, label: <span class="str">'New Adventurer'</span>, icon: <span class="str">'✨'</span> },
   ],
 });`,
@@ -557,7 +556,6 @@ const SHOWCASES = [
       methods: [
         { id: 'nip07',  label: 'Hero Extension',     icon: '⚔️', secLabel: 'Recommended', secColor: 'rgb(106,206,106)' },
         { id: 'nip46',  label: 'Remote Tome',     icon: '📜' },
-        { id: 'nip55',  label: 'Mobile Talisman', icon: '📱' },
         { id: 'newkey', label: 'New Adventurer',  icon: '✨' },
       ],
       onConnected: showResult,
@@ -585,19 +583,19 @@ const SHOWCASES = [
   {
     name: 'Terminal CRT',
     sub: 'Phosphor green on black, all VT323. Privacy-only methods (no nsec, no read-only). Compact + grid for max retro density.',
-    traits: ['theme: terminal', 'density: compact', 'layout: grid', 'methods: 3'],
+    traits: ['theme: terminal', 'density: compact', 'layout: grid', 'methods: 2'],
     preview: { bg: '#000', text: '#00ff00', accent: '#00ff00', font: '"VT323", monospace', label: '$ MILL_LOGIN', tag: '> awaiting input...' },
     snippet: `MILL.<span class="acc">open</span>({
   theme: terminalTokens,
   density: <span class="str">'compact'</span>,
   layout: <span class="str">'grid'</span>,
-  methods: [<span class="str">'nip07'</span>, <span class="str">'nip46'</span>, <span class="str">'nip55'</span>],
+  methods: [<span class="str">'nip07'</span>, <span class="str">'nip46'</span>],
 });`,
     open: () => MILL.open({
       theme: CUSTOM_THEMES.terminal.tokens,
       density: 'compact',
       layout: 'grid',
-      methods: ['nip07', 'nip46', 'nip55'],
+      methods: ['nip07', 'nip46'],
       onConnected: showResult,
     }),
   },
@@ -634,21 +632,24 @@ const SHOWCASES = [
     }),
   },
   {
-    name: 'Pro Operator',
-    sub: 'Dark + grid layout featuring NIP-46 as the headline option. For power users running their own bunker.',
-    traits: ['theme: dark', 'layout: grid', 'callout: nip46', 'methods: 4'],
-    preview: { bg: '#100e1b', text: '#ede8fc', accent: 'oklch(0.67 0.18 195)', font: '"Space Grotesk", sans-serif', label: 'PRO OPERATOR', tag: 'bunker → relays → app' },
-    snippet: `MILL.<span class="acc">open</span>({
-  theme: <span class="str">'dark'</span>,
-  layout: <span class="str">'grid'</span>,
-  callout: <span class="str">'nip46'</span>,
-  methods: [<span class="str">'nip46'</span>, <span class="str">'nip07'</span>, <span class="str">'nip55'</span>, <span class="str">'readonly'</span>],
-});`,
+    name: 'Server-Backed (with Amber)',
+    sub: 'Default theme with NIP-55 (Amber direct) explicitly enabled. NIP-55 is hidden from the default modal because the browser ⇄ Amber callback handoff is unreliable on mobile web — for production use you need a server-side /amber-callback route to capture the result. For static/no-server sites, prefer NIP-46 with Amber-as-bunker (the QR path inside Remote Signer).',
+    traits: ['theme: dark', 'callout: nip07', 'methods: 5', 'requires: server callback'],
+    preview: { bg: '#100e1b', text: '#ede8fc', accent: 'oklch(0.67 0.28 282)', font: '"Space Grotesk", sans-serif', label: 'SERVER-BACKED', tag: '+amber · /amber-callback' },
+    snippet: `<span class="cm">// NIP-55 is opt-in. In production, your server must</span>
+<span class="cm">// implement /amber-callback to capture ?event= and</span>
+<span class="cm">// create the user's session. See the README for a Go example.</span>
+MILL.<span class="acc">open</span>({
+  callout: <span class="str">'nip07'</span>,
+  methods: [<span class="str">'nip07'</span>, <span class="str">'nip46'</span>, <span class="str">'nip55'</span>, <span class="str">'newkey'</span>, <span class="str">'readonly'</span>],
+});
+
+<span class="cm">// On mobile web, the more reliable path is NIP-46 with</span>
+<span class="cm">// Amber as a bunker (the QR option inside Remote Signer).</span>
+<span class="cm">// That works without any server-side glue.</span>`,
     open: () => MILL.open({
-      theme: 'dark',
-      layout: 'grid',
-      callout: 'nip46',
-      methods: ['nip46', 'nip07', 'nip55', 'readonly'],
+      callout: 'nip07',
+      methods: ['nip07', 'nip46', 'nip55', 'newkey', 'readonly'],
       onConnected: showResult,
     }),
   },
