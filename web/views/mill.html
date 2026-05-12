@@ -6,10 +6,7 @@
 <style>
 /* Scoped reset — only affects mill demo content, not surrounding newTavern UI */
 .mill-page-wrap, .mill-page-wrap *, .mill-page-wrap *::before, .mill-page-wrap *::after { box-sizing: border-box; }
-.mill-page-wrap h1, .mill-page-wrap h2, .mill-page-wrap h3, .mill-page-wrap h4,
-.mill-page-wrap p, .mill-page-wrap pre, .mill-page-wrap ul, .mill-page-wrap li,
-.mill-page-wrap table, .mill-page-wrap th, .mill-page-wrap td,
-.mill-page-wrap div, .mill-page-wrap button, .mill-page-wrap input { margin: 0; padding: 0; }
+.mill-page-wrap :where(h1, h2, h3, h4, p, pre, ul, li, table, th, td, div, button, input) { margin: 0; padding: 0; }
 
 .mill-page-wrap {
   position: relative;
